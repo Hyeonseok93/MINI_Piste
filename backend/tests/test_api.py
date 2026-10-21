@@ -118,6 +118,14 @@ def test_no_routine_uses_back_extension_or_machine_row(client):
     assert "백 익스텐션 (45°)" in all_names and "머신 로우" in all_names
 
 
+def test_routine_b_uses_underhand_pulldown_instead_of_high_row(client):
+    routines = {r["name"]: r["id"] for r in client.get("/api/routines").json()}
+    items = client.get(f"/api/routines/{routines['전신 B']}").json()["items"]
+    names = [i["exercise"]["name"] for i in items]
+    assert "하이로우" not in names
+    assert names.index("랫풀다운 언더그립") == 3
+
+
 def test_exercise_create(client):
     r = client.post("/api/exercises", json={"name": " 바벨 로우 ", "equipment": "barbell", "increment_kg": 2.5})
     assert r.status_code == 201
