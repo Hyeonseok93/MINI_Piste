@@ -4,7 +4,7 @@
 
 ## 실행 (Docker, 한 번에)
 
-1. Docker Desktop을 켠다.
+1. (선택) Docker Desktop을 켠다. `start.cmd` 가 꺼져 있으면 알아서 켠다.
 2. `start.cmd` 더블클릭 (또는 아래 명령)
 3. 브라우저에서 http://localhost:8080
 

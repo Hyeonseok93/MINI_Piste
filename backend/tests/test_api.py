@@ -100,6 +100,24 @@ def test_daily_log_upsert(client):
     assert len(logs) == 1 and logs[0]["body_weight_kg"] == 109.8
 
 
+def test_routine_a_includes_shoulder_press_and_curl(client):
+    items = client.get("/api/routines/1").json()["items"]
+    names = [i["exercise"]["name"] for i in items]
+    assert names[-3:] == ["바벨 숄더프레스", "바이셉 컬 머신", "플랭크"]
+    shoulder = items[-3]
+    assert (shoulder["sets"], shoulder["rep_min"], shoulder["rep_max"]) == (3, 12, 12)
+    assert [i["position"] for i in items] == list(range(1, len(items) + 1))
+
+
+def test_exercise_create(client):
+    r = client.post("/api/exercises", json={"name": " 바벨 로우 ", "equipment": "barbell", "increment_kg": 2.5})
+    assert r.status_code == 201
+    assert r.json()["name"] == "바벨 로우" and r.json()["equipment"] == "barbell"
+    assert client.post("/api/exercises", json={"name": "바벨 로우"}).status_code == 409
+    assert client.post("/api/exercises", json={"name": "바벨 숄더프레스"}).status_code == 409
+    assert client.post("/api/exercises", json={"name": ""}).status_code == 422
+
+
 def test_exercise_patch(client):
     r = client.patch("/api/exercises/3", json={"setup_note": "의자 4번"})
     assert r.json()["setup_note"] == "의자 4번"

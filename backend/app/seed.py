@@ -24,12 +24,13 @@ from app.models import (
 )
 
 S, C = Category.strength, Category.core
-PIN, PLATE, SMITH, BW, ASSIST = (
+PIN, PLATE, SMITH, BW, ASSIST, BAR = (
     Equipment.pin,
     Equipment.plate,
     Equipment.smith,
     Equipment.bodyweight,
     Equipment.assisted,
+    Equipment.barbell,
 )
 
 # name, category, equipment, increment_kg, unilateral, alternative, setup_note, cue
@@ -55,6 +56,8 @@ EXERCISES = [
     ("펙덱", S, PIN, 5, False, None, None, "팔꿈치를 살짝 굽혀 고정하고 가슴으로 모은다"),
     ("데드버그", C, BW, 0, False, None, None, "허리를 바닥에 붙인 채 반대 팔·다리를 뻗는다"),
     ("바이셉 컬 머신", S, PIN, 2.5, False, None, None, None),
+    ("바벨 숄더프레스", S, BAR, 2.5, False, "숄더프레스 머신", None,
+     "바는 쇄골 위에서 출발, 팔꿈치를 살짝 앞으로. 허리를 뒤로 꺾지 않는다"),
     ("레그 익스텐션", S, PIN, 5, False, None, None, "무릎 관절이 회전축과 일직선이 되게 의자를 맞춘다"),
     ("어시스트 풀업 머신", S, ASSIST, 5, False, "랫풀다운", "보조 무게: 숫자가 작을수록 어렵다", None),
     ("인클라인 체스트프레스 머신", S, PIN, 5, False, None, None, None),
@@ -75,6 +78,8 @@ ROUTINES = {
         ("랫풀다운", 3, 10, 12, None),
         ("백 익스텐션 (45°)", 3, 12, 12, None),
         ("머신 로우", 3, 10, 12, None),
+        ("바벨 숄더프레스", 3, 12, 12, None),
+        ("바이셉 컬 머신", 3, 12, 12, None),
         ("플랭크", 3, None, None, 30),
     ]),
     "전신 B": ("Phase 1 · 스쿼트·숄더·힙 중심", [

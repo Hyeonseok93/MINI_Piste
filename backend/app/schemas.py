@@ -23,6 +23,17 @@ class ExerciseOut(ORM):
     cue: str | None
 
 
+class ExerciseCreate(BaseModel):
+    name: str = Field(min_length=1, max_length=80)
+    category: Category = Category.strength
+    equipment: Equipment = Equipment.pin
+    increment_kg: float = Field(default=5.0, ge=0, le=50)
+    unilateral: bool = False
+    alternative: str | None = None
+    setup_note: str | None = None
+    cue: str | None = None
+
+
 class ExerciseUpdate(BaseModel):
     increment_kg: float | None = Field(default=None, gt=0, le=50)
     alternative: str | None = None

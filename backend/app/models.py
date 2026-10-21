@@ -35,6 +35,7 @@ class Equipment(str, enum.Enum):
     assisted = "assisted"  # 보조 무게 (어시스트 풀업)
     plate = "plate"  # 원판 끼우는 머신
     smith = "smith"
+    barbell = "barbell"
     bodyweight = "bodyweight"
     cardio = "cardio"
 

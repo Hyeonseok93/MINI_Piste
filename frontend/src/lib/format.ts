@@ -7,6 +7,7 @@ export const EQUIPMENT_LABEL: Record<Equipment, string> = {
   assisted: '보조 머신',
   plate: '원판 머신',
   smith: '스미스',
+  barbell: '바벨',
   bodyweight: '맨몸/추가중량',
   cardio: '유산소',
 }

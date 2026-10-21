@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.db import get_db
 from app.models import Exercise
-from app.schemas import ExerciseOut, ExerciseUpdate, HistoryPoint
+from app.schemas import ExerciseCreate, ExerciseOut, ExerciseUpdate, HistoryPoint
 from app.services.history import exercise_history
 
 router = APIRouter(prefix="/exercises", tags=["exercises"])
@@ -20,6 +20,17 @@ def get_exercise(db: Session, exercise_id: int) -> Exercise:
 @router.get("", response_model=list[ExerciseOut])
 def list_exercises(db: Session = Depends(get_db)):
     return db.scalars(select(Exercise).order_by(Exercise.id)).all()
+
+
+@router.post("", response_model=ExerciseOut, status_code=201)
+def create_exercise(body: ExerciseCreate, db: Session = Depends(get_db)):
+    name = body.name.strip()
+    if db.scalar(select(Exercise.id).where(Exercise.name == name)) is not None:
+        raise HTTPException(409, f"'{name}' 종목이 이미 있습니다")
+    ex = Exercise(**body.model_dump(exclude={"name"}), name=name)
+    db.add(ex)
+    db.commit()
+    return ex
 
 
 @router.get("/{exercise_id}", response_model=ExerciseOut)

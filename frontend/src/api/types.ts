@@ -1,7 +1,7 @@
 // backend/app/schemas.py 와 1:1 대응
 
 export type Category = 'strength' | 'core' | 'cardio'
-export type Equipment = 'pin' | 'assisted' | 'plate' | 'smith' | 'bodyweight' | 'cardio'
+export type Equipment = 'pin' | 'assisted' | 'plate' | 'smith' | 'barbell' | 'bodyweight' | 'cardio'
 export type DayKind = 'strength' | 'cardio' | 'outdoor' | 'rest'
 export type SetKind = 'work' | 'find' | 'warmup'
 export type Side = 'L' | 'R'
