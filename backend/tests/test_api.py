@@ -47,7 +47,7 @@ def test_today_uses_friday_find_results(client):
     assert recs["레그프레스"]["weight_kg"] == 120
     assert recs["체스트프레스 머신"]["weight_kg"] == 40
     assert recs["랫풀다운"]["weight_kg"] == 50
-    assert recs["머신 로우"]["action"] == "unknown"
+    assert "머신 로우" not in recs and "백 익스텐션 (45°)" not in recs
     assert data["workout"] is None
 
 
@@ -107,6 +107,15 @@ def test_routine_a_includes_shoulder_press_and_curl(client):
     shoulder = items[-3]
     assert (shoulder["sets"], shoulder["rep_min"], shoulder["rep_max"]) == (3, 12, 12)
     assert [i["position"] for i in items] == list(range(1, len(items) + 1))
+
+
+def test_no_routine_uses_back_extension_or_machine_row(client):
+    for r in client.get("/api/routines").json():
+        names = [i["exercise"]["name"] for i in client.get(f"/api/routines/{r['id']}").json()["items"]]
+        assert "백 익스텐션 (45°)" not in names and "머신 로우" not in names, r["name"]
+    # 종목 자체(과거 기록용)는 남아 있다
+    all_names = [e["name"] for e in client.get("/api/exercises").json()]
+    assert "백 익스텐션 (45°)" in all_names and "머신 로우" in all_names
 
 
 def test_exercise_create(client):
