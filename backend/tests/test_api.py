@@ -123,7 +123,8 @@ def test_routine_b_uses_underhand_pulldown_instead_of_high_row(client):
     items = client.get(f"/api/routines/{routines['전신 B']}").json()["items"]
     names = [i["exercise"]["name"] for i in items]
     assert "하이로우" not in names
-    assert names.index("랫풀다운 언더그립") == 3
+    assert names[:4] == ["스미스머신 스쿼트", "레그 익스텐션", "숄더프레스 머신", "랫풀다운 내로우"]
+    assert "싱글 레그프레스" not in names and "랫풀다운 언더그립" not in names
 
 
 def test_exercise_create(client):
