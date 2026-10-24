@@ -1,0 +1,22 @@
+/*
+ * 글꼴은 저장소 안 src/assets/fonts 에 둔 파일만 쓴다 (외부 CDN·npm 패키지 없음).
+ * - Pretendard Variable 1.3.9 (OFL-1.1): 한글 본문. 글자 범위별로 쪼갠 파일이라 화면에 나온 글자 묶음만 받는다
+ * - Barlow Condensed 500·600 라틴 (OFL-1.1): 숫자·무게·날짜(스코어보드)
+ */
+@import '../assets/fonts/pretendard/pretendard.css';
+
+@font-face {
+  font-family: 'Barlow Condensed';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 500;
+  src: url('../assets/fonts/barlow-condensed/barlow-condensed-latin-500-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Barlow Condensed';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 600;
+  src: url('../assets/fonts/barlow-condensed/barlow-condensed-latin-600-normal.woff2') format('woff2');
+}

@@ -70,9 +70,9 @@
 }
 
 .brandMark {
-  width: 24px;
-  height: 24px;
   flex: none;
+  width: 28px;
+  height: 28px;
 }
 
 .avatar {
