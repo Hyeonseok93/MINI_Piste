@@ -182,3 +182,22 @@
 .phaseCard {
   scroll-margin-top: 72px;
 }
+
+/* 전체 일정(요약)과 단계 카드(편집) 사이 구역 제목: 글자 + 가는 선 */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 16px 0 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--line-2);
+}

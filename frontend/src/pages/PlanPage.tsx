@@ -72,6 +72,7 @@ function Phases({ phases, today }: { phases: Phase[] | undefined; today: string 
           <PhaseEditor phases={phases} onDone={() => setEditing(null)} />
         </section>
       )}
+      <h2 className={css.divider}>단계별 요일 계획</h2>
       <div className="grid cols-2">
         {phases.map((p, idx) => (
           <section key={p.id} id={`phase-${idx}`} className={`panel ${css.phaseCard}${isCurrent(p, today) ? ` ${css.current}` : ''}`}>
