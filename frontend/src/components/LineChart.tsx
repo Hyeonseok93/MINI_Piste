@@ -1,4 +1,5 @@
-import { useCallback, useRef, useState } from 'react'
+import { useState } from 'react'
+import { useWidth } from '../hooks/useWidth'
 import s from './LineChart.module.css'
 
 interface Series {
@@ -21,22 +22,6 @@ interface Props {
 }
 
 const PAD = { t: 18, r: 14, b: 28, l: 38 }
-
-/** 실제 폭을 재서 그린다. viewBox 로 늘이면 휴대폰에서 글자가 너무 작아진다 */
-function useWidth() {
-  const [width, setWidth] = useState(0)
-  const observer = useRef<ResizeObserver | null>(null)
-  // 데이터가 늦게 와서 figure 가 나중에 생겨도 잴 수 있게 콜백 ref 를 쓴다
-  const ref = useCallback((el: HTMLElement | null) => {
-    observer.current?.disconnect()
-    if (!el) return
-    setWidth(el.clientWidth)
-    if (typeof ResizeObserver === 'undefined') return
-    observer.current = new ResizeObserver(([e]) => setWidth(Math.round(e.contentRect.width)))
-    observer.current.observe(el)
-  }, [])
-  return [ref, width] as const
-}
 
 /** 의존성 없는 가벼운 SVG 선 그래프 */
 export default function LineChart({ labels, series, unit = '', height = 200, guide }: Props) {

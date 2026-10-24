@@ -16,7 +16,7 @@ export default function WeightChart() {
 
   return (
     <section className="panel stack">
-      <h2 className="panel-title">체중</h2>
+      <h2 className="panel-title">체중 추이</h2>
       <div className="row align-baseline gap-sm wrap">
         <span className="num num-xl">{latest != null ? kg(latest) : '—'}</span>
         {avg != null && start != null && (

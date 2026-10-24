@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { useDailyLogs, useDashboard, useSaveDailyLog, useToday } from '../api/hooks'
 import type { CalendarDay, Dashboard, DailyLog, Profile, Today } from '../api/types'
 import LineChart from '../components/LineChart'
-import PisteTimeline from '../components/PisteTimeline'
+import PlanTimeline from '../components/PlanTimeline'
 import { useToast } from '../components/Toast'
 import WeekStrip from '../components/WeekStrip'
 import { addDays, formatDay, formatMD, formatShort, parseISODate, todayISO, weekdayIndex, weekdayLabel } from '../lib/date'
@@ -144,7 +144,7 @@ function Board({ data, today }: { data: Dashboard; today: string }) {
             플랜
           </Link>
         </div>
-        <PisteTimeline phases={data.phases} today={today} />
+        <PlanTimeline phases={data.phases} today={today} />
       </section>
     </div>
   )
@@ -326,7 +326,7 @@ function WeightCard({ today, start, goal }: { today: string; start: number | nul
           체중
         </h2>
         <Link to="/body" className="panel-link">
-          몸 기록
+          자세히
         </Link>
       </div>
       <div className={s.weightBody}>

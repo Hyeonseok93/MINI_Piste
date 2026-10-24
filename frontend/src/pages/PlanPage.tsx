@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useCreateRoutine, useExercises, useMuscles, usePhases, useRoutine, useRoutines } from '../api/hooks'
 import type { Phase } from '../api/types'
-import PisteTimeline from '../components/PisteTimeline'
+import PlanTimeline from '../components/PlanTimeline'
 import ExerciseEditor from '../components/plan/ExerciseEditor'
 import PhaseDayEditor from '../components/plan/PhaseDayEditor'
 import PhaseEditor from '../components/plan/PhaseEditor'
@@ -64,7 +64,7 @@ function Phases({ phases, today }: { phases: Phase[] | undefined; today: string 
             </button>
           )}
         </div>
-        <PisteTimeline phases={phases} today={today} />
+        <PlanTimeline phases={phases} today={today} />
       </section>
       {editing === 'new' && (
         <section className="panel" aria-label="새 단계">
