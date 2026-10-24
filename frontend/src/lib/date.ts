@@ -43,12 +43,6 @@ export function formatMD(s: string): string {
   return `${d.getMonth() + 1}/${d.getDate()}`
 }
 
-/** 2026-10-19 → "26.10.19" */
-export function formatYMDot(s: string): string {
-  const d = parseISODate(s)
-  return `${d.getFullYear() % 100}.${d.getMonth() + 1}.${d.getDate()}`
-}
-
 /** 2026-10-19 → "10/19 (월)" */
 export function formatShort(s: string): string {
   const d = parseISODate(s)
