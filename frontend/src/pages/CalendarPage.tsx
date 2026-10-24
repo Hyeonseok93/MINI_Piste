@@ -41,7 +41,7 @@ export default function CalendarPage() {
         </div>
       </header>
 
-      <div className="grid cols-main-aside">
+      <div className="grid cols-cal">
         <section className="panel">
           <div className="cal-toolbar">
             <button className="icon-btn" onClick={() => go(-1)} aria-label="이전 달">
@@ -81,6 +81,9 @@ export default function CalendarPage() {
               <i className="dot miss" /> 빠짐
             </span>
             <span>
+              <i className="dot skipped" /> 못 함
+            </span>
+            <span>
               <i className="dot" /> 휴식
             </span>
           </div>
@@ -115,7 +118,7 @@ function DayDetail({ day, today }: { day: CalendarDay; today: string }) {
 
       {day.kind ? (
         <div>
-          <p className="row-title">{day.kind === 'rest' ? '휴식' : day.rest_day && !day.done ? `${shortTitle(day)} 대신 쉼` : shortTitle(day)}</p>
+          <p className="row-title">{day.kind === 'rest' ? '휴식' : shortTitle(day)}</p>
           <p className="row-sub">
             {day.phase} · {KIND_LABEL[day.kind]}
             {day.cardio_minutes != null && ` · 유산소 ${day.cardio_minutes}분`}

@@ -115,7 +115,7 @@ function WorkoutView({ date, data }: { date: string; data: Today }) {
       <div className="stack">
         {restDay && !workout && (
           <div className="rest-banner" role="status">
-            <b>이 날은 쉬기로 했어요.</b> 달력에 '쉼'으로 표시되고 빠짐으로 세지 않습니다. 마음이 바뀌면 세트를 기록하거나 쉬는 날 표시를 취소하세요.
+            <b>이 날은 '못 함'으로 표시했어요.</b> 달력에 원래 일정과 함께 회색으로 표시되고 빠짐으로 세지 않습니다. 운동을 하게 되면 세트를 기록하거나 표시를 취소하세요.
           </div>
         )}
         {items.length === 0 && (
@@ -218,17 +218,17 @@ function RestToggle({ date, rest }: { date: string; rest: boolean }) {
   return (
     <section className={`panel stack rest-panel${rest ? ' is-rest' : ''}`}>
       <div>
-        <h2 className="panel-title">{rest ? '쉬는 날로 바꿨어요' : '오늘 못 하나요?'}</h2>
+        <h2 className="panel-title">{rest ? '못 함으로 표시했어요' : '오늘 못 하나요?'}</h2>
         <p className="row-sub" style={{ marginTop: 4 }}>
-          {rest ? '달력에 쉼으로 표시되고, 출석률과 연속 기록에서 빠짐으로 세지 않아요.' : '아프거나 일정이 생겼으면 쉬는 날로 바꾸세요. 빠짐으로 세지 않습니다.'}
+          {rest ? '달력에 회색 \'못 함\'으로 표시되고, 출석률과 연속 기록에서 빠짐으로 세지 않아요.' : '아프거나 일정이 생겼으면 못 함으로 표시하세요. 빠짐으로 세지 않습니다.'}
         </p>
       </div>
       <button
         className={`btn ${rest ? 'btn-secondary' : 'btn-ghost rest-btn'}`}
         disabled={setRest.isPending}
-        onClick={() => setRest.mutate({ date, rest: !rest }, { onSuccess: () => toast(rest ? '다시 운동하는 날로 바꿨습니다' : '쉬는 날로 바꿨습니다') })}
+        onClick={() => setRest.mutate({ date, rest: !rest }, { onSuccess: () => toast(rest ? '못 함 표시를 취소했습니다' : '못 함으로 표시했습니다') })}
       >
-        {rest ? '다시 운동하는 날로' : '오늘은 쉼'}
+        {rest ? '못 함 표시 취소' : '오늘은 못 함'}
       </button>
     </section>
   )

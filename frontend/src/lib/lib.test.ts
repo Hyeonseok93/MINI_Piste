@@ -52,3 +52,14 @@ describe('format', () => {
     expect(movingAverage([110, null, 109, 108], 3)).toEqual([110, 110, 109.5, 108.5])
   })
 })
+
+describe('dayStatus', () => {
+  const base = { date: '2026-10-22', kind: 'cardio' as const, done: false }
+  it('distinguishes missed, skipped and planned rest', async () => {
+    const { dayStatus } = await import('./status')
+    expect(dayStatus(base, '2026-10-24')).toBe('missed')
+    expect(dayStatus({ ...base, rest_day: true }, '2026-10-24')).toBe('skipped')
+    expect(dayStatus({ ...base, kind: 'rest' }, '2026-10-24')).toBe('rest')
+    expect(dayStatus({ ...base, rest_day: true, done: true }, '2026-10-24')).toBe('done')
+  })
+})

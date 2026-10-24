@@ -39,12 +39,8 @@ export default function MonthCalendar({ days, today, selected, onSelect }: Props
               onClick={() => onSelect(d.date)}
             >
               <span className={`cal-num num${d.date === today ? ' is-today' : ''}`}>{parseISODate(d.date).getDate()}</span>
-              {st === 'rest' ? (
-                <span className="cal-title">{d.rest_day ? '쉼' : '휴식'}</span>
-              ) : (
-                d.kind && <span className="cal-title">{title}</span>
-              )}
-              {st === 'done' || st === 'missed' ? <span className={`cal-flag ${st}`}>{STATUS_LABEL[st]}</span> : null}
+              {st === 'rest' ? <span className="cal-title">휴식</span> : d.kind && <span className="cal-title">{title}</span>}
+              {st === 'done' || st === 'missed' || st === 'skipped' ? <span className={`cal-flag ${st}`}>{STATUS_LABEL[st]}</span> : null}
             </button>
           )
         })}

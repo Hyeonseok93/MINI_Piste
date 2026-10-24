@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import type { CalendarDay } from '../api/types'
 import { parseISODate, weekdayLabel } from '../lib/date'
 import { dayStatus, shortTitle, STATUS_LABEL } from '../lib/status'
-import { CheckIcon, XIcon } from './icons'
+import { CheckIcon, MinusIcon, XIcon } from './icons'
 
 export default function WeekStrip({ days, today }: { days: CalendarDay[]; today: string }) {
   return (
@@ -21,7 +21,7 @@ export default function WeekStrip({ days, today }: { days: CalendarDay[]; today:
               <span className="wk-name">{weekdayLabel(i)}</span>
               <span className="wk-num num">{parseISODate(d.date).getDate()}</span>
               <span className="wk-mark" aria-hidden>
-                {st === 'done' ? <CheckIcon /> : st === 'missed' ? <XIcon /> : null}
+                {st === 'done' ? <CheckIcon /> : st === 'missed' ? <XIcon /> : st === 'skipped' ? <MinusIcon /> : null}
               </span>
               <span className="wk-title">{st === 'rest' ? '휴식' : title}</span>
             </Link>

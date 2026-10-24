@@ -1420,3 +1420,51 @@ button.cal-cell:hover {
 .rest-btn {
   border: 1px dashed var(--line-strong);
 }
+
+/* '못 함': 원래 일정은 흐리게 두고 회색 표시 */
+.cal-cell.skipped .cal-title {
+  opacity: 0.55;
+}
+
+.cal-flag.skipped {
+  color: var(--muted);
+}
+
+.dot.skipped {
+  background: var(--muted);
+}
+
+@media (max-width: 640px) {
+  .cal-cell.skipped::after {
+    content: '';
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--muted);
+  }
+}
+
+.wk-day.skipped .wk-mark {
+  border-color: var(--muted);
+  background: var(--surface-2);
+  color: var(--muted);
+}
+
+.wk-day.skipped .wk-title {
+  color: var(--muted);
+}
+
+.cal-flag {
+  white-space: nowrap;
+}
+
+/* 달력은 칸이 넓어야 읽히므로 아주 넓은 화면에서만 상세 패널을 옆에 둔다 */
+@media (min-width: 1280px) {
+  .grid.cols-cal {
+    grid-template-columns: minmax(0, 1fr) 320px;
+    align-items: start;
+  }
+}
