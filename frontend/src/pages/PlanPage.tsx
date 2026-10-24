@@ -63,7 +63,7 @@ function Phases({ phases, today }: { phases: Phase[] | undefined; today: string 
     <div className="grid">
       <section className="panel">
         <div className="panel-head">
-          <h2 className="panel-title">1년 플랜</h2>
+          <h2 className="panel-title">전체 일정</h2>
           {editing !== 'new' && (
             <button type="button" className="btn btn-primary btn-sm" onClick={() => setEditing('new')}>
               <PlusIcon /> 새 단계

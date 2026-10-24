@@ -133,7 +133,7 @@ function Board({ data, today }: { data: Dashboard; today: string }) {
       <section className={`panel ${s.plan}`} aria-labelledby="plan-title">
         <div className="panel-head">
           <h2 className="panel-title" id="plan-title">
-            1년 플랜
+            전체 일정
           </h2>
           {data.today.phase && stats.day_number != null && (
             <span className={s.planNow}>

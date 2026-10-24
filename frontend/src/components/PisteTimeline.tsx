@@ -16,7 +16,7 @@ function splitName(name: string) {
   return /\p{Extended_Pictographic}/u.test(first) ? { icon: first, text: rest.join(' ') } : { icon: '', text: name }
 }
 
-/** 1년 플랜을 펜싱 피스트처럼 한 줄 띠로 보여 준다 */
+/** 전체 일정(단계들)을 펜싱 피스트처럼 한 줄 띠로 보여 준다 */
 export default function PisteTimeline({ phases, today }: Props) {
   if (phases.length === 0) return null
   const start = phases[0].start_date
@@ -28,7 +28,7 @@ export default function PisteTimeline({ phases, today }: Props) {
 
   return (
     <div>
-      <div className={s.track} role="img" aria-label={`1년 플랜 중 ${elapsed}일째, 전체의 ${Math.round(pct)}%${current ? `, 지금은 ${current.name}` : ''}`}>
+      <div className={s.track} role="img" aria-label={`전체 일정 중 ${elapsed}일째, 전체의 ${Math.round(pct)}%${current ? `, 지금은 ${current.name}` : ''}`}>
         {phases.map((p) => {
           const w = (days(p.start_date, p.end_date ?? p.start_date) + 1) / total
           const { icon, text } = splitName(p.name)
