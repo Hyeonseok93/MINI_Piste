@@ -2394,6 +2394,33 @@
             ],
             "title": "Attendance 28D"
           },
+          "attendance_since": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Attendance Since"
+          },
+          "attendance_days": {
+            "type": "integer",
+            "title": "Attendance Days",
+            "default": 0
+          },
+          "attendance_done": {
+            "type": "integer",
+            "title": "Attendance Done",
+            "default": 0
+          },
+          "attendance_skipped": {
+            "type": "integer",
+            "title": "Attendance Skipped",
+            "default": 0
+          },
           "streak": {
             "type": "integer",
             "title": "Streak"

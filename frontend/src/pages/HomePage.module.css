@@ -232,6 +232,12 @@
   color: var(--muted);
 }
 
+/* 출석률 근거 한 줄 */
+.basis {
+  margin-top: 12px;
+  font-size: 12.5px;
+}
+
 /* ---------- 다음 운동 ---------- */
 .nextList li + li {
   border-top: 1px solid var(--line);

@@ -103,16 +103,10 @@
   }
 }
 
-@media (min-width: 1024px) {
-  .grid.cols-main-aside {
-    grid-template-columns: minmax(0, 1fr) 340px;
-    align-items: start;
-  }
-
-  .sticky-aside {
-    position: sticky;
-    top: 24px;
-  }
+/* 위에서 아래로 한 줄로 읽는 화면(운동·달력·몸·분석): 가운데 놓은 칼럼 하나 */
+.page-col {
+  max-width: 760px;
+  margin: 0 auto;
 }
 
 .narrow {

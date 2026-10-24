@@ -117,6 +117,8 @@ def dashboard(db: Session, today: date) -> DashboardOut:
     ).scalar()
 
     week_planned = [d for d in week if is_planned_training(d) or d.done]
+    counted = [d for d in last_28 if d.kind is not None]  # 플랜 기간 안의 날만
+    att_days = [d for d in counted if is_planned_training(d) and (d.date < today or d.done)]
     stats = DashboardStats(
         plan_start=plan_start,
         plan_end=plan_end,
@@ -125,6 +127,10 @@ def dashboard(db: Session, today: date) -> DashboardOut:
         week_done=sum(d.done for d in week_planned),
         week_planned=len(week_planned),
         attendance_28d=attendance(last_28, today),
+        attendance_since=min((d.date for d in counted), default=None),
+        attendance_days=len(att_days),
+        attendance_done=sum(d.done for d in att_days),
+        attendance_skipped=sum(d.rest_day and d.kind not in (None, DayKind.rest) and d.date < today for d in counted),
         streak=compute_streak(past, today),
         latest_weight_kg=latest,
         start_weight_kg=profile.start_weight_kg if profile else None,

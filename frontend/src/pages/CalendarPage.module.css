@@ -1,11 +1,3 @@
-/* 달력은 칸이 넓어야 읽히므로 아주 넓은 화면에서만 상세를 옆에 둔다 */
-@media (min-width: 1280px) {
-  .layout {
-    grid-template-columns: minmax(0, 1fr) 320px;
-    align-items: start;
-  }
-}
-
 .toolbar {
   display: flex;
   align-items: center;

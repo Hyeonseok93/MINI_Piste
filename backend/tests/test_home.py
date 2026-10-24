@@ -115,3 +115,16 @@ def test_dashboard(client):
     assert s["latest_weight_kg"] == 109.4
     assert s["total_workouts"] == 2  # 10/16 무게 찾기 + 10/19
     assert len(d["phases"]) == 7
+
+
+def test_dashboard_attendance_shows_its_basis(client):
+    # 10/19 전신, 10/20 유산소, 10/21 전신을 하고 10/22(유산소)는 '못 함'으로 표시. 10/23·24 는 휴식
+    for d in ("2026-10-19", "2026-10-20", "2026-10-21"):
+        client.post("/api/workouts", json={"date": d})
+    client.put("/api/daily-logs/2026-10-22/rest", json={"rest_day": True})
+
+    s = client.get("/api/dashboard", params={"date": "2026-10-24"}).json()["stats"]
+    # 못 함은 빠짐으로 세지 않으므로 3일 중 3일 = 100%. 화면이 근거를 보여 줄 수 있게 숫자도 내려준다
+    assert s["attendance_28d"] == 1.0
+    assert (s["attendance_done"], s["attendance_days"], s["attendance_skipped"]) == (3, 3, 1)
+    assert s["attendance_since"] == "2026-10-19"  # 플랜 시작 전 날짜는 세지 않는다

@@ -19,7 +19,7 @@ export default function AnalysisPage() {
   const tab = (TABS.find(([k]) => k === params.get('tab'))?.[0] ?? 'summary') as Tab
 
   return (
-    <>
+    <div className="page-col">
       <header className="page-header">
         <div className="titles">
           <h1 className="page-title">분석</h1>
@@ -36,7 +36,7 @@ export default function AnalysisPage() {
       {tab === 'summary' && <Summary />}
       {tab === 'trend' && <ExerciseTrend />}
       {tab === 'history' && <HistoryList />}
-    </>
+    </div>
   )
 }
 
@@ -49,7 +49,7 @@ function Summary() {
   const balance = useBalance(month)
 
   return (
-    <div className="grid cols-2">
+    <div className="stack loose">
       <section className="panel">
         <div className="panel-head">
           <h2 className="panel-title">최근 7일 근육별 세트</h2>
@@ -60,58 +60,56 @@ function Summary() {
         {volume.data ? <MuscleBars data={volume.data} /> : <div className="skeleton md" />}
       </section>
 
-      <div className="stack">
-        <section className="panel">
-          <div className="panel-head">
-            <h2 className="panel-title">개인 기록</h2>
-          </div>
-          {prs.data?.length === 0 && <p className="empty">무게를 기록하면 종목별 최고 기록이 쌓입니다.</p>}
+      <section className="panel">
+        <div className="panel-head">
+          <h2 className="panel-title">개인 기록</h2>
+        </div>
+        {prs.data?.length === 0 && <p className="empty">무게를 기록하면 종목별 최고 기록이 쌓입니다.</p>}
+        <ul className="rows">
+          {prs.data?.map((p) => (
+            <li key={p.exercise_id}>
+              <span className="grow">
+                <span className="row-title block">{p.name}</span>
+                <span className="row-sub">
+                  {formatShort(p.best_weight_date)}, 추정 1RM {kg(p.e1rm_kg)}
+                </span>
+              </span>
+              <span className="num num-lg">
+                {kg(p.best_weight_kg)} × {p.best_weight_reps}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="panel">
+        <div className="panel-head">
+          <h2 className="panel-title">좌우 균형 (최근 4주)</h2>
+        </div>
+        {balance.data?.length === 0 ? (
+          <p className="row-sub">싱글 레그프레스처럼 한쪽씩 하는 종목을 기록하면 왼쪽·오른쪽을 비교해 드립니다.</p>
+        ) : (
           <ul className="rows">
-            {prs.data?.map((p) => (
-              <li key={p.exercise_id}>
+            {balance.data?.map((b) => (
+              <li key={b.exercise_id}>
                 <span className="grow">
-                  <span className="row-title block">{p.name}</span>
+                  <span className="row-title block">{b.name}</span>
                   <span className="row-sub">
-                    {formatShort(p.best_weight_date)}, 추정 1RM {kg(p.e1rm_kg)}
+                    왼쪽 {kg(b.left.top_weight_kg)}, 오른쪽 {kg(b.right.top_weight_kg)}
                   </span>
                 </span>
-                <span className="num num-lg">
-                  {kg(p.best_weight_kg)} × {p.best_weight_reps}
-                </span>
+                {b.weaker ? (
+                  <span className={`pill ${b.diff_pct != null && b.diff_pct >= 10 ? 'miss' : 'find'}`}>
+                    {b.weaker === 'L' ? '왼쪽' : '오른쪽'} 약함{b.diff_pct != null && ` ${b.diff_pct}%`}
+                  </span>
+                ) : (
+                  <span className="pill hit">균형</span>
+                )}
               </li>
             ))}
           </ul>
-        </section>
-
-        <section className="panel">
-          <div className="panel-head">
-            <h2 className="panel-title">좌우 균형 (최근 4주)</h2>
-          </div>
-          {balance.data?.length === 0 ? (
-            <p className="row-sub">싱글 레그프레스처럼 한쪽씩 하는 종목을 기록하면 왼쪽·오른쪽을 비교해 드립니다.</p>
-          ) : (
-            <ul className="rows">
-              {balance.data?.map((b) => (
-                <li key={b.exercise_id}>
-                  <span className="grow">
-                    <span className="row-title block">{b.name}</span>
-                    <span className="row-sub">
-                      왼쪽 {kg(b.left.top_weight_kg)}, 오른쪽 {kg(b.right.top_weight_kg)}
-                    </span>
-                  </span>
-                  {b.weaker ? (
-                    <span className={`pill ${b.diff_pct != null && b.diff_pct >= 10 ? 'miss' : 'find'}`}>
-                      {b.weaker === 'L' ? '왼쪽' : '오른쪽'} 약함{b.diff_pct != null && ` ${b.diff_pct}%`}
-                    </span>
-                  ) : (
-                    <span className="pill hit">균형</span>
-                  )}
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
-      </div>
+        )}
+      </section>
     </div>
   )
 }

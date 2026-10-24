@@ -47,6 +47,8 @@ export default function HomePage({ profile }: { profile: Profile }) {
 function Board({ data, today }: { data: Dashboard; today: string }) {
   const { stats } = data
   const att = stats.attendance_28d
+  // 플랜을 시작한 지 4주가 안 됐으면 '최근 4주'가 아니라 시작일부터 센다
+  const since = stats.attendance_since && stats.attendance_since > addDays(today, -27) ? stats.attendance_since : null
 
   return (
     <div className={s.board}>
@@ -81,10 +83,16 @@ function Board({ data, today }: { data: Dashboard; today: string }) {
               {att == null ? '—' : Math.round(att * 100)}
               {att != null && <small>%</small>}
             </b>
-            <span>최근 4주 출석</span>
+            <span>
+              출석 {stats.attendance_done}/{stats.attendance_days}일
+            </span>
           </div>
         </div>
         <WeekStrip days={data.week} today={today} />
+        <p className={`row-sub ${s.basis}`}>
+          출석은 {since ? `플랜 시작(${formatMD(since)})부터` : '최근 4주'} 지난 운동일 기준이에요.
+          {stats.attendance_skipped > 0 && ` 못 함으로 표시한 ${stats.attendance_skipped}일은 빼고 셉니다.`}
+        </p>
       </section>
 
       <section className={`panel ${s.next}`} aria-labelledby="next-title">

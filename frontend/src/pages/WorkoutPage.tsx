@@ -24,7 +24,7 @@ export default function WorkoutPage() {
   const title = data ? (data.workout?.title ?? data.plan.routine?.name ?? (data.plan.kind ? KIND_LABEL[data.plan.kind] : '자유 운동')) : '운동'
 
   return (
-    <>
+    <div className="page-col">
       <header className="page-header">
         <div className="titles">
           <p className="page-date">
@@ -69,7 +69,7 @@ export default function WorkoutPage() {
         </div>
       )}
       {data && <WorkoutView key={date} date={date} data={data} />}
-    </>
+    </div>
   )
 }
 
@@ -97,105 +97,96 @@ function WorkoutView({ date, data }: { date: string; data: Today }) {
   const restDay = daily_log?.rest_day ?? false
 
   return (
-    <div className="grid cols-main-aside">
-      <div className="stack">
-        {restDay && !workout && (
-          <div className={css.banner} role="status">
-            <b>이 날은 '못 함'으로 표시했어요.</b> 달력에 원래 일정과 함께 회색으로 표시되고 빠짐으로 세지 않습니다. 운동을 하게 되면 세트를 기록하거나 표시를 취소하세요.
+    <div className="stack loose">
+      {restDay && !workout && (
+        <div className={css.banner} role="status">
+          <b>이 날은 '못 함'으로 표시했어요.</b> 달력에 원래 일정과 함께 회색으로 표시되고 빠짐으로 세지 않습니다. 운동을 하게 되면 세트를 기록하거나 표시를 취소하세요.
+        </div>
+      )}
+      {items.length > 0 && (
+        <section className="panel stack">
+          <div className="row">
+            <h2 className="panel-title">진행</h2>
+            <span className="num num-lg">
+              {doneCount}/{items.length}
+            </span>
           </div>
-        )}
-        {items.length === 0 && (
-          <div className="panel empty">
-            {isRest ? '오늘은 쉬는 날입니다. 몸 상태만 기록해 두세요.' : '오늘은 근력 종목이 없는 날입니다. 유산소 시간을 기록하세요.'}
+          <div className={css.progress} role="progressbar" aria-label="종목 진행" aria-valuemin={0} aria-valuemax={items.length} aria-valuenow={doneCount}>
+            <span style={{ width: `${(doneCount / items.length) * 100}%` }} />
           </div>
-        )}
-        {items.map((it, i) => (
-          <ExerciseCard
-            key={it.item.id}
-            index={i + 1}
-            exercise={it.item.exercise}
-            item={it.item}
-            recommendation={it.recommendation}
-            last={it.last}
-            sets={setsOf(it.item.exercise.id)}
-            finderChoices={finderChoices}
-            onAdd={onAdd}
-            onDelete={session.removeSet}
+          <p className="row-sub">세트마다 2~3개 남기고 멈추세요. 모든 세트를 목표 횟수까지 채우면 다음에 무게가 올라갑니다.</p>
+        </section>
+      )}
+      {items.length === 0 && (
+        <div className="panel empty">
+          {isRest ? '오늘은 쉬는 날입니다. 몸 상태만 기록해 두세요.' : '오늘은 근력 종목이 없는 날입니다. 유산소 시간을 기록하세요.'}
+        </div>
+      )}
+      {items.map((it, i) => (
+        <ExerciseCard
+          key={it.item.id}
+          index={i + 1}
+          exercise={it.item.exercise}
+          item={it.item}
+          recommendation={it.recommendation}
+          last={it.last}
+          sets={setsOf(it.item.exercise.id)}
+          finderChoices={finderChoices}
+          onAdd={onAdd}
+          onDelete={session.removeSet}
+        />
+      ))}
+      {extras.map((ex, i) => (
+        <ExerciseCard key={`x-${ex.id}`} index={items.length + i + 1} exercise={ex} sets={setsOf(ex.id)} finderChoices={finderChoices} onAdd={onAdd} onDelete={session.removeSet} />
+      ))}
+      {exercises.data && (
+        <div className="field">
+          <span className="field-label">다른 종목 추가</span>
+          <Select
+            label="다른 종목 추가"
+            placeholder="루틴에 없는 종목을 골라 기록"
+            searchable
+            resetAfterSelect
+            value={null}
+            onChange={(id) => setExtraIds((p) => [...p, id])}
+            options={exercises.data
+              .filter((e) => !e.archived && !routineIds.has(e.id) && !extras.some((x) => x.id === e.id))
+              .map((e) => ({ value: e.id, label: e.name, hint: EQUIPMENT_LABEL[e.equipment] }))}
           />
-        ))}
-        {extras.map((ex, i) => (
-          <ExerciseCard key={`x-${ex.id}`} index={items.length + i + 1} exercise={ex} sets={setsOf(ex.id)} finderChoices={finderChoices} onAdd={onAdd} onDelete={session.removeSet} />
-        ))}
-        {exercises.data && (
-          <div className="field">
-            <span className="field-label">다른 종목 추가</span>
-            <Select
-              label="다른 종목 추가"
-              placeholder="루틴에 없는 종목을 골라 기록"
-              searchable
-              resetAfterSelect
-              value={null}
-              onChange={(id) => setExtraIds((p) => [...p, id])}
-              options={exercises.data
-                .filter((e) => !e.archived && !routineIds.has(e.id) && !extras.some((x) => x.id === e.id))
-                .map((e) => ({ value: e.id, label: e.name, hint: EQUIPMENT_LABEL[e.equipment] }))}
-            />
-          </div>
-        )}
-      </div>
-
-      <aside className="stack">
-        {items.length > 0 && (
-          <section className="panel stack">
-            <div className="row">
-              <h2 className="panel-title">진행</h2>
-              <span className="num num-lg">
-                {doneCount}/{items.length}
-              </span>
-            </div>
-            <div className={css.progress} role="progressbar" aria-label="종목 진행" aria-valuemin={0} aria-valuemax={items.length} aria-valuenow={doneCount}>
-              <span style={{ width: `${(doneCount / items.length) * 100}%` }} />
-            </div>
-            <p className="row-sub">세트마다 2~3개 남기고 멈추세요. 모든 세트를 목표 횟수까지 채우면 다음에 무게가 올라갑니다.</p>
-          </section>
-        )}
-
-        {!isRest && !workout && <RestToggle date={date} rest={restDay} />}
-
-        <section className="panel">
-          <div className="panel-head">
-            <h2 className="panel-title">유산소와 메모</h2>
-          </div>
-          <WorkoutMeta key={workout?.id ?? 'none'} workout={workout} plannedCardio={plan.cardio_minutes} onEnsure={ensureWorkout} />
-        </section>
-
-        <section className="panel">
-          <div className="panel-head">
-            <h2 className="panel-title">몸 상태</h2>
-          </div>
-          <DailyLogForm key={date} date={date} log={daily_log} />
-        </section>
-
-        {workout && (
-          <button
-            className="btn btn-danger"
-            onClick={async () => {
-              const ok = await confirm({
-                title: `${formatShort(date)} 운동 기록을 삭제할까요?`,
-                message: `${workout.title}, 세트 ${workout.sets.length}개${workout.cardio_minutes != null ? `, 유산소 ${workout.cardio_minutes}분` : ''}. 삭제하면 되돌릴 수 없습니다.`,
-                confirmLabel: '삭제',
-                danger: true,
-              })
-              if (!ok) return
-              session.resetPending()
-              await deleteWorkout.mutateAsync(workout.id)
-              toast('운동 기록을 삭제했습니다')
-            }}
-          >
-            이 날 운동 기록 삭제
-          </button>
-        )}
-      </aside>
+        </div>
+      )}
+      {!isRest && !workout && <RestToggle date={date} rest={restDay} />}
+      <section className="panel">
+        <div className="panel-head">
+          <h2 className="panel-title">유산소와 메모</h2>
+        </div>
+        <WorkoutMeta key={workout?.id ?? 'none'} workout={workout} plannedCardio={plan.cardio_minutes} onEnsure={ensureWorkout} />
+      </section>
+      <section className="panel">
+        <div className="panel-head">
+          <h2 className="panel-title">몸 상태</h2>
+        </div>
+        <DailyLogForm key={date} date={date} log={daily_log} />
+      </section>
+      {workout && (
+        <button
+          className="btn btn-danger"
+          onClick={async () => {
+            const ok = await confirm({
+              title: `${formatShort(date)} 운동 기록을 삭제할까요?`,
+              message: `${workout.title}, 세트 ${workout.sets.length}개${workout.cardio_minutes != null ? `, 유산소 ${workout.cardio_minutes}분` : ''}. 삭제하면 되돌릴 수 없습니다.`,
+              confirmLabel: '삭제',
+              danger: true,
+            })
+            if (!ok) return
+            session.resetPending()
+            await deleteWorkout.mutateAsync(workout.id)
+            toast('운동 기록을 삭제했습니다')
+          }}
+        >
+          이 날 운동 기록 삭제
+        </button>
+      )}
     </div>
   )
 }

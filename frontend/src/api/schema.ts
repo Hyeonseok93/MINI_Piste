@@ -694,6 +694,23 @@ export interface components {
             week_planned: number;
             /** Attendance 28D */
             attendance_28d: number | null;
+            /** Attendance Since */
+            attendance_since?: string | null;
+            /**
+             * Attendance Days
+             * @default 0
+             */
+            attendance_days: number;
+            /**
+             * Attendance Done
+             * @default 0
+             */
+            attendance_done: number;
+            /**
+             * Attendance Skipped
+             * @default 0
+             */
+            attendance_skipped: number;
             /** Streak */
             streak: number;
             /** Latest Weight Kg */

@@ -36,7 +36,7 @@ export default function BodyPage() {
   const measurements = useMeasurements()
 
   return (
-    <>
+    <div className="page-col">
       <header className="page-header">
         <div className="titles">
           <h1 className="page-title">몸</h1>
@@ -44,7 +44,7 @@ export default function BodyPage() {
         </div>
       </header>
 
-      <div className="grid cols-2">
+      <div className="stack loose">
         <section className="panel">
           <div className="panel-head">
             <h2 className="panel-title">오늘</h2>
@@ -55,11 +55,11 @@ export default function BodyPage() {
         <WeightChart />
       </div>
 
-      <div className="grid cols-2 mt-md">
+      <div className="stack loose mt-md">
         <MeasurementForm today={today} existing={measurements.data ?? []} />
         <MeasurementList list={measurements.data ?? []} />
       </div>
-    </>
+    </div>
   )
 }
 

@@ -376,6 +376,11 @@ class DashboardStats(BaseModel):
     week_done: int
     week_planned: int
     attendance_28d: float | None  # 0~1
+    # 출석률의 근거: 집계 시작일(최근 4주와 플랜 시작일 중 늦은 날), 지난 운동일 수, 그중 한 날, 빼고 센 '못 함' 날
+    attendance_since: date | None = None
+    attendance_days: int = 0
+    attendance_done: int = 0
+    attendance_skipped: int = 0
     streak: int
     latest_weight_kg: float | None
     start_weight_kg: float | None

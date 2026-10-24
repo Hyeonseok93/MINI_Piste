@@ -32,7 +32,7 @@ export default function CalendarPage() {
   }
 
   return (
-    <>
+    <div className="page-col">
       <header className="page-header">
         <div className="titles">
           <h1 className="page-title">달력</h1>
@@ -42,7 +42,7 @@ export default function CalendarPage() {
         </div>
       </header>
 
-      <div className={`grid ${css.layout}`}>
+      <div className="grid">
         <section className="panel">
           <div className={css.toolbar}>
             <button className="icon-btn" onClick={() => go(-1)} aria-label="이전 달">
@@ -90,9 +90,9 @@ export default function CalendarPage() {
           </div>
         </section>
 
-        <aside className="sticky-aside">{sel ? <DayDetail day={sel} today={today} /> : <div className="panel empty">날짜를 고르면 그날 계획과 기록이 보입니다</div>}</aside>
+        {sel ? <DayDetail day={sel} today={today} /> : <div className="panel empty">날짜를 고르면 그날 계획과 기록이 보입니다</div>}
       </div>
-    </>
+    </div>
   )
 }
 
