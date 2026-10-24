@@ -10,8 +10,9 @@ import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-DB = Path(tempfile.gettempdir()) / "piste_e2e.db"
 PORT = int(sys.argv[1]) if len(sys.argv) > 1 else 8100
+# 포트마다 DB 파일을 따로 둔다: 시연용 서버와 E2E 서버를 같이 띄워도 서로 파일을 잠그지 않게
+DB = Path(tempfile.gettempdir()) / f"piste_e2e_{PORT}.db"
 
 # app 을 import 하기 전에 DB 주소를 정해야 설정에 반영된다
 DB.unlink(missing_ok=True)
