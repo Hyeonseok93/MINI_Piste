@@ -41,7 +41,7 @@ export default function LineChart({ labels, series, unit = '', height = 200 }: P
   const labelEvery = Math.max(1, Math.ceil(n / 6))
 
   return (
-    <figure style={{ margin: 0, position: 'relative' }} onPointerLeave={() => setHover(null)}>
+    <figure className="chart-fig" onPointerLeave={() => setHover(null)}>
       <svg className="chart" viewBox={`0 0 ${W} ${height}`} role="img" aria-label={series.map((s) => s.label).join(', ')}>
         {ticks.map((t) => (
           <g key={t}>
@@ -92,7 +92,7 @@ export default function LineChart({ labels, series, unit = '', height = 200 }: P
                         onPointerEnter={() => setHover(i)}
                         onFocus={() => setHover(i)}
                         onBlur={() => setHover(null)}
-                        style={{ cursor: 'pointer', outline: 'none' }}
+                        className="chart-hit"
                       />
                     </g>
                   ) : null,
@@ -102,7 +102,7 @@ export default function LineChart({ labels, series, unit = '', height = 200 }: P
         })}
       </svg>
       {hover != null && (() => {
-        const v = series[0].values[hover] ?? series.find((x) => x.values[hover] != null)?.values[hover]
+        const v = series[0].values[hover] ?? series.find((sr) => sr.values[hover] != null)?.values[hover]
         if (v == null) return null
         return (
           <div
@@ -127,10 +127,10 @@ export default function LineChart({ labels, series, unit = '', height = 200 }: P
         )
       })()}
       {series.length > 1 && (
-        <figcaption className="row muted" style={{ gap: 14, marginTop: 4 }}>
+        <figcaption className="chart-legend">
           {series.map((s) => (
-            <span key={s.label} className="row" style={{ gap: 6 }}>
-              <span className="kind-dot" style={{ background: s.color }} />
+            <span key={s.label} className="chart-legend-item">
+              <span className="legend-dot" style={{ background: s.color }} />
               {s.label}
             </span>
           ))}

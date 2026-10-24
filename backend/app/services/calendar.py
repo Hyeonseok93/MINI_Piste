@@ -14,11 +14,7 @@ from app.schemas import (
     ProfileOut,
     RoutineSummary,
 )
-from app.services.planner import DayPlan, load_phases, plan_range
-
-
-def _is_training(p: DayPlan) -> bool:
-    return p.day is not None and p.day.kind != DayKind.rest
+from app.services.planner import load_phases, plan_range
 
 
 def is_planned_training(d: CalendarDay) -> bool:

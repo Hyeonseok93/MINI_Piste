@@ -11,3 +11,6 @@ dist/
 # env
 .env
 .env.*
+
+# DB 백업
+backups/

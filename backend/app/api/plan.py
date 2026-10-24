@@ -1,13 +1,11 @@
-from datetime import date, timedelta
-
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
 from app.db import get_db
-from app.models import Phase, PhaseDay, Routine, RoutineItem, Workout
-from app.schemas import DayPlanOut, PhaseOut, RoutineOut, RoutineSummary, WeekDayOut
-from app.services.planner import DayPlan, plan_for
+from app.models import Phase, PhaseDay, Routine, RoutineItem
+from app.schemas import DayPlanOut, PhaseOut, RoutineOut, RoutineSummary
+from app.services.planner import DayPlan
 
 router = APIRouter(tags=["plan"])
 
@@ -32,28 +30,6 @@ def list_phases(db: Session = Depends(get_db)):
         .options(selectinload(Phase.days).selectinload(PhaseDay.alt_routine))
         .order_by(Phase.start_date)
     ).all()
-
-
-@router.get("/plan/day", response_model=DayPlanOut)
-def day_plan(date: date, db: Session = Depends(get_db)):
-    return to_day_plan_out(plan_for(db, date))
-
-
-@router.get("/plan/week", response_model=list[WeekDayOut])
-def week_plan(start: date, db: Session = Depends(get_db)):
-    """start가 속한 주(월~일) 7일."""
-    monday = start - timedelta(days=start.weekday())
-    sunday = monday + timedelta(days=6)
-    workouts = db.scalars(select(Workout).where(Workout.date.between(monday, sunday))).all()
-    by_date = {w.date: w for w in workouts}
-
-    out = []
-    for i in range(7):
-        d = monday + timedelta(days=i)
-        base = to_day_plan_out(plan_for(db, d))
-        w = by_date.get(d)
-        out.append(WeekDayOut(**base.model_dump(), workout_id=w.id if w else None, done=w is not None))
-    return out
 
 
 @router.get("/routines", response_model=list[RoutineSummary])

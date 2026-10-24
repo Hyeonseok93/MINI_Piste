@@ -2,13 +2,8 @@ import { useState } from 'react'
 import { useDailyLogs, useExercises, useHistory, useProfile } from '../api/hooks'
 import LineChart from '../components/LineChart'
 import Select from '../components/Select'
-import { parseISODate } from '../lib/date'
+import { formatMD } from '../lib/date'
 import { EQUIPMENT_LABEL, kg, movingAverage } from '../lib/format'
-
-const md = (s: string) => {
-  const d = parseISODate(s)
-  return `${d.getMonth() + 1}/${d.getDate()}`
-}
 
 export default function ProgressPage() {
   const exercises = useExercises()
@@ -49,8 +44,8 @@ export default function ProgressPage() {
             options={strength.map((e) => ({ value: e.id, label: e.name, hint: EQUIPMENT_LABEL[e.equipment] }))}
           />
           {h.length > 0 && first != null && last != null && (
-            <div className="row" style={{ alignItems: 'baseline', gap: 10 }}>
-              <span className="num" style={{ fontSize: 34, fontWeight: 600 }}>
+            <div className="row align-baseline gap-sm">
+              <span className="num num-xl">
                 {kg(last)}
               </span>
               <span className="muted">
@@ -59,19 +54,19 @@ export default function ProgressPage() {
               </span>
             </div>
           )}
-          <LineChart labels={h.map((p) => md(p.date))} series={[{ label: '최고 무게', values: h.map((p) => p.top_weight_kg), color: 'var(--primary)' }]} unit="kg" />
+          <LineChart labels={h.map((p) => formatMD(p.date))} series={[{ label: '최고 무게', values: h.map((p) => p.top_weight_kg), color: 'var(--primary)' }]} unit="kg" />
         </section>
 
         <section className="panel stack">
           <div className="row">
             <h2 className="panel-title">체중</h2>
           </div>
-          <div className="row" style={{ alignItems: 'baseline', gap: 10 }}>
-            <span className="num" style={{ fontSize: 34, fontWeight: 600 }}>
+          <div className="row align-baseline gap-sm">
+            <span className="num num-xl">
               {latest != null ? kg(latest) : '—'}
             </span>
             {latest != null && start != null && (
-              <span style={{ color: latest <= start ? 'var(--hit)' : 'var(--miss)', fontWeight: 600 }}>
+              <span className={`fw-600 ${latest <= start ? 'text-hit' : 'text-miss'}`}>
                 시작 대비 {latest - start > 0 ? '+' : ''}
                 {+(latest - start).toFixed(1)}kg
               </span>
@@ -79,7 +74,7 @@ export default function ProgressPage() {
             {goal != null && <span className="muted">목표 {kg(goal)}</span>}
           </div>
           <LineChart
-            labels={weights.map((l) => md(l.date))}
+            labels={weights.map((l) => formatMD(l.date))}
             series={[
               { label: '체중', values: weights.map((l) => l.body_weight_kg), color: 'var(--cardio)' },
               { label: '7일 평균', values: movingAverage(weights.map((l) => l.body_weight_kg), 7), color: 'var(--ink)', dashed: true },

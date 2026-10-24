@@ -1,22 +1,13 @@
 import { useState } from 'react'
-import { useSaveProfile } from '../api/hooks'
 import type { Profile } from '../api/types'
-import { initial } from '../lib/format'
+import ProfileForm from '../components/ProfileForm'
 import { useToast } from '../components/Toast'
-
-const num = (v: string) => (v.trim() === '' ? null : Number(v))
-const str = (v: number | null) => (v == null ? '' : String(v))
+import { initial } from '../lib/format'
 
 export default function SettingsPage({ profile }: { profile: Profile }) {
-  const save = useSaveProfile()
   const toast = useToast()
   const [name, setName] = useState(profile.name)
-  const [height, setHeight] = useState(str(profile.height_cm))
-  const [weight, setWeight] = useState(str(profile.start_weight_kg))
-  const [goal, setGoal] = useState(str(profile.goal_weight_kg))
-
-  const h = num(height)
-  const w = num(weight)
+  const { height_cm: h, start_weight_kg: w } = profile
   const bmi = h && w ? (w / (h / 100) ** 2).toFixed(1) : null
 
   return (
@@ -28,58 +19,16 @@ export default function SettingsPage({ profile }: { profile: Profile }) {
         </div>
       </header>
 
-      <div className="grid cols-2" style={{ maxWidth: 980 }}>
+      <div className="grid cols-2 narrow-lg">
         <section className="panel">
-          <div className="row" style={{ gap: 14, marginBottom: 20 }}>
-            <span className="avatar" style={{ width: 52, height: 52, fontSize: 20 }}>
-              {initial(name || profile.name)}
-            </span>
+          <div className="row gap-md mb-lg">
+            <span className="avatar lg">{initial(name || profile.name)}</span>
             <div>
-              <p className="row-title" style={{ fontSize: 18 }}>
-                {name || profile.name}
-              </p>
+              <p className="row-title title-lg">{name || profile.name}</p>
               {bmi && <p className="row-sub">시작 BMI {bmi}</p>}
             </div>
           </div>
-          <form
-            className="form-grid"
-            onSubmit={(e) => {
-              e.preventDefault()
-              save.mutate({ name: name.trim(), height_cm: h, start_weight_kg: w, goal_weight_kg: num(goal) }, { onSuccess: () => toast('프로필을 저장했습니다') })
-            }}
-          >
-            <label className="field">
-              <span className="field-label">이름</span>
-              <input className="input" value={name} onChange={(e) => setName(e.target.value)} maxLength={40} />
-            </label>
-            <div className="form-grid cols-3">
-              <label className="field">
-                <span className="field-label">키</span>
-                <span className="input-suffix">
-                  <input className="input" inputMode="decimal" value={height} onChange={(e) => setHeight(e.target.value)} />
-                  <span>cm</span>
-                </span>
-              </label>
-              <label className="field">
-                <span className="field-label">시작 체중</span>
-                <span className="input-suffix">
-                  <input className="input" inputMode="decimal" value={weight} onChange={(e) => setWeight(e.target.value)} />
-                  <span>kg</span>
-                </span>
-              </label>
-              <label className="field">
-                <span className="field-label">목표 체중</span>
-                <span className="input-suffix">
-                  <input className="input" inputMode="decimal" value={goal} onChange={(e) => setGoal(e.target.value)} />
-                  <span>kg</span>
-                </span>
-              </label>
-            </div>
-            {save.isError && <p className="error-text">{save.error.message}</p>}
-            <button className="btn btn-primary" type="submit" disabled={!name.trim() || save.isPending}>
-              프로필 저장
-            </button>
-          </form>
+          <ProfileForm initial={profile} submitLabel="프로필 저장" onNameChange={setName} onSaved={() => toast('프로필을 저장했습니다')} />
         </section>
 
         <section className="panel stack">

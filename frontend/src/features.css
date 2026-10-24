@@ -34,17 +34,6 @@
   margin: 10px 0 30px;
 }
 
-.welcome-form {
-  display: grid;
-  gap: 18px;
-}
-
-.welcome-form .two {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
 @media (min-width: 1024px) {
   .welcome {
     grid-template-columns: 1.05fr 1fr;
@@ -1466,5 +1455,106 @@ button.cal-cell:hover {
   .grid.cols-cal {
     grid-template-columns: minmax(0, 1fr) 320px;
     align-items: start;
+  }
+}
+
+/* ============ component bits (인라인 스타일 정리) ============ */
+.me-name {
+  display: block;
+}
+.topbar .brand {
+  font-size: 20px;
+}
+.topbar .brand-mark {
+  width: 26px;
+  height: 26px;
+}
+.hero-greet {
+  align-self: end;
+}
+.set-inputs.single {
+  grid-template-columns: 1fr;
+}
+.set-rir {
+  font-size: 13px;
+  margin-left: 6px;
+}
+.finder-q {
+  font-size: 14px;
+}
+.chart-fig {
+  margin: 0;
+  position: relative;
+}
+.chart-hit {
+  cursor: pointer;
+  outline: none;
+}
+.chart-legend {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.chart-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex: none;
+}
+.rows > li.align-start {
+  align-items: flex-start;
+}
+.rows > li.compact {
+  padding: 8px 0;
+}
+.row-button {
+  width: 100%;
+  text-align: left;
+  gap: 14px;
+}
+.chev {
+  width: 18px;
+  height: 18px;
+  color: var(--muted);
+  transition: transform 150ms ease;
+}
+.chev.open {
+  transform: rotate(90deg);
+}
+.detail-indent {
+  padding: 12px 0 4px 60px;
+}
+.phase-dates {
+  margin: -8px 0 12px;
+}
+.wd-label {
+  width: 20px;
+}
+.avatar.lg {
+  width: 52px;
+  height: 52px;
+  font-size: 20px;
+}
+
+/* 카드가 좁으면(사이드 패널 옆, 작은 노트북) 입력칸을 두 줄로: 숫자가 잘리지 않게 */
+.ex {
+  container-type: inline-size;
+}
+
+@container (max-width: 460px) {
+  .set-inputs {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .set-inputs > .field:nth-child(3) {
+    grid-column: span 2;
   }
 }

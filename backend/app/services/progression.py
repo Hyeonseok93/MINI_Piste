@@ -1,10 +1,11 @@
 """무게 추천 규칙. DB에 의존하지 않는 순수 함수로 두어 단위 테스트한다."""
 
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
+from functools import partial
 
 
-class Action(str, Enum):
+class Action(StrEnum):
     start = "start"  # 무게 찾기 결과로 시작
     increase = "increase"
     keep = "keep"
@@ -17,6 +18,7 @@ class LoggedSet:
     weight_kg: float
     reps: int
     kind: str = "work"
+    side: str | None = None  # 'L' / 'R' (한쪽씩 하는 종목)
 
 
 @dataclass(frozen=True)
@@ -28,6 +30,42 @@ class Recommendation:
 
 
 def recommend_next(
+    last_sets: list[LoggedSet],
+    *,
+    planned_sets: int,
+    rep_min: int,
+    rep_max: int,
+    increment_kg: float,
+    assisted: bool = False,
+) -> Recommendation:
+    """한쪽씩 하는 종목은 좌우를 따로 계산하고 약한 쪽(더 가벼운 추천)에 맞춘다.
+
+    플랜 규칙: "약한 쪽부터 시작하고 횟수는 약한 쪽에 맞춘다".
+    """
+    one = partial(
+        _recommend_one,
+        planned_sets=planned_sets,
+        rep_min=rep_min,
+        rep_max=rep_max,
+        increment_kg=increment_kg,
+        assisted=assisted,
+    )
+    sides = sorted({s.side for s in last_sets if s.side})
+    if not sides:
+        return one(last_sets)
+
+    per_side = {side: one([s for s in last_sets if s.side == side]) for side in sides}
+    weights = {k: r.weight_kg for k, r in per_side.items() if r.weight_kg is not None}
+    if not weights:
+        return next(iter(per_side.values()))
+    # 보조 머신은 보조 무게가 클수록 약한 쪽
+    pick = max(weights, key=weights.__getitem__) if assisted else min(weights, key=weights.__getitem__)
+    rec = per_side[pick]
+    label = "왼쪽" if pick == "L" else "오른쪽"
+    return Recommendation(rec.action, rec.weight_kg, rec.last_weight_kg, f"{label}(약한 쪽) 기준 · {rec.reason}")
+
+
+def _recommend_one(
     last_sets: list[LoggedSet],
     *,
     planned_sets: int,
@@ -75,7 +113,7 @@ def recommend_next(
     )
 
 
-class FinderVerdict(str, Enum):
+class FinderVerdict(StrEnum):
     up2 = "up2"
     up1 = "up1"
     confirm = "confirm"
@@ -90,6 +128,24 @@ FINDER_TEXT = {
     FinderVerdict.confirm_heavy: "확정 · 다만 무거운 편이라 다음엔 유지",
     FinderVerdict.down1: "무거움 → 무게 1단계 내리기",
 }
+
+
+@dataclass(frozen=True)
+class FinderChoice:
+    """무게 찾기 화면의 버튼 하나: 12회 후 '몇 개 더 할 수 있었나'."""
+
+    label: str
+    completed: bool
+    rir: int | None
+
+
+FINDER_CHOICES = [
+    FinderChoice("못 채움", False, None),
+    FinderChoice("0~1개", True, 1),
+    FinderChoice("2~3개", True, 2),
+    FinderChoice("4개", True, 4),
+    FinderChoice("5개+", True, 5),
+]
 
 FINDER_STEPS = {
     FinderVerdict.up2: 2,

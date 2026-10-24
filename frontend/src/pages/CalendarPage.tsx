@@ -5,7 +5,7 @@ import type { CalendarDay } from '../api/types'
 import { ChevronLeft, ChevronRight } from '../components/icons'
 import MonthCalendar from '../components/MonthCalendar'
 import { formatLong, todayISO } from '../lib/date'
-import { kg, summarizeSets } from '../lib/format'
+import { kg, summarizeSets, targetShort } from '../lib/format'
 import { dayStatus, KIND_LABEL, shortTitle, STATUS_LABEL } from '../lib/status'
 
 function shiftMonth(month: string, n: number) {
@@ -64,7 +64,7 @@ export default function CalendarPage() {
               </button>
             )}
           </div>
-          {isPending && <div className="skeleton" style={{ height: 420 }} />}
+          {isPending && <div className="skeleton lg" />}
           {isError && <p className="error-text">{error.message}</p>}
           {data && <MonthCalendar days={data} today={today} selected={selected} onSelect={setSelected} />}
           <div className="cal-legend">
@@ -129,15 +129,15 @@ function DayDetail({ day, today }: { day: CalendarDay; today: string }) {
       )}
 
       {workout.data && (
-        <div className="stack" style={{ gap: 8 }}>
+        <div className="stack tight">
           <p className="field-label">기록 · {workout.data.title}</p>
           <ul className="rows">
             {groups.map((g) => (
-              <li key={g.id} style={{ alignItems: 'flex-start' }}>
-                <span className="grow" style={{ fontWeight: 600 }}>
+              <li key={g.id} className="align-start">
+                <span className="grow fw-600">
                   {nameOf(g.id)}
                 </span>
-                <span className="muted num" style={{ fontSize: 16, textAlign: 'right' }}>
+                <span className="muted num num-md text-right">
                   {summarizeSets(g.sets)}
                 </span>
               </li>
@@ -149,14 +149,14 @@ function DayDetail({ day, today }: { day: CalendarDay; today: string }) {
       )}
 
       {!day.done && routine.data && (
-        <div className="stack" style={{ gap: 8 }}>
+        <div className="stack tight">
           <p className="field-label">할 종목</p>
           <ul className="rows">
             {routine.data.items.map((it) => (
               <li key={it.id}>
                 <span className="grow">{it.exercise.name}</span>
-                <span className="muted num" style={{ fontSize: 16 }}>
-                  {it.sets}×{it.duration_sec ? `${it.duration_sec}초` : it.rep_min === it.rep_max ? it.rep_max : `${it.rep_min}–${it.rep_max}`}
+                <span className="muted num num-md">
+                  {targetShort(it)}
                 </span>
               </li>
             ))}

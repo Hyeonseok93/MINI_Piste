@@ -51,6 +51,19 @@ def test_warmup_sets_ignored():
     assert rec.weight_kg == 75
 
 
+def test_unilateral_follows_weaker_side():
+    sets_lr = [LoggedSet(60, 12, "work", "L")] * 2 + [LoggedSet(60, 10, "work", "R")] * 2
+    rec = recommend_next(sets_lr, planned_sets=2, rep_min=10, rep_max=12, increment_kg=5)
+    # 왼쪽은 다 채워서 65, 오른쪽은 유지 60 → 약한 쪽(60) 기준
+    assert rec.action is Action.keep and rec.weight_kg == 60 and "오른쪽" in rec.reason
+
+
+def test_unilateral_both_sides_done_increases():
+    sets_lr = [LoggedSet(60, 12, "work", "L")] * 2 + [LoggedSet(60, 12, "work", "R")] * 2
+    rec = recommend_next(sets_lr, planned_sets=2, rep_min=10, rep_max=12, increment_kg=5)
+    assert rec.action is Action.increase and rec.weight_kg == 65
+
+
 def test_assisted_machine_goes_down_when_progressing():
     rec = recommend_next(sets(30, 10, 10, 10), planned_sets=3, rep_min=8, rep_max=10, increment_kg=5, assisted=True)
     assert rec.action is Action.increase and rec.weight_kg == 25

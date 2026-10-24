@@ -35,6 +35,7 @@ export interface RoutineSummary {
   id: number
   name: string
   description: string | null
+  item_count: number
 }
 
 export interface RoutineItem {
@@ -78,18 +79,16 @@ export interface DayPlan {
   routine: RoutineSummary | null
 }
 
-export interface WeekDay extends DayPlan {
-  workout_id: number | null
-  done: boolean
-}
-
 export interface SetLog {
   id: number
   exercise_id: number
   set_no: number
   kind: SetKind
   weight_kg: number
-  reps: number
+  /** 시간 종목이면 null */
+  reps: number | null
+  /** 플랭크 등 시간 종목(초) */
+  duration_sec: number | null
   rir: number | null
   side: Side | null
 }
@@ -98,12 +97,13 @@ export interface SetInput {
   exercise_id: number
   kind?: SetKind
   weight_kg: number
-  reps: number
+  reps?: number
+  duration_sec?: number
   rir?: number | null
   side?: Side | null
 }
 
-export interface WorkoutSummary {
+interface WorkoutSummary {
   id: number
   date: string
   title: string
@@ -164,6 +164,12 @@ export interface Today {
   daily_log: DailyLog | null
 }
 
+export interface FinderChoice {
+  label: string
+  completed: boolean
+  rir: number | null
+}
+
 export interface FinderInput {
   completed: boolean
   rir?: number | null
@@ -187,7 +193,9 @@ export interface ProfileInput {
 
 export type Profile = ProfileInput
 
-export interface CalendarDay extends WeekDay {
+export interface CalendarDay extends DayPlan {
+  workout_id: number | null
+  done: boolean
   workout_title: string | null
   set_count: number
   cardio_minutes_done: number | null

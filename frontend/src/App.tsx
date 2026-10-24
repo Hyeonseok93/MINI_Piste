@@ -15,13 +15,13 @@ export default function App() {
   const { data: profile, isPending, isError, error, refetch } = useProfile()
   const { pathname } = useLocation()
 
-  if (isPending) return <div className="empty" style={{ paddingTop: '40dvh' }}>불러오는 중…</div>
+  if (isPending) return <div className="empty page-state">불러오는 중…</div>
   if (isError)
     return (
-      <div className="empty" style={{ paddingTop: '30dvh' }}>
+      <div className="empty page-state">
         <p>서버에 연결하지 못했습니다. ({error.message})</p>
         <p className="muted">Docker가 켜져 있는지 확인한 뒤 다시 시도하세요.</p>
-        <button className="btn btn-secondary" style={{ marginTop: 16 }} onClick={() => refetch()}>
+        <button className="btn btn-secondary mt-md" onClick={() => refetch()}>
           다시 시도
         </button>
       </div>

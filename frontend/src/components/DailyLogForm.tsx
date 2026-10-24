@@ -1,10 +1,8 @@
 import { useState } from 'react'
 import { useSaveDailyLog } from '../api/hooks'
 import type { DailyLog } from '../api/types'
+import { toNum as num, toStr as str } from '../lib/format'
 import { useToast } from './Toast'
-
-const num = (v: string) => (v.trim() === '' ? null : Number(v))
-const str = (v: number | null | undefined) => (v == null ? '' : String(v))
 
 export default function DailyLogForm({ date, log }: { date: string; log: DailyLog | null }) {
   const save = useSaveDailyLog()

@@ -1,5 +1,5 @@
 import type { PhaseSpan } from '../api/types'
-import { parseISODate } from '../lib/date'
+import { formatYMDot, parseISODate } from '../lib/date'
 
 interface Props {
   phases: PhaseSpan[]
@@ -13,11 +13,6 @@ function splitName(name: string) {
   const [first, ...rest] = name.split(' ')
   // 단계 이름은 "🌱 복귀 적응기" 형태
   return /\p{Extended_Pictographic}/u.test(first) ? { icon: first, text: rest.join(' ') } : { icon: '', text: name }
-}
-
-const md = (s: string) => {
-  const d = parseISODate(s)
-  return `${d.getFullYear() % 100}.${d.getMonth() + 1}.${d.getDate()}`
 }
 
 /** 1년 플랜을 펜싱 피스트처럼 한 줄 띠로 보여 준다 */
@@ -39,7 +34,7 @@ export default function PisteTimeline({ phases, today }: Props) {
           const { icon, text } = splitName(p.name)
           const isCurrent = p === current
           return (
-            <div key={p.name} className={`piste-seg${isCurrent ? ' current' : ''}`} style={{ width: `${w}%` }} data-tip={`${p.name} · ${md(p.start_date)}–${p.end_date ? md(p.end_date) : ''}`} tabIndex={0}>
+            <div key={p.name} className={`piste-seg${isCurrent ? ' current' : ''}`} style={{ width: `${w}%` }} data-tip={`${p.name} · ${formatYMDot(p.start_date)}–${p.end_date ? formatYMDot(p.end_date) : ''}`}>
               {w > 4 && (
                 <span className="piste-icon" aria-hidden>
                   {icon}
@@ -54,8 +49,8 @@ export default function PisteTimeline({ phases, today }: Props) {
         </div>
       </div>
       <div className="piste-ends num">
-        <span>{md(start)} 시작</span>
-        <span>{md(end)} 종료</span>
+        <span>{formatYMDot(start)} 시작</span>
+        <span>{formatYMDot(end)} 종료</span>
       </div>
     </div>
   )

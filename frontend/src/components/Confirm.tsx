@@ -1,7 +1,7 @@
-import { createContext, useCallback, useContext, useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 
-export interface ConfirmOptions {
+interface ConfirmOptions {
   title: string
   message?: ReactNode
   confirmLabel?: string
@@ -50,21 +50,24 @@ function Dialog({ title, message, confirmLabel = '확인', cancelLabel = '취소
     }
   }, [danger])
 
-  function onKeyDown(e: KeyboardEvent) {
-    if (e.key === 'Escape') {
-      e.preventDefault()
-      onClose(false)
+  // Esc 로 닫기, Tab 은 두 버튼 사이에서만 돈다
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault()
+        onClose(false)
+      } else if (e.key === 'Tab') {
+        e.preventDefault()
+        ;(document.activeElement === cancel.current ? ok : cancel).current?.focus()
+      }
     }
-    // 두 버튼 사이에서만 Tab 이 돈다
-    if (e.key === 'Tab') {
-      e.preventDefault()
-      ;(document.activeElement === cancel.current ? ok : cancel).current?.focus()
-    }
-  }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [onClose])
 
   return (
     <div className="dialog-backdrop" onPointerDown={(e) => e.target === e.currentTarget && onClose(false)}>
-      <div className="dialog" role="alertdialog" aria-modal="true" aria-labelledby="dialog-title" aria-describedby={message ? 'dialog-msg' : undefined} onKeyDown={onKeyDown}>
+      <div className="dialog" role="alertdialog" aria-modal="true" aria-labelledby="dialog-title" aria-describedby={message ? 'dialog-msg' : undefined}>
         <h2 id="dialog-title" className="dialog-title">
           {title}
         </h2>

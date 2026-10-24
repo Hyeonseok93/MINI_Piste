@@ -5,6 +5,7 @@ import type {
   DailyLogInput,
   Exercise,
   ExerciseUpdate,
+  FinderChoice,
   FinderInput,
   FinderResult,
   HistoryPoint,
@@ -16,7 +17,6 @@ import type {
   SetInput,
   SetLog,
   Today,
-  WeekDay,
   Workout,
   WorkoutInput,
   WorkoutListItem,
@@ -25,7 +25,7 @@ import type {
 
 const BASE = import.meta.env.VITE_API_BASE ?? '/api'
 
-export class ApiError extends Error {
+class ApiError extends Error {
   readonly status: number
   constructor(status: number, message: string) {
     super(message)
@@ -71,7 +71,6 @@ export const api = {
   calendar: (month: string) => request<CalendarDay[]>(`/calendar${qs({ month })}`),
 
   today: (date: string) => request<Today>(`/today${qs({ date })}`),
-  week: (start: string) => request<WeekDay[]>(`/plan/week${qs({ start })}`),
   phases: () => request<Phase[]>('/phases'),
   routines: () => request<RoutineSummary[]>('/routines'),
   routine: (id: number) => request<Routine>(`/routines/${id}`),
@@ -92,5 +91,6 @@ export const api = {
   saveDailyLog: (date: string, body: DailyLogInput) => request<DailyLog>(`/daily-logs/${date}`, json('PUT', body)),
   setRestDay: (date: string, rest_day: boolean) => request<DailyLog>(`/daily-logs/${date}/rest`, json('PUT', { rest_day })),
 
+  finderChoices: () => request<FinderChoice[]>('/tools/weight-finder/choices'),
   weightFinder: (body: FinderInput) => request<FinderResult>('/tools/weight-finder', json('POST', body)),
 }

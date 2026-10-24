@@ -25,13 +25,13 @@ def _enum(cls: type[enum.Enum]) -> Enum:
     return Enum(cls, native_enum=False, values_callable=lambda e: [m.value for m in e], length=20)
 
 
-class Category(str, enum.Enum):
+class Category(enum.StrEnum):
     strength = "strength"
     core = "core"
     cardio = "cardio"
 
 
-class Equipment(str, enum.Enum):
+class Equipment(enum.StrEnum):
     pin = "pin"  # 핀 꽂는 머신
     assisted = "assisted"  # 보조 무게 (어시스트 풀업)
     plate = "plate"  # 원판 끼우는 머신
@@ -41,20 +41,20 @@ class Equipment(str, enum.Enum):
     cardio = "cardio"
 
 
-class DayKind(str, enum.Enum):
+class DayKind(enum.StrEnum):
     strength = "strength"
     cardio = "cardio"
     outdoor = "outdoor"
     rest = "rest"
 
 
-class SetKind(str, enum.Enum):
+class SetKind(enum.StrEnum):
     work = "work"
-    find = "find"  # 시작 무게 찾기
+    weight_find = "find"  # 시작 무게 찾기
     warmup = "warmup"
 
 
-class Side(str, enum.Enum):
+class Side(enum.StrEnum):
     left = "L"
     right = "R"
 
@@ -83,6 +83,10 @@ class Routine(Base):
     items: Mapped[list["RoutineItem"]] = relationship(
         back_populates="routine", order_by="RoutineItem.position", cascade="all, delete-orphan"
     )
+
+    @property
+    def item_count(self) -> int:
+        return len(self.items)
 
 
 class RoutineItem(Base):
@@ -136,7 +140,8 @@ class Workout(Base):
     __tablename__ = "workouts"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    date: Mapped[date] = mapped_column(Date, index=True)
+    # 하루에 세션은 하나 (같은 날 기록은 한 세션에 모은다)
+    date: Mapped[date] = mapped_column(Date, unique=True)
     routine_id: Mapped[int | None] = mapped_column(ForeignKey("routines.id"))
     title: Mapped[str] = mapped_column(String(80))
     cardio_minutes: Mapped[int | None] = mapped_column(Integer)
@@ -160,7 +165,8 @@ class SetLog(Base):
     set_no: Mapped[int] = mapped_column(Integer)
     kind: Mapped[SetKind] = mapped_column(_enum(SetKind), default=SetKind.work)
     weight_kg: Mapped[float] = mapped_column(Float)
-    reps: Mapped[int] = mapped_column(Integer)
+    reps: Mapped[int | None] = mapped_column(Integer)  # 시간 종목이면 비움
+    duration_sec: Mapped[int | None] = mapped_column(Integer)  # 플랭크 등 시간 종목
     rir: Mapped[int | None] = mapped_column(Integer)
     side: Mapped[Side | None] = mapped_column(_enum(Side))
 

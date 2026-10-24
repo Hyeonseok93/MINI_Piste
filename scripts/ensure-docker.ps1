@@ -1,6 +1,6 @@
 ﻿# Docker 엔진이 꺼져 있으면 켠다.
 # Docker Desktop 4.84 는 종료할 때 남긴 소켓 파일(접근 불가 상태)을 다음 시작 때 지우지 못해
-# 바로 멈추는 문제가 있어, 시작 전에 해당 폴더를 옆으로 옮겨 둔다(삭제하지 않음).
+# 바로 멈추는 문제가 있어, 시작 전에 해당 폴더를 옆으로 옮겨 둔다. 옮긴 폴더는 일주일 뒤 정리한다.
 
 $ErrorActionPreference = 'SilentlyContinue'
 
@@ -25,6 +25,13 @@ foreach ($dir in @((Join-Path $env:LOCALAPPDATA 'Docker\run'), (Join-Path $env:L
         Rename-Item -LiteralPath $dir -NewName ((Split-Path $dir -Leaf) + '.stale-' + $stamp)
     }
 }
+
+# 일주일 지난 옛 폴더는 지운다 (접근 불가 소켓이 남아 있으면 지워지지 않을 수 있어 실패는 무시)
+$cutoff = (Get-Date).AddDays(-7)
+Get-ChildItem -LiteralPath $env:LOCALAPPDATA -Directory -Filter 'docker-secrets-engine.stale-*' |
+    Where-Object { $_.CreationTime -lt $cutoff } | Remove-Item -Recurse -Force
+Get-ChildItem -LiteralPath (Join-Path $env:LOCALAPPDATA 'Docker') -Directory -Filter 'run.stale*' |
+    Where-Object { $_.CreationTime -lt $cutoff } | Remove-Item -Recurse -Force
 
 Start-Process -FilePath $exe
 for ($i = 0; $i -lt 60; $i++) {

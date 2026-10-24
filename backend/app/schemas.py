@@ -1,6 +1,6 @@
 from datetime import date
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from app.models import Category, DayKind, Equipment, SetKind, Side
 from app.services.progression import Action, FinderVerdict
@@ -64,6 +64,7 @@ class RoutineSummary(ORM):
     id: int
     name: str
     description: str | None
+    item_count: int
 
 
 class RoutineOut(RoutineSummary):
@@ -97,25 +98,28 @@ class DayPlanOut(BaseModel):
     routine: RoutineSummary | None
 
 
-class WeekDayOut(DayPlanOut):
-    workout_id: int | None
-    done: bool
-
-
 # --- 세트·세션 -------------------------------------------------------------
 class SetIn(BaseModel):
     exercise_id: int
     set_no: int | None = Field(default=None, ge=1)
     kind: SetKind = SetKind.work
     weight_kg: float = Field(ge=0, le=1000)
-    reps: int = Field(ge=0, le=200)
+    reps: int | None = Field(default=None, ge=0, le=200)
+    duration_sec: int | None = Field(default=None, gt=0, le=3600)
     rir: int | None = Field(default=None, ge=0, le=20)
     side: Side | None = None
+
+    @model_validator(mode="after")
+    def _reps_or_duration(self):
+        if (self.reps is None) == (self.duration_sec is None):
+            raise ValueError("횟수(reps)와 시간(duration_sec) 중 하나만 입력하세요")
+        return self
 
 
 class SetUpdate(BaseModel):
     weight_kg: float | None = Field(default=None, ge=0, le=1000)
     reps: int | None = Field(default=None, ge=0, le=200)
+    duration_sec: int | None = Field(default=None, gt=0, le=3600)
     rir: int | None = Field(default=None, ge=0, le=20)
     kind: SetKind | None = None
 
@@ -126,7 +130,8 @@ class SetOut(ORM):
     set_no: int
     kind: SetKind
     weight_kg: float
-    reps: int
+    reps: int | None
+    duration_sec: int | None
     rir: int | None
     side: Side | None
 
@@ -213,6 +218,12 @@ class FinderIn(BaseModel):
     increment_kg: float | None = Field(default=None, gt=0)
 
 
+class FinderChoiceOut(BaseModel):
+    label: str
+    completed: bool
+    rir: int | None
+
+
 class FinderOut(BaseModel):
     verdict: FinderVerdict
     steps: int
@@ -232,7 +243,9 @@ class ProfileOut(ORM, ProfileIn):
     pass
 
 
-class CalendarDay(WeekDayOut):
+class CalendarDay(DayPlanOut):
+    workout_id: int | None
+    done: bool
     workout_title: str | None
     set_count: int
     cardio_minutes_done: int | None

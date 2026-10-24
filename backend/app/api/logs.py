@@ -6,14 +6,16 @@ from sqlalchemy.orm import Session
 
 from app.db import get_db
 from app.models import DailyLog
-from app.schemas import DailyLogIn, DailyLogOut, FinderIn, FinderOut, RestDayIn
-from app.services.progression import FINDER_STEPS, FINDER_TEXT, weight_finder
+from app.schemas import DailyLogIn, DailyLogOut, FinderChoiceOut, FinderIn, FinderOut, RestDayIn
+from app.services.progression import FINDER_CHOICES, FINDER_STEPS, FINDER_TEXT, weight_finder
 
 router = APIRouter(tags=["logs"])
 
 
 @router.get("/daily-logs", response_model=list[DailyLogOut])
-def list_daily_logs(from_: date | None = Query(default=None, alias="from"), to: date | None = None, db: Session = Depends(get_db)):
+def list_daily_logs(
+    from_: date | None = Query(default=None, alias="from"), to: date | None = None, db: Session = Depends(get_db)
+):
     q = select(DailyLog).order_by(DailyLog.date)
     if from_:
         q = q.where(DailyLog.date >= from_)
@@ -40,6 +42,12 @@ def set_rest_day(day: date, body: RestDayIn, db: Session = Depends(get_db)):
     db.add(log)
     db.commit()
     return log
+
+
+@router.get("/tools/weight-finder/choices", response_model=list[FinderChoiceOut])
+def finder_choices():
+    """무게 찾기 버튼 목록 (문구·판정 기준을 한 곳에서 관리)."""
+    return [c.__dict__ for c in FINDER_CHOICES]
 
 
 @router.post("/tools/weight-finder", response_model=FinderOut)

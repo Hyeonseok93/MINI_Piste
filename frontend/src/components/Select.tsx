@@ -1,7 +1,7 @@
 import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react'
 import { CheckIcon, ChevronDown, SearchIcon } from './icons'
 
-export interface SelectOption<T extends string | number> {
+interface SelectOption<T extends string | number> {
   value: T
   label: string
   /** 오른쪽에 흐리게 붙는 보조 설명 (예: 기구 종류) */
@@ -82,7 +82,9 @@ export default function Select<T extends string | number>({
   useEffect(() => {
     if (!open) return
     const onDown = (e: PointerEvent) => {
-      if (!root.current?.contains(e.target as Node)) close(false)
+      if (root.current?.contains(e.target as Node)) return
+      setOpen(false)
+      setQuery('')
     }
     document.addEventListener('pointerdown', onDown)
     return () => document.removeEventListener('pointerdown', onDown)
@@ -138,7 +140,7 @@ export default function Select<T extends string | number>({
   const activeId = filtered[active] ? `${id}-opt-${active}` : undefined
 
   return (
-    <div className={`sel${open ? ' is-open' : ''}${dropUp ? ' drop-up' : ''}`} ref={root} onKeyDown={onKeyDown}>
+    <div className={`sel${open ? ' is-open' : ''}${dropUp ? ' drop-up' : ''}`} ref={root}>
       <button
         ref={trigger}
         type="button"
@@ -150,6 +152,7 @@ export default function Select<T extends string | number>({
         aria-controls={`${id}-list`}
         aria-activedescendant={open && !searchable ? activeId : undefined}
         onClick={() => (open ? close() : openList())}
+        onKeyDown={onKeyDown}
       >
         <span className={shown ? 'sel-value' : 'sel-placeholder'}>{shown?.label ?? placeholder}</span>
         {shown?.hint && <span className="sel-hint">{shown.hint}</span>}
@@ -172,6 +175,7 @@ export default function Select<T extends string | number>({
                 aria-label={`${label} 검색`}
                 aria-controls={`${id}-list`}
                 aria-activedescendant={activeId}
+                onKeyDown={onKeyDown}
               />
             </div>
           )}
@@ -180,6 +184,8 @@ export default function Select<T extends string | number>({
             {filtered.map((o, i) => {
               const isSel = o.value === value && !resetAfterSelect
               return (
+                // 옵션은 포커스를 받지 않고 콤보박스가 aria-activedescendant 로 키보드를 처리한다
+                // oxlint-disable-next-line jsx-a11y/click-events-have-key-events
                 <li
                   key={String(o.value)}
                   id={`${id}-opt-${i}`}

@@ -22,8 +22,8 @@ export default function HomePage({ profile }: { profile: Profile }) {
     <>
       {isPending && (
         <div className="grid">
-          <div className="skeleton" style={{ height: 180 }} />
-          <div className="skeleton" style={{ height: 120 }} />
+          <div className="skeleton md" />
+          <div className="skeleton sm" />
         </div>
       )}
       {isError && <p className="error-text">{error.message}</p>}
@@ -39,7 +39,7 @@ function HomeView({ data, name, today }: { data: Dashboard; name: string; today:
   return (
     <div className="grid">
       <section className="hero">
-        <div style={{ alignSelf: 'end' }}>
+        <div className="hero-greet">
           <p className="greet-date">
             {formatLong(today)}
             {stats.day_number != null && ` · ${stats.day_number}일째`}
@@ -72,7 +72,7 @@ function HomeView({ data, name, today }: { data: Dashboard; name: string; today:
             <h2 className="panel-title" id="week-title">
               이번 주
             </h2>
-            <span className="muted num" style={{ fontSize: 17 }}>
+            <span className="muted num num-md">
               {stats.week_done}/{stats.week_planned}
             </span>
             <Link to="/calendar" className="panel-link">
@@ -94,13 +94,13 @@ function HomeView({ data, name, today }: { data: Dashboard; name: string; today:
             <ul className="rows">
               {data.upcoming.map((d) => (
                 <li key={d.date}>
-                  <Link to={`/workout?date=${d.date}`} className="row grow" style={{ gap: 14 }}>
+                  <Link to={`/workout?date=${d.date}`} className="row grow gap-md">
                     <span className="date-block">
                       <span className="num">{parseISODate(d.date).getDate()}</span>
                       <span>{weekdayLabel(weekdayIndex(d.date))}요일</span>
                     </span>
                     <span className="grow">
-                      <span className="row-title" style={{ display: 'block' }}>
+                      <span className="row-title block">
                         {shortTitle(d)}
                       </span>
                       <span className="row-sub">{d.label}</span>
@@ -166,7 +166,7 @@ function TodayCard({ day, today }: { day: CalendarDay; today: string }) {
       <div className="tc-meta">
         {day.routine && (
           <span>
-            <b>45</b>분 근력
+            <b>{day.routine.item_count}</b>종목
           </span>
         )}
         {day.cardio_minutes != null && (

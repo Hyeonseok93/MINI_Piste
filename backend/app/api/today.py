@@ -8,6 +8,7 @@ from app.api.plan import to_day_plan_out
 from app.db import get_db
 from app.models import DailyLog, Routine, RoutineItem, Workout
 from app.schemas import (
+    DailyLogOut,
     LastSession,
     RecommendationOut,
     RoutineItemOut,
@@ -15,7 +16,6 @@ from app.schemas import (
     TodayItem,
     TodayOut,
     WorkoutOut,
-    DailyLogOut,
 )
 from app.services.history import recommend_for
 from app.services.planner import plan_for
@@ -29,11 +29,7 @@ def today(date: date, db: Session = Depends(get_db)):
     plan = plan_for(db, date)
 
     workout = db.scalar(
-        select(Workout)
-        .where(Workout.date == date)
-        .options(selectinload(Workout.sets))
-        .order_by(Workout.id)
-        .limit(1)
+        select(Workout).where(Workout.date == date).options(selectinload(Workout.sets)).order_by(Workout.id).limit(1)
     )
     # 이미 다른 루틴으로 시작했다면 그 루틴을 기준으로 보여준다
     routine_id = workout.routine_id if workout and workout.routine_id else (plan.routine.id if plan.routine else None)
@@ -45,7 +41,7 @@ def today(date: date, db: Session = Depends(get_db)):
             .where(Routine.id == routine_id)
             .options(selectinload(Routine.items).selectinload(RoutineItem.exercise))
         )
-        for it in routine.items:
+        for it in routine.items if routine else []:
             last_date, sets, rec = recommend_for(db, it.exercise, date, it)
             items.append(
                 TodayItem(

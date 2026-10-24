@@ -17,11 +17,34 @@ dependencies = [
 dev = [
     "pytest>=8",
     "httpx>=0.27",
+    "ruff>=0.8",
+    "mypy>=1.13",
 ]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
+# starlette TestClient 의 httpx 경고 (테스트 동작과 무관)
+filterwarnings = ["ignore:Using `httpx` with `starlette.testclient`"]
 
 [tool.uv]
 package = false
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+# 오류(F), 버그 패턴(B), 단순화(SIM), 최신 문법(UP), import 정렬(I), 미사용 인자(ARG)
+select = ["E", "F", "B", "SIM", "UP", "I", "ARG"]
+ignore = ["B008"]  # FastAPI 의 Depends() 기본값 패턴
+
+[tool.ruff.lint.per-file-ignores]
+"alembic/versions/*" = ["E501", "I"]
+
+[tool.mypy]
+python_version = "3.12"
+plugins = ["pydantic.mypy"]
+warn_unused_ignores = true
+check_untyped_defs = true
+exclude = ["alembic/"]

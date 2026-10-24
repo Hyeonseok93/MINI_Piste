@@ -1,7 +1,8 @@
 import type { ComponentType, SVGProps } from 'react'
-import { Link, NavLink, Outlet } from 'react-router-dom'
+import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import type { Profile } from '../api/types'
 import { initial } from '../lib/format'
+import ErrorBoundary from './ErrorBoundary'
 import {
   BrandMark,
   CalendarIcon,
@@ -33,6 +34,7 @@ const TABS: Item[] = [
 ]
 
 export default function AppShell({ profile }: { profile: Profile }) {
+  const { pathname } = useLocation()
   return (
     <div className="shell">
       <aside className="sidebar" aria-label="사이드바">
@@ -52,7 +54,7 @@ export default function AppShell({ profile }: { profile: Profile }) {
           <NavLink to="/settings" className="me">
             <span className="avatar">{initial(profile.name)}</span>
             <span className="grow">
-              <span className="me-name" style={{ display: 'block' }}>
+              <span className="me-name">
                 {profile.name}
               </span>
               <span className="me-sub">프로필 · 설정</span>
@@ -62,8 +64,8 @@ export default function AppShell({ profile }: { profile: Profile }) {
       </aside>
 
       <header className="topbar">
-        <Link to="/" className="brand grow" style={{ fontSize: 20 }}>
-          <BrandMark className="brand-mark" style={{ width: 26, height: 26 }} />
+        <Link to="/" className="brand grow">
+          <BrandMark className="brand-mark" />
           PISTE
         </Link>
         <Link to="/settings" aria-label="프로필 설정">
@@ -72,7 +74,9 @@ export default function AppShell({ profile }: { profile: Profile }) {
       </header>
 
       <main className="content">
-        <Outlet />
+        <ErrorBoundary key={pathname}>
+          <Outlet />
+        </ErrorBoundary>
       </main>
 
       <nav className="tabbar" aria-label="하단 메뉴">

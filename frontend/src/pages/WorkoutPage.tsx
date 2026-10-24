@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { useAddSet, useCreateWorkout, useDeleteSet, useDeleteWorkout, useExercises, useSetRestDay, useToday, useUpdateWorkout } from '../api/hooks'
+import { useAddSet, useCreateWorkout, useDeleteSet, useDeleteWorkout, useExercises, useFinderChoices, useSetRestDay, useToday, useUpdateWorkout } from '../api/hooks'
 import type { SetInput, Today, Workout } from '../api/types'
 import DailyLogForm from '../components/DailyLogForm'
 import ExerciseCard from '../components/ExerciseCard'
@@ -42,7 +42,7 @@ export default function WorkoutPage() {
             <button className="icon-btn" aria-label="전날" onClick={() => setDate(addDays(date, -1))}>
               <ChevronLeft />
             </button>
-            <span className="label num" style={{ fontSize: 17 }}>
+            <span className="label num num-md">
               {formatShort(date)}
             </span>
             <button className="icon-btn" aria-label="다음날" onClick={() => setDate(addDays(date, 1))}>
@@ -52,7 +52,7 @@ export default function WorkoutPage() {
         </div>
       </header>
 
-      {isPending && <div className="skeleton" style={{ height: 320 }} />}
+      {isPending && <div className="skeleton lg" />}
       {isError && (
         <div className="panel stack">
           <p className="error-text">{error.message}</p>
@@ -69,6 +69,7 @@ export default function WorkoutPage() {
 function WorkoutView({ date, data }: { date: string; data: Today }) {
   const { plan, items, workout, daily_log } = data
   const exercises = useExercises()
+  const finderChoices = useFinderChoices().data ?? []
   const createWorkout = useCreateWorkout()
   const addSet = useAddSet()
   const deleteSet = useDeleteSet()
@@ -132,12 +133,13 @@ function WorkoutView({ date, data }: { date: string; data: Today }) {
             recommendation={it.recommendation}
             last={it.last}
             sets={setsOf(it.item.exercise.id)}
+            finderChoices={finderChoices}
             onAdd={onAdd}
             onDelete={(id) => deleteSet.mutate(id)}
           />
         ))}
         {extras.map((ex, i) => (
-          <ExerciseCard key={`x-${ex.id}`} index={items.length + i + 1} exercise={ex} sets={setsOf(ex.id)} onAdd={onAdd} onDelete={(id) => deleteSet.mutate(id)} />
+          <ExerciseCard key={`x-${ex.id}`} index={items.length + i + 1} exercise={ex} sets={setsOf(ex.id)} finderChoices={finderChoices} onAdd={onAdd} onDelete={(id) => deleteSet.mutate(id)} />
         ))}
         {exercises.data && (
           <div className="field">
@@ -162,7 +164,7 @@ function WorkoutView({ date, data }: { date: string; data: Today }) {
           <section className="panel stack">
             <div className="row">
               <h2 className="panel-title">진행</h2>
-              <span className="num" style={{ fontSize: 22, fontWeight: 600 }}>
+              <span className="num num-lg">
                 {doneCount}/{items.length}
               </span>
             </div>
@@ -219,7 +221,7 @@ function RestToggle({ date, rest }: { date: string; rest: boolean }) {
     <section className={`panel stack rest-panel${rest ? ' is-rest' : ''}`}>
       <div>
         <h2 className="panel-title">{rest ? '못 함으로 표시했어요' : '오늘 못 하나요?'}</h2>
-        <p className="row-sub" style={{ marginTop: 4 }}>
+        <p className="row-sub mt-xs">
           {rest ? '달력에 회색 \'못 함\'으로 표시되고, 출석률과 연속 기록에서 빠짐으로 세지 않아요.' : '아프거나 일정이 생겼으면 못 함으로 표시하세요. 빠짐으로 세지 않습니다.'}
         </p>
       </div>

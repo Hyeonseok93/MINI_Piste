@@ -8,9 +8,19 @@ from app.services.calendar import attendance, compute_streak
 def day(d: str, kind: DayKind | None, done: bool, rest_day: bool = False) -> CalendarDay:
     return CalendarDay(
         rest_day=rest_day,
-        date=date.fromisoformat(d), phase=None, week_index=None, kind=kind, label=None, cardio_minutes=None,
-        routine=None, workout_id=1 if done else None, done=done, workout_title=None, set_count=0,
-        cardio_minutes_done=None, body_weight_kg=None,
+        date=date.fromisoformat(d),
+        phase=None,
+        week_index=None,
+        kind=kind,
+        label=None,
+        cardio_minutes=None,
+        routine=None,
+        workout_id=1 if done else None,
+        done=done,
+        workout_title=None,
+        set_count=0,
+        cardio_minutes_done=None,
+        body_weight_kg=None,
     )
 
 
@@ -49,13 +59,20 @@ def test_rest_day_endpoint_keeps_other_fields(client):
 
     # 체중을 다시 저장해도 휴식 표시는 그대로
     client.put("/api/daily-logs/2026-10-22", json={"body_weight_kg": 109.0})
-    assert client.get("/api/daily-logs", params={"from": "2026-10-22", "to": "2026-10-22"}).json()[0]["rest_day"] is True
+    assert (
+        client.get("/api/daily-logs", params={"from": "2026-10-22", "to": "2026-10-22"}).json()[0]["rest_day"] is True
+    )
 
     assert client.put("/api/daily-logs/2026-10-22/rest", json={"rest_day": False}).json()["rest_day"] is False
 
 
 def test_attendance_counts_past_planned_days():
-    days = [day("2026-10-19", S, True), day("2026-10-20", C, False), day("2026-10-21", R, False), day("2026-10-22", S, False)]
+    days = [
+        day("2026-10-19", S, True),
+        day("2026-10-20", C, False),
+        day("2026-10-21", R, False),
+        day("2026-10-22", S, False),
+    ]
     # 오늘(22일)은 안 했으니 제외 → 19, 20 중 1개
     assert attendance(days, date(2026, 10, 22)) == 0.5
     assert attendance([], date(2026, 10, 22)) is None

@@ -2,6 +2,7 @@ from datetime import date
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from sqlalchemy import func, select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, selectinload
 
 from app.db import get_db
@@ -28,7 +29,10 @@ def get_workout(db: Session, workout_id: int) -> Workout:
 
 @router.get("/workouts", response_model=list[WorkoutListItem])
 def list_workouts(
-    from_: date | None = Query(default=None, alias="from"), to: date | None = None, limit: int = 50, db: Session = Depends(get_db)
+    from_: date | None = Query(default=None, alias="from"),
+    to: date | None = None,
+    limit: int = 50,
+    db: Session = Depends(get_db),
 ):
     q = (
         select(
@@ -61,13 +65,18 @@ def list_workouts(
 
 
 @router.post("/workouts", response_model=WorkoutOut, status_code=201)
-def create_workout(body: WorkoutIn, db: Session = Depends(get_db)):
+def create_workout(body: WorkoutIn, response: Response, db: Session = Depends(get_db)):
+    """그날 세션을 만든다. 이미 있으면 새로 만들지 않고 기존 세션을 200으로 돌려준다."""
     title = body.title
     if body.routine_id is not None:
         routine = db.get(Routine, body.routine_id)
         if routine is None:
             raise HTTPException(422, "존재하지 않는 루틴입니다")
         title = title or routine.name
+    existing = db.scalar(select(Workout.id).where(Workout.date == body.date))
+    if existing is not None:
+        response.status_code = 200
+        return get_workout(db, existing)
     w = Workout(
         date=body.date,
         routine_id=body.routine_id,
@@ -76,7 +85,15 @@ def create_workout(body: WorkoutIn, db: Session = Depends(get_db)):
         notes=body.notes,
     )
     db.add(w)
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError:  # 동시에 두 요청이 온 경우: 먼저 만든 쪽을 돌려준다
+        db.rollback()
+        response.status_code = 200
+        existing_id = db.scalar(select(Workout.id).where(Workout.date == body.date))
+        if existing_id is None:  # 다른 이유의 무결성 오류
+            raise
+        return get_workout(db, existing_id)
     return get_workout(db, w.id)
 
 

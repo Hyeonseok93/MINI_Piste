@@ -16,6 +16,14 @@ const lat: Exercise = {
   cue: null,
 }
 
+const CHOICES = [
+  { label: '못 채움', completed: false, rir: null },
+  { label: '0~1개', completed: true, rir: 1 },
+  { label: '2~3개', completed: true, rir: 2 },
+  { label: '4개', completed: true, rir: 4 },
+  { label: '5개+', completed: true, rir: 5 },
+]
+
 const item: RoutineItem = { id: 1, position: 3, sets: 3, rep_min: 10, rep_max: 12, duration_sec: null, exercise: lat }
 
 describe('ExerciseCard', () => {
@@ -27,8 +35,9 @@ describe('ExerciseCard', () => {
         exercise={lat}
         item={item}
         recommendation={{ action: 'start', weight_kg: 50, last_weight_kg: 50, reason: '무게 찾기 결과 50kg로 시작' }}
-        last={{ date: '2026-10-16', sets: [{ id: 9, exercise_id: 3, set_no: 1, kind: 'find', weight_kg: 50, reps: 12, rir: null, side: null }] }}
+        last={{ date: '2026-10-16', sets: [{ id: 9, exercise_id: 3, set_no: 1, kind: 'find', weight_kg: 50, reps: 12, duration_sec: null, rir: null, side: null }] }}
         sets={[]}
+        finderChoices={CHOICES}
         onAdd={onAdd}
         onDelete={() => {}}
       />,
@@ -54,6 +63,7 @@ describe('ExerciseCard', () => {
         item={item}
         recommendation={{ action: 'unknown', weight_kg: null, last_weight_kg: null, reason: '기록 없음 · 시작 무게 찾기부터' }}
         sets={[]}
+        finderChoices={CHOICES}
         onAdd={vi.fn()}
         onDelete={() => {}}
       />,

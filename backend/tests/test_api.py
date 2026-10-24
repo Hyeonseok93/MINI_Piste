@@ -2,8 +2,13 @@ def test_health(client):
     assert client.get("/api/health").json() == {"status": "ok"}
 
 
+def _day(client, d):
+    days = client.get("/api/calendar", params={"month": d[:7]}).json()
+    return next(x for x in days if x["date"] == d)
+
+
 def _routine(client, d):
-    r = client.get("/api/plan/day", params={"date": d}).json()
+    r = _day(client, d)
     return r["routine"]["name"] if r["routine"] else r["kind"]
 
 
@@ -22,7 +27,7 @@ def test_phase1_strength_days_alternate_without_break(client):
 
 
 def test_phase2_split(client):
-    mon = client.get("/api/plan/day", params={"date": "2026-11-16"}).json()
+    mon = _day(client, "2026-11-16")
     assert mon["routine"]["name"] == "하체 1"
     assert mon["phase"].endswith("빌드업")
     assert _routine(client, "2026-11-22") == "상체 1"  # 일
@@ -30,15 +35,8 @@ def test_phase2_split(client):
 
 
 def test_outside_plan(client):
-    d = client.get("/api/plan/day", params={"date": "2026-10-16"}).json()
+    d = _day(client, "2026-10-16")
     assert d["phase"] is None and d["routine"] is None
-
-
-def test_week_marks_done_days(client):
-    week = client.get("/api/plan/week", params={"start": "2026-10-14"}).json()
-    assert len(week) == 7 and week[0]["date"] == "2026-10-12"
-    fri = week[4]
-    assert fri["date"] == "2026-10-16" and fri["done"] is True
 
 
 def test_today_uses_friday_find_results(client):
@@ -75,6 +73,24 @@ def test_log_session_then_next_recommendation_increases(client):
     assert [h["top_weight_kg"] for h in hist] == [50, 50]
 
 
+def test_one_workout_per_day(client):
+    a = client.post("/api/workouts", json={"date": "2026-10-23", "routine_id": 1})
+    b = client.post("/api/workouts", json={"date": "2026-10-23"})
+    assert a.status_code == 201 and b.status_code == 200
+    assert a.json()["id"] == b.json()["id"]
+
+
+def test_timed_set_uses_duration(client):
+    w = client.post("/api/workouts", json={"date": "2026-10-23"}).json()
+    plank = next(e["id"] for e in client.get("/api/exercises").json() if e["name"] == "플랭크")
+    r = client.post(f"/api/workouts/{w['id']}/sets", json={"exercise_id": plank, "weight_kg": 0, "duration_sec": 30})
+    assert r.status_code == 201 and r.json()["duration_sec"] == 30 and r.json()["reps"] is None
+    both = {"exercise_id": plank, "weight_kg": 0, "duration_sec": 30, "reps": 10}
+    assert client.post(f"/api/workouts/{w['id']}/sets", json=both).status_code == 422
+    neither = {"exercise_id": plank, "weight_kg": 0}
+    assert client.post(f"/api/workouts/{w['id']}/sets", json=neither).status_code == 422
+
+
 def test_set_update_and_delete(client):
     w = client.post("/api/workouts", json={"date": "2026-10-21"}).json()
     s = client.post(f"/api/workouts/{w['id']}/sets", json={"exercise_id": 1, "weight_kg": 100, "reps": 10}).json()
@@ -87,8 +103,14 @@ def test_set_update_and_delete(client):
 
 def test_validation_errors(client):
     w = client.post("/api/workouts", json={"date": "2026-10-21"}).json()
-    assert client.post(f"/api/workouts/{w['id']}/sets", json={"exercise_id": 9999, "weight_kg": 10, "reps": 5}).status_code == 422
-    assert client.post(f"/api/workouts/{w['id']}/sets", json={"exercise_id": 1, "weight_kg": -1, "reps": 5}).status_code == 422
+    assert (
+        client.post(f"/api/workouts/{w['id']}/sets", json={"exercise_id": 9999, "weight_kg": 10, "reps": 5}).status_code
+        == 422
+    )
+    assert (
+        client.post(f"/api/workouts/{w['id']}/sets", json={"exercise_id": 1, "weight_kg": -1, "reps": 5}).status_code
+        == 422
+    )
     assert client.post("/api/workouts", json={"date": "2026-10-21", "routine_id": 9999}).status_code == 422
 
 
@@ -140,6 +162,12 @@ def test_exercise_patch(client):
     r = client.patch("/api/exercises/3", json={"setup_note": "의자 4번"})
     assert r.json()["setup_note"] == "의자 4번"
     assert client.patch("/api/exercises/3", json={"increment_kg": 0}).status_code == 422
+
+
+def test_weight_finder_choices(client):
+    choices = client.get("/api/tools/weight-finder/choices").json()
+    assert [c["label"] for c in choices] == ["못 채움", "0~1개", "2~3개", "4개", "5개+"]
+    assert choices[0] == {"label": "못 채움", "completed": False, "rir": None}
 
 
 def test_weight_finder_endpoint(client):

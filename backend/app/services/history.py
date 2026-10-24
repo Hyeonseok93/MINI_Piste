@@ -4,7 +4,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.models import Equipment, Exercise, RoutineItem, SetKind, SetLog, Workout
-from app.services.progression import LoggedSet, Recommendation, recommend_next
+from app.services.progression import Action, LoggedSet, Recommendation, recommend_next
 
 DEFAULT_REP_MIN = 10
 DEFAULT_REP_MAX = 12
@@ -38,8 +38,10 @@ def recommend_for(
     db: Session, exercise: Exercise, before: date, item: RoutineItem | None = None
 ) -> tuple[date | None, list[SetLog], Recommendation]:
     last_date, sets = last_session_sets(db, exercise.id, before)
+    if item is not None and item.duration_sec:
+        return last_date, sets, Recommendation(Action.unknown, None, None, "시간 종목은 무게 추천 없음")
     rec = recommend_next(
-        [LoggedSet(s.weight_kg, s.reps, s.kind.value) for s in sets],
+        [LoggedSet(s.weight_kg, s.reps or 0, s.kind.value, s.side.value if s.side else None) for s in sets],
         planned_sets=item.sets if item else 3,
         rep_min=(item.rep_min if item and item.rep_min else DEFAULT_REP_MIN),
         rep_max=(item.rep_max if item and item.rep_max else DEFAULT_REP_MAX),
@@ -63,7 +65,4 @@ def exercise_history(db: Session, exercise_id: int) -> list[dict]:
         .group_by(Workout.date)
         .order_by(Workout.date)
     ).all()
-    return [
-        {"date": d, "top_weight_kg": top, "volume_kg": float(vol or 0), "sets": n}
-        for d, top, vol, n in rows
-    ]
+    return [{"date": d, "top_weight_kg": top, "volume_kg": float(vol or 0), "sets": n} for d, top, vol, n in rows]

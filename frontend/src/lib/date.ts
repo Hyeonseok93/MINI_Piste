@@ -2,7 +2,7 @@
 
 const WEEKDAYS = ['월', '화', '수', '목', '금', '토', '일']
 
-export function toISODate(d: Date): string {
+function toISODate(d: Date): string {
   const y = d.getFullYear()
   const m = String(d.getMonth() + 1).padStart(2, '0')
   const day = String(d.getDate()).padStart(2, '0')
@@ -35,6 +35,18 @@ export function weekdayLabel(index: number): string {
 
 export function mondayOf(s: string): string {
   return addDays(s, -weekdayIndex(s))
+}
+
+/** 2026-10-19 → "10/19" */
+export function formatMD(s: string): string {
+  const d = parseISODate(s)
+  return `${d.getMonth() + 1}/${d.getDate()}`
+}
+
+/** 2026-10-19 → "26.10.19" */
+export function formatYMDot(s: string): string {
+  const d = parseISODate(s)
+  return `${d.getFullYear() % 100}.${d.getMonth() + 1}.${d.getDate()}`
 }
 
 /** 2026-10-19 → "10/19 (월)" */

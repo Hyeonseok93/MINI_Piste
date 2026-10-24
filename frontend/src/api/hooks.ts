@@ -2,12 +2,11 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { api } from './client'
 import type { DailyLogInput, ExerciseUpdate, ProfileInput, SetInput, WorkoutInput, WorkoutUpdate } from './types'
 
-export const keys = {
+const keys = {
   profile: ['profile'] as const,
   dashboard: (date: string) => ['dashboard', date] as const,
   calendar: (month: string) => ['calendar', month] as const,
   today: (date: string) => ['today', date] as const,
-  week: (start: string) => ['week', start] as const,
   phases: ['phases'] as const,
   routines: ['routines'] as const,
   routine: (id: number) => ['routine', id] as const,
@@ -22,7 +21,7 @@ export const useProfile = () => useQuery({ queryKey: keys.profile, queryFn: api.
 export const useDashboard = (date: string) => useQuery({ queryKey: keys.dashboard(date), queryFn: () => api.dashboard(date) })
 export const useCalendar = (month: string) => useQuery({ queryKey: keys.calendar(month), queryFn: () => api.calendar(month) })
 export const useToday = (date: string) => useQuery({ queryKey: keys.today(date), queryFn: () => api.today(date) })
-export const useWeek = (start: string) => useQuery({ queryKey: keys.week(start), queryFn: () => api.week(start) })
+export const useFinderChoices = () => useQuery({ queryKey: ['finder-choices'], queryFn: api.finderChoices, staleTime: Infinity })
 export const usePhases = () => useQuery({ queryKey: keys.phases, queryFn: api.phases, staleTime: Infinity })
 export const useRoutines = () => useQuery({ queryKey: keys.routines, queryFn: api.routines, staleTime: Infinity })
 export const useRoutine = (id: number | null) =>
@@ -40,7 +39,7 @@ function useInvalidateLogs() {
   const qc = useQueryClient()
   return () =>
     Promise.all(
-      ['today', 'week', 'workouts', 'workout', 'history', 'daily-logs', 'dashboard', 'calendar'].map((k) =>
+      ['today', 'workouts', 'workout', 'history', 'daily-logs', 'dashboard', 'calendar'].map((k) =>
         qc.invalidateQueries({ queryKey: [k] }),
       ),
     )

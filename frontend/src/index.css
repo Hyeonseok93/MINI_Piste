@@ -555,7 +555,6 @@ button:disabled {
 }
 
 .input,
-.select,
 .textarea {
   width: 100%;
   min-width: 0;
@@ -577,7 +576,6 @@ button:disabled {
 }
 
 .input:focus,
-.select:focus,
 .textarea:focus {
   outline: none;
   border-color: var(--primary);
@@ -620,7 +618,8 @@ button:disabled {
   color: var(--muted);
 }
 
-.seg button[aria-pressed='true'] {
+.seg button[aria-pressed='true'],
+.seg button[aria-selected='true'] {
   background: var(--surface);
   color: var(--ink);
   box-shadow: 0 0 0 1px var(--line);
@@ -797,4 +796,96 @@ button:disabled {
 input,
 textarea {
   caret-color: var(--primary);
+}
+
+/* ============ utilities (자주 쓰는 간격·글자만) ============ */
+.block {
+  display: block;
+}
+.wrap {
+  flex-wrap: wrap;
+}
+.grow.fw-600,
+.fw-600 {
+  font-weight: 600;
+}
+.text-right {
+  text-align: right;
+}
+.text-hit {
+  color: var(--hit);
+}
+.text-miss {
+  color: var(--miss);
+}
+.self-start {
+  justify-self: start;
+}
+.align-baseline {
+  align-items: baseline;
+}
+.gap-sm {
+  gap: 10px;
+}
+.gap-md {
+  gap: 14px;
+}
+.mt-xs {
+  margin-top: 4px;
+}
+.mt-sm {
+  margin-top: 8px;
+}
+.mt-md {
+  margin-top: 14px;
+}
+.ml-sm {
+  margin-left: 8px;
+}
+.mb-lg {
+  margin-bottom: 20px;
+}
+.narrow-sm {
+  max-width: 720px;
+}
+.narrow {
+  max-width: 820px;
+}
+.narrow-lg {
+  max-width: 980px;
+}
+.stack.tight {
+  gap: 8px;
+}
+.stack.loose {
+  gap: 20px;
+}
+.num-md {
+  font-size: 16px;
+}
+.num-lg {
+  font-size: 20px;
+  font-weight: 600;
+}
+.num-xl {
+  font-size: 34px;
+  font-weight: 600;
+}
+.title-lg {
+  font-size: 18px;
+}
+.input.center {
+  text-align: center;
+}
+.skeleton.sm {
+  height: 140px;
+}
+.skeleton.md {
+  height: 240px;
+}
+.skeleton.lg {
+  height: 400px;
+}
+.page-state {
+  padding-top: 35dvh;
 }
