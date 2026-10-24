@@ -3,11 +3,30 @@ from datetime import date
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from app.models import Category, DayKind, Equipment, SetKind, Side
+from app.muscles import Muscle, MuscleRole
 from app.services.progression import Action, FinderVerdict
 
 
 class ORM(BaseModel):
     model_config = ConfigDict(from_attributes=True)
+
+
+# --- 근육 ---------------------------------------------------------------
+class MuscleInfo(BaseModel):
+    muscle: Muscle
+    label: str
+    side: str  # front / back
+
+
+class ExerciseMuscleIO(ORM):
+    muscle: Muscle
+    role: MuscleRole = MuscleRole.primary
+
+
+def _unique_muscles(items: list[ExerciseMuscleIO]) -> list[ExerciseMuscleIO]:
+    if len({m.muscle for m in items}) != len(items):
+        raise ValueError("같은 근육을 두 번 넣을 수 없습니다")
+    return items
 
 
 # --- 종목 ---------------------------------------------------------------
@@ -21,6 +40,8 @@ class ExerciseOut(ORM):
     alternative: str | None
     setup_note: str | None
     cue: str | None
+    archived: bool = False
+    muscles: list[ExerciseMuscleIO] = []
 
 
 class ExerciseCreate(BaseModel):
@@ -32,6 +53,12 @@ class ExerciseCreate(BaseModel):
     alternative: str | None = None
     setup_note: str | None = None
     cue: str | None = None
+    muscles: list[ExerciseMuscleIO] = []
+
+    @model_validator(mode="after")
+    def _check_muscles(self):
+        _unique_muscles(self.muscles)
+        return self
 
 
 class ExerciseUpdate(BaseModel):
@@ -40,6 +67,18 @@ class ExerciseUpdate(BaseModel):
     setup_note: str | None = None
     cue: str | None = None
     equipment: Equipment | None = None
+    unilateral: bool | None = None
+    archived: bool | None = None
+    name: str | None = Field(default=None, min_length=1, max_length=80)
+
+
+class ExerciseMusclesIn(BaseModel):
+    muscles: list[ExerciseMuscleIO]
+
+    @model_validator(mode="after")
+    def _check(self):
+        _unique_muscles(self.muscles)
+        return self
 
 
 class HistoryPoint(BaseModel):
@@ -69,6 +108,59 @@ class RoutineSummary(ORM):
 
 class RoutineOut(RoutineSummary):
     items: list[RoutineItemOut]
+
+
+class RoutineItemIn(BaseModel):
+    exercise_id: int
+    sets: int = Field(ge=1, le=10)
+    rep_min: int | None = Field(default=None, ge=1, le=100)
+    rep_max: int | None = Field(default=None, ge=1, le=100)
+    duration_sec: int | None = Field(default=None, gt=0, le=3600)
+
+    @model_validator(mode="after")
+    def _reps_or_duration(self):
+        has_reps = self.rep_min is not None or self.rep_max is not None
+        if has_reps == (self.duration_sec is not None):
+            raise ValueError("횟수 범위(rep_min~rep_max)와 시간(duration_sec) 중 하나만 정하세요")
+        if has_reps:
+            if self.rep_min is None or self.rep_max is None:
+                raise ValueError("rep_min 과 rep_max 를 함께 정하세요")
+            if self.rep_min > self.rep_max:
+                raise ValueError("rep_min 은 rep_max 보다 클 수 없습니다")
+        return self
+
+
+class RoutineCreate(BaseModel):
+    name: str = Field(min_length=1, max_length=40)
+    description: str | None = Field(default=None, max_length=200)
+    items: list[RoutineItemIn] = []
+
+
+class RoutineUpdate(BaseModel):
+    name: str | None = Field(default=None, min_length=1, max_length=40)
+    description: str | None = Field(default=None, max_length=200)
+
+
+class PhaseUpdate(BaseModel):
+    name: str | None = Field(default=None, min_length=1, max_length=80)
+    start_date: date | None = None
+    end_date: date | None = None
+
+
+class PhaseDayIn(BaseModel):
+    kind: DayKind
+    label: str = Field(min_length=1, max_length=80)
+    routine_id: int | None = None
+    alt_routine_id: int | None = None
+    cardio_minutes: int | None = Field(default=None, ge=0, le=300)
+
+    @model_validator(mode="after")
+    def _routine_matches_kind(self):
+        if self.kind == DayKind.strength and self.routine_id is None:
+            raise ValueError("근력 날은 루틴을 골라야 합니다")
+        if self.kind != DayKind.strength and (self.routine_id or self.alt_routine_id):
+            raise ValueError("근력 날이 아니면 루틴을 넣을 수 없습니다")
+        return self
 
 
 class PhaseDayOut(ORM):
@@ -280,3 +372,57 @@ class DashboardOut(BaseModel):
     upcoming: list[CalendarDay]
     phases: list[PhaseSpan]
     stats: DashboardStats
+
+
+# --- 월말 측정 ---------------------------------------------------------------
+class MeasurementIn(BaseModel):
+    waist_cm: float | None = Field(default=None, gt=30, le=250)
+    chest_cm: float | None = Field(default=None, gt=30, le=250)
+    hip_cm: float | None = Field(default=None, gt=30, le=250)
+    thigh_cm: float | None = Field(default=None, gt=10, le=150)
+    arm_cm: float | None = Field(default=None, gt=10, le=100)
+    body_fat_pct: float | None = Field(default=None, gt=1, lt=70)
+    note: str | None = None
+
+
+class MeasurementOut(ORM, MeasurementIn):
+    date: date
+    # 그날까지 7일간 아침 체중 평균 (daily_logs 에서 계산, 기록이 없으면 null)
+    weight_avg_7d: float | None = None
+    weight_days: int = 0
+
+
+# --- 통계 -------------------------------------------------------------------
+class MuscleVolume(BaseModel):
+    muscle: Muscle
+    label: str
+    side: str
+    sets: float  # 주동근 1 + 보조근 0.5 로 센 세트 수
+    primary_sets: int
+    secondary_sets: int
+    target_sets: int  # 기간을 주 단위로 환산한 목표
+
+
+class PersonalRecord(BaseModel):
+    exercise_id: int
+    name: str
+    best_weight_kg: float
+    best_weight_reps: int
+    best_weight_date: date
+    e1rm_kg: float  # Epley 추정 1RM
+    e1rm_date: date
+
+
+class SideStats(BaseModel):
+    top_weight_kg: float | None
+    total_reps: int
+    sets: int
+
+
+class BalanceRow(BaseModel):
+    exercise_id: int
+    name: str
+    left: SideStats
+    right: SideStats
+    weaker: str | None  # 'L' / 'R' / None(같음)
+    diff_pct: float | None  # 약한 쪽 대비 강한 쪽 무게 차이 %

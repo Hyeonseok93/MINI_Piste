@@ -18,6 +18,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db import Base
+from app.muscles import Muscle, MuscleRole
 
 
 def _enum(cls: type[enum.Enum]) -> Enum:
@@ -71,6 +72,24 @@ class Exercise(Base):
     alternative: Mapped[str | None] = mapped_column(String(120))
     setup_note: Mapped[str | None] = mapped_column(Text)
     cue: Mapped[str | None] = mapped_column(Text)
+    # 더 이상 안 하는 종목: 선택 목록에서 숨기되 과거 기록은 남긴다
+    archived: Mapped[bool] = mapped_column(Boolean, default=False, server_default=false())
+
+    muscles: Mapped[list["ExerciseMuscle"]] = relationship(
+        back_populates="exercise", cascade="all, delete-orphan", lazy="selectin", order_by="ExerciseMuscle.role"
+    )
+
+
+class ExerciseMuscle(Base):
+    """종목이 쓰는 근육 (주동근/보조근)."""
+
+    __tablename__ = "exercise_muscles"
+
+    exercise_id: Mapped[int] = mapped_column(ForeignKey("exercises.id", ondelete="CASCADE"), primary_key=True)
+    muscle: Mapped[Muscle] = mapped_column(_enum(Muscle), primary_key=True)
+    role: Mapped[MuscleRole] = mapped_column(_enum(MuscleRole), default=MuscleRole.primary)
+
+    exercise: Mapped[Exercise] = relationship(back_populates="muscles")
 
 
 class Routine(Base):
@@ -197,3 +216,19 @@ class Profile(Base):
     start_weight_kg: Mapped[float | None] = mapped_column(Float)
     goal_weight_kg: Mapped[float | None] = mapped_column(Float)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+
+
+class BodyMeasurement(Base):
+    """월말 측정 (허리둘레 등). 체중은 daily_logs 의 7일 평균으로 따로 계산한다."""
+
+    __tablename__ = "body_measurements"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    date: Mapped[date] = mapped_column(Date, unique=True)
+    waist_cm: Mapped[float | None] = mapped_column(Float)
+    chest_cm: Mapped[float | None] = mapped_column(Float)
+    hip_cm: Mapped[float | None] = mapped_column(Float)
+    thigh_cm: Mapped[float | None] = mapped_column(Float)
+    arm_cm: Mapped[float | None] = mapped_column(Float)
+    body_fat_pct: Mapped[float | None] = mapped_column(Float)
+    note: Mapped[str | None] = mapped_column(Text)

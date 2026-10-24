@@ -6,6 +6,21 @@ export type DayKind = 'strength' | 'cardio' | 'outdoor' | 'rest'
 export type SetKind = 'work' | 'find' | 'warmup'
 export type Side = 'L' | 'R'
 export type Action = 'start' | 'increase' | 'keep' | 'decrease' | 'unknown'
+export type Muscle =
+  | 'chest'
+  | 'shoulders'
+  | 'biceps'
+  | 'triceps'
+  | 'lats'
+  | 'upper_back'
+  | 'lower_back'
+  | 'abs'
+  | 'obliques'
+  | 'glutes'
+  | 'quads'
+  | 'hamstrings'
+  | 'calves'
+export type MuscleRole = 'primary' | 'secondary'
 export type FinderVerdict = 'up2' | 'up1' | 'confirm' | 'confirm_heavy' | 'down1'
 
 export interface Exercise {
@@ -18,6 +33,9 @@ export interface Exercise {
   alternative: string | null
   setup_note: string | null
   cue: string | null
+  /** 더 이상 안 하는 종목: 선택 목록에서 숨김, 과거 기록은 유지 */
+  archived: boolean
+  muscles: { muscle: Muscle; role: MuscleRole }[]
 }
 
 export type ExerciseUpdate = Partial<

@@ -14,6 +14,8 @@ const lat: Exercise = {
   alternative: null,
   setup_note: null,
   cue: null,
+  archived: false,
+  muscles: [{ muscle: 'lats', role: 'primary' }],
 }
 
 const CHOICES = [

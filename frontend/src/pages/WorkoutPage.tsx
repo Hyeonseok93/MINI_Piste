@@ -152,7 +152,7 @@ function WorkoutView({ date, data }: { date: string; data: Today }) {
               value={null}
               onChange={(id) => setExtraIds((p) => [...p, id])}
               options={exercises.data
-                .filter((e) => !routineIds.has(e.id) && !extras.some((x) => x.id === e.id))
+                .filter((e) => !e.archived && !routineIds.has(e.id) && !extras.some((x) => x.id === e.id))
                 .map((e) => ({ value: e.id, label: e.name, hint: EQUIPMENT_LABEL[e.equipment] }))}
             />
           </div>

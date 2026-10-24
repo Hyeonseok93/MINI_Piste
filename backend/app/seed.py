@@ -14,6 +14,7 @@ from app.models import (
     DayKind,
     Equipment,
     Exercise,
+    ExerciseMuscle,
     Phase,
     PhaseDay,
     Routine,
@@ -22,6 +23,7 @@ from app.models import (
     SetLog,
     Workout,
 )
+from app.muscles import DEFAULT_MUSCLES
 
 S, C = Category.strength, Category.core
 PIN, PLATE, SMITH, BW, ASSIST, BAR = (
@@ -304,6 +306,8 @@ def seed(db: Session) -> bool:
             setup_note=setup,
             cue=cue,
         )
+    for name, e in ex.items():
+        e.muscles = [ExerciseMuscle(muscle=m, role=r) for m, r in DEFAULT_MUSCLES.get(name, [])]
     db.add_all(ex.values())
 
     routines = {}

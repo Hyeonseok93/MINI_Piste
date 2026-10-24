@@ -1,7 +1,7 @@
 from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import exercises, home, logs, plan, today, workouts
+from app.api import exercises, home, logs, measurements, plan, stats, today, workouts
 from app.core.config import settings
 
 app = FastAPI(title="PISTE API", version="0.2.0", docs_url="/api/docs", openapi_url="/api/openapi.json", redoc_url=None)
@@ -21,7 +21,17 @@ def health():
     return {"status": "ok"}
 
 
-for r in (home.router, today.router, plan.router, exercises.router, workouts.router, logs.router):
+for r in (
+    home.router,
+    today.router,
+    plan.router,
+    exercises.meta,
+    exercises.router,
+    workouts.router,
+    logs.router,
+    measurements.router,
+    stats.router,
+):
     api.include_router(r)
 
 app.include_router(api)
