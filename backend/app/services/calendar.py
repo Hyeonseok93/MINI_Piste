@@ -76,14 +76,15 @@ def compute_streak(days: list[CalendarDay], today: date) -> int:
     """오늘부터 거꾸로, 계획된 운동일을 연속으로 해낸 횟수.
 
     휴식일·계획 밖 날짜는 건너뛰고, 오늘은 아직 안 했어도 끊지 않는다.
+    '못 함'으로 표시한 날은 안 한 날이므로 끊는다 (오늘이어도).
     """
     streak = 0
     for d in sorted(days, key=lambda x: x.date, reverse=True):
-        if d.date > today or not (d.done or is_planned_training(d)):
+        if d.date > today or not (d.done or is_training_day(d)):
             continue
         if d.done:
             streak += 1
-        elif d.date == today:
+        elif d.date == today and not d.rest_day:
             continue
         else:
             break

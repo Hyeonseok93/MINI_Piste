@@ -43,10 +43,13 @@ def test_streak_breaks_on_missed_day():
     assert compute_streak(days, date(2026, 10, 21)) == 1
 
 
-def test_chosen_rest_day_keeps_streak_but_counts_as_absent():
+def test_chosen_rest_day_breaks_streak_and_counts_as_absent():
     days = [day("2026-10-19", S, True), day("2026-10-20", C, False, rest_day=True), day("2026-10-21", S, True)]
-    assert compute_streak(days, date(2026, 10, 21)) == 2  # 연속 기록은 끊지 않는다
+    assert compute_streak(days, date(2026, 10, 21)) == 1  # 못 함에서 끊긴다
     assert attendance(days, date(2026, 10, 21)) == 0.667  # 출석은 3일 중 2일
+    # 오늘을 못 함으로 표시해도 끊긴다 (아직 안 한 오늘은 원래 끊지 않음)
+    today_skipped = [day("2026-10-19", S, True), day("2026-10-20", C, False, rest_day=True)]
+    assert compute_streak(today_skipped, date(2026, 10, 20)) == 0
 
 
 def test_rest_day_endpoint_keeps_other_fields(client):
