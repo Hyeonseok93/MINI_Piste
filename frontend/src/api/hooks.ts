@@ -77,6 +77,14 @@ export function useDeleteSet() {
   return useMutation({ mutationFn: (id: number) => api.deleteSet(id), onSuccess: invalidate })
 }
 
+export function useSetRestDay() {
+  const invalidate = useInvalidateLogs()
+  return useMutation({
+    mutationFn: ({ date, rest }: { date: string; rest: boolean }) => api.setRestDay(date, rest),
+    onSuccess: invalidate,
+  })
+}
+
 export function useSaveDailyLog() {
   const invalidate = useInvalidateLogs()
   return useMutation({

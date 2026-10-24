@@ -21,6 +21,11 @@ def _is_training(p: DayPlan) -> bool:
     return p.day is not None and p.day.kind != DayKind.rest
 
 
+def is_planned_training(d: CalendarDay) -> bool:
+    """출석·연속 계산에 들어가는 운동일: 계획된 운동일이고 직접 쉬기로 하지 않은 날."""
+    return d.kind not in (None, DayKind.rest) and not d.rest_day
+
+
 def calendar_days(db: Session, start: date, end: date) -> list[CalendarDay]:
     plans = plan_range(db, start, end)
 
@@ -35,11 +40,12 @@ def calendar_days(db: Session, start: date, end: date) -> list[CalendarDay]:
     for wid, d, title, cardio, n in rows:
         workouts.setdefault(d, (wid, title, cardio, n))  # 하루 여러 개면 첫 세션 기준
 
-    weights = dict(
-        db.execute(
-            select(DailyLog.date, DailyLog.body_weight_kg).where(DailyLog.date.between(start, end))
+    logs = {
+        d: (w, rest)
+        for d, w, rest in db.execute(
+            select(DailyLog.date, DailyLog.body_weight_kg, DailyLog.rest_day).where(DailyLog.date.between(start, end))
         ).all()
-    )
+    }
 
     out = []
     for p in plans:
@@ -58,7 +64,8 @@ def calendar_days(db: Session, start: date, end: date) -> list[CalendarDay]:
                 workout_title=w[1] if w else None,
                 cardio_minutes_done=w[2] if w else None,
                 set_count=w[3] if w else 0,
-                body_weight_kg=weights.get(p.date),
+                body_weight_kg=logs.get(p.date, (None, False))[0],
+                rest_day=bool(logs.get(p.date, (None, False))[1]),
             )
         )
     return out
@@ -71,7 +78,7 @@ def compute_streak(days: list[CalendarDay], today: date) -> int:
     """
     streak = 0
     for d in sorted(days, key=lambda x: x.date, reverse=True):
-        if d.date > today or d.kind in (None, DayKind.rest):
+        if d.date > today or not (d.done or is_planned_training(d)):
             continue
         if d.done:
             streak += 1
@@ -84,7 +91,7 @@ def compute_streak(days: list[CalendarDay], today: date) -> int:
 
 def attendance(days: list[CalendarDay], today: date) -> float | None:
     """지난 운동일 중 해낸 비율 (오늘은 했을 때만 포함)."""
-    planned = [d for d in days if d.kind not in (None, DayKind.rest) and (d.date < today or d.done)]
+    planned = [d for d in days if is_planned_training(d) and (d.date < today or d.done)]
     if not planned:
         return None
     return round(sum(d.done for d in planned) / len(planned), 3)
@@ -101,7 +108,7 @@ def dashboard(db: Session, today: date) -> DashboardOut:
     by_date = {d.date: d for d in span}
 
     week = [by_date[monday + timedelta(days=i)] for i in range(7)]
-    upcoming = [d for d in span if d.date > today and d.kind not in (None, DayKind.rest)][:3]
+    upcoming = [d for d in span if d.date > today and is_planned_training(d)][:3]
     past = [d for d in span if d.date <= today]
     last_28 = [d for d in past if d.date > today - timedelta(days=28)]
 
@@ -113,7 +120,7 @@ def dashboard(db: Session, today: date) -> DashboardOut:
         .limit(1)
     ).scalar()
 
-    week_planned = [d for d in week if d.kind not in (None, DayKind.rest)]
+    week_planned = [d for d in week if is_planned_training(d) or d.done]
     stats = DashboardStats(
         plan_start=plan_start,
         plan_end=plan_end,

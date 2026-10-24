@@ -80,6 +80,9 @@ export default function CalendarPage() {
             <span>
               <i className="dot miss" /> 빠짐
             </span>
+            <span>
+              <i className="dot" /> 휴식
+            </span>
           </div>
         </section>
 
@@ -112,7 +115,7 @@ function DayDetail({ day, today }: { day: CalendarDay; today: string }) {
 
       {day.kind ? (
         <div>
-          <p className="row-title">{day.kind === 'rest' ? '휴식' : shortTitle(day)}</p>
+          <p className="row-title">{day.kind === 'rest' ? '휴식' : day.rest_day && !day.done ? `${shortTitle(day)} 대신 쉼` : shortTitle(day)}</p>
           <p className="row-sub">
             {day.phase} · {KIND_LABEL[day.kind]}
             {day.cardio_minutes != null && ` · 유산소 ${day.cardio_minutes}분`}

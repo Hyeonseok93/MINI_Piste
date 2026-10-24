@@ -1,11 +1,14 @@
 import { useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { useAddSet, useCreateWorkout, useDeleteSet, useDeleteWorkout, useExercises, useToday, useUpdateWorkout } from '../api/hooks'
+import { useAddSet, useCreateWorkout, useDeleteSet, useDeleteWorkout, useExercises, useSetRestDay, useToday, useUpdateWorkout } from '../api/hooks'
 import type { SetInput, Today, Workout } from '../api/types'
 import DailyLogForm from '../components/DailyLogForm'
 import ExerciseCard from '../components/ExerciseCard'
 import { ChevronLeft, ChevronRight } from '../components/icons'
+import { useConfirm } from '../components/Confirm'
+import Select from '../components/Select'
 import { useToast } from '../components/Toast'
+import { EQUIPMENT_LABEL } from '../lib/format'
 import { addDays, formatLong, formatShort, todayISO } from '../lib/date'
 import { KIND_LABEL } from '../lib/status'
 
@@ -71,6 +74,7 @@ function WorkoutView({ date, data }: { date: string; data: Today }) {
   const deleteSet = useDeleteSet()
   const deleteWorkout = useDeleteWorkout()
   const toast = useToast()
+  const confirm = useConfirm()
   const [extraIds, setExtraIds] = useState<number[]>([])
   // 생성 요청 중 연타해도 세션이 하나만 생기도록 진행 중인 요청을 공유한다
   const pending = useRef<Promise<Workout> | null>(null)
@@ -104,10 +108,16 @@ function WorkoutView({ date, data }: { date: string; data: Today }) {
     return setsOf(i.item.exercise.id).filter((s) => s.kind === 'work').length >= goal
   }).length
   const isRest = plan.kind == null || plan.kind === 'rest'
+  const restDay = daily_log?.rest_day ?? false
 
   return (
     <div className="grid cols-main-aside">
       <div className="stack">
+        {restDay && !workout && (
+          <div className="rest-banner" role="status">
+            <b>이 날은 쉬기로 했어요.</b> 달력에 '쉼'으로 표시되고 빠짐으로 세지 않습니다. 마음이 바뀌면 세트를 기록하거나 쉬는 날 표시를 취소하세요.
+          </div>
+        )}
         {items.length === 0 && (
           <div className="panel empty">
             {isRest ? '오늘은 쉬는 날입니다. 몸 상태만 기록해 두세요.' : '오늘은 근력 종목이 없는 날입니다. 유산소 시간을 기록하세요.'}
@@ -130,30 +140,24 @@ function WorkoutView({ date, data }: { date: string; data: Today }) {
           <ExerciseCard key={`x-${ex.id}`} index={items.length + i + 1} exercise={ex} sets={setsOf(ex.id)} onAdd={onAdd} onDelete={(id) => deleteSet.mutate(id)} />
         ))}
         {exercises.data && (
-          <label className="field">
+          <div className="field">
             <span className="field-label">다른 종목 추가</span>
-            <select
-              className="select"
-              value=""
-              onChange={(e) => {
-                const id = Number(e.target.value)
-                if (id) setExtraIds((p) => [...p, id])
-              }}
-            >
-              <option value="">루틴에 없는 종목을 골라 기록</option>
-              {exercises.data
+            <Select
+              label="다른 종목 추가"
+              placeholder="루틴에 없는 종목을 골라 기록"
+              searchable
+              resetAfterSelect
+              value={null}
+              onChange={(id) => setExtraIds((p) => [...p, id])}
+              options={exercises.data
                 .filter((e) => !routineIds.has(e.id) && !extras.some((x) => x.id === e.id))
-                .map((e) => (
-                  <option key={e.id} value={e.id}>
-                    {e.name}
-                  </option>
-                ))}
-            </select>
-          </label>
+                .map((e) => ({ value: e.id, label: e.name, hint: EQUIPMENT_LABEL[e.equipment] }))}
+            />
+          </div>
         )}
       </div>
 
-      <aside className="stack sticky-aside">
+      <aside className="stack">
         {items.length > 0 && (
           <section className="panel stack">
             <div className="row">
@@ -168,6 +172,8 @@ function WorkoutView({ date, data }: { date: string; data: Today }) {
             <p className="row-sub">세트마다 2~3개 남기고 멈추세요. 모든 세트를 목표 횟수까지 채우면 다음에 무게가 올라갑니다.</p>
           </section>
         )}
+
+        {!isRest && !workout && <RestToggle date={date} rest={restDay} />}
 
         <section className="panel">
           <div className="panel-head">
@@ -186,11 +192,16 @@ function WorkoutView({ date, data }: { date: string; data: Today }) {
         {workout && (
           <button
             className="btn btn-danger"
-            onClick={() => {
-              if (confirm(`${workout.title} 기록(세트 ${workout.sets.length}개)을 삭제할까요? 되돌릴 수 없습니다.`)) {
-                pending.current = null
-                deleteWorkout.mutate(workout.id, { onSuccess: () => toast('운동 기록을 삭제했습니다') })
-              }
+            onClick={async () => {
+              const ok = await confirm({
+                title: `${formatShort(date)} 운동 기록을 삭제할까요?`,
+                message: `${workout.title} · 세트 ${workout.sets.length}개${workout.cardio_minutes != null ? ` · 유산소 ${workout.cardio_minutes}분` : ''}. 삭제하면 되돌릴 수 없습니다.`,
+                confirmLabel: '삭제',
+                danger: true,
+              })
+              if (!ok) return
+              pending.current = null
+              deleteWorkout.mutate(workout.id, { onSuccess: () => toast('운동 기록을 삭제했습니다') })
             }}
           >
             이 날 운동 기록 삭제
@@ -198,6 +209,28 @@ function WorkoutView({ date, data }: { date: string; data: Today }) {
         )}
       </aside>
     </div>
+  )
+}
+
+function RestToggle({ date, rest }: { date: string; rest: boolean }) {
+  const setRest = useSetRestDay()
+  const toast = useToast()
+  return (
+    <section className={`panel stack rest-panel${rest ? ' is-rest' : ''}`}>
+      <div>
+        <h2 className="panel-title">{rest ? '쉬는 날로 바꿨어요' : '오늘 못 하나요?'}</h2>
+        <p className="row-sub" style={{ marginTop: 4 }}>
+          {rest ? '달력에 쉼으로 표시되고, 출석률과 연속 기록에서 빠짐으로 세지 않아요.' : '아프거나 일정이 생겼으면 쉬는 날로 바꾸세요. 빠짐으로 세지 않습니다.'}
+        </p>
+      </div>
+      <button
+        className={`btn ${rest ? 'btn-secondary' : 'btn-ghost rest-btn'}`}
+        disabled={setRest.isPending}
+        onClick={() => setRest.mutate({ date, rest: !rest }, { onSuccess: () => toast(rest ? '다시 운동하는 날로 바꿨습니다' : '쉬는 날로 바꿨습니다') })}
+      >
+        {rest ? '다시 운동하는 날로' : '오늘은 쉼'}
+      </button>
+    </section>
   )
 }
 

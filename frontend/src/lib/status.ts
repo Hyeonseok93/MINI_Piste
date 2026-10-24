@@ -3,10 +3,10 @@ import type { CalendarDay, DayKind } from '../api/types'
 export type DayStatus = 'done' | 'missed' | 'today' | 'planned' | 'rest' | 'off'
 
 /** 계획과 기록을 합쳐 그날 상태를 정한다 */
-export function dayStatus(d: Pick<CalendarDay, 'date' | 'kind' | 'done'>, today: string): DayStatus {
+export function dayStatus(d: Pick<CalendarDay, 'date' | 'kind' | 'done'> & { rest_day?: boolean }, today: string): DayStatus {
   if (d.done) return 'done'
   if (d.kind == null) return 'off'
-  if (d.kind === 'rest') return 'rest'
+  if (d.kind === 'rest' || d.rest_day) return 'rest'
   if (d.date < today) return 'missed'
   if (d.date === today) return 'today'
   return 'planned'

@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { useDailyLogs, useExercises, useHistory, useProfile } from '../api/hooks'
 import LineChart from '../components/LineChart'
+import Select from '../components/Select'
 import { parseISODate } from '../lib/date'
-import { kg, movingAverage } from '../lib/format'
+import { EQUIPMENT_LABEL, kg, movingAverage } from '../lib/format'
 
 const md = (s: string) => {
   const d = parseISODate(s)
@@ -40,13 +41,13 @@ export default function ProgressPage() {
           <div className="row">
             <h2 className="panel-title">종목별 무게</h2>
           </div>
-          <select className="select" value={selected ?? ''} onChange={(e) => setExId(Number(e.target.value))} aria-label="종목 선택">
-            {strength.map((e) => (
-              <option key={e.id} value={e.id}>
-                {e.name}
-              </option>
-            ))}
-          </select>
+          <Select
+            label="종목 선택"
+            searchable
+            value={selected}
+            onChange={setExId}
+            options={strength.map((e) => ({ value: e.id, label: e.name, hint: EQUIPMENT_LABEL[e.equipment] }))}
+          />
           {h.length > 0 && first != null && last != null && (
             <div className="row" style={{ alignItems: 'baseline', gap: 10 }}>
               <span className="num" style={{ fontSize: 34, fontWeight: 600 }}>

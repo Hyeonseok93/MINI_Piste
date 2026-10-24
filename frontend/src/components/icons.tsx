@@ -58,3 +58,11 @@ export function BrandMark(props: SVGProps<SVGSVGElement>) {
     </svg>
   )
 }
+
+export const ChevronDown = make(<path d="m6 9.5 6 6 6-6" />)
+export const SearchIcon = make(
+  <>
+    <circle cx="11" cy="11" r="6.5" />
+    <path d="m20 20-4.2-4.2" />
+  </>,
+)

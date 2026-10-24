@@ -153,6 +153,8 @@ export interface DailyLogInput {
 
 export interface DailyLog extends DailyLogInput {
   date: string
+  /** 계획된 운동일을 쉬기로 바꾼 날 */
+  rest_day: boolean
 }
 
 export interface Today {
@@ -190,6 +192,7 @@ export interface CalendarDay extends WeekDay {
   set_count: number
   cardio_minutes_done: number | null
   body_weight_kg: number | null
+  rest_day: boolean
 }
 
 export interface PhaseSpan {

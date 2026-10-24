@@ -10,7 +10,7 @@ import { dayStatus, KIND_LABEL, shortTitle } from '../lib/status'
 function greeting(name: string, today: CalendarDay) {
   const st = dayStatus(today, today.date)
   if (st === 'done') return `${name}님, 오늘 운동 끝!`
-  if (today.kind === 'rest' || today.kind == null) return `${name}님, 오늘은 쉬는 날이에요`
+  if (today.kind === 'rest' || today.kind == null || today.rest_day) return `${name}님, 오늘은 쉬는 날이에요`
   return `${name}님, 오늘은 ${shortTitle(today)}`
 }
 
@@ -119,7 +119,7 @@ function HomeView({ data, name, today }: { data: Dashboard; name: string; today:
 
 function TodayCard({ day, today }: { day: CalendarDay; today: string }) {
   const st = dayStatus(day, today)
-  const isRest = day.kind == null || day.kind === 'rest'
+  const isRest = day.kind == null || day.kind === 'rest' || day.rest_day
 
   if (st === 'done') {
     return (
@@ -147,7 +147,7 @@ function TodayCard({ day, today }: { day: CalendarDay; today: string }) {
     return (
       <div className="today-card rest">
         <p className="tc-kicker">오늘</p>
-        <p className="tc-title">휴식</p>
+        <p className="tc-title">{day.rest_day ? '오늘은 쉬기로 했어요' : '휴식'}</p>
         <p className="tc-meta">걷기 30분이나 스트레칭 정도면 충분해요. 체중만 기록해 두세요.</p>
         <Link to="/workout" className="btn btn-primary">
           체중 기록하기

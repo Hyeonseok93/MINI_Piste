@@ -753,3 +753,48 @@ button:disabled {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ============ scrollbar ============ */
+/* 얇고 둥근 스크롤바. 트랙은 투명, 손잡이는 선 색상에서 hover 때만 진하게 */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  border-radius: 999px;
+  /* 투명 테두리로 손잡이를 트랙 안쪽에 띄운다 */
+  border: 3px solid transparent;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--muted);
+}
+
+::-webkit-scrollbar-button,
+::-webkit-scrollbar-corner {
+  display: none;
+  background: transparent;
+}
+
+/* 텍스트 선택·입력 커서도 앱 색으로 */
+::selection {
+  background: color-mix(in srgb, var(--primary) 28%, transparent);
+  color: inherit;
+}
+
+input,
+textarea {
+  caret-color: var(--primary);
+}

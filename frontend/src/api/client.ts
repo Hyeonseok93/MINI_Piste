@@ -90,6 +90,7 @@ export const api = {
 
   dailyLogs: (p: { from?: string; to?: string } = {}) => request<DailyLog[]>(`/daily-logs${qs(p)}`),
   saveDailyLog: (date: string, body: DailyLogInput) => request<DailyLog>(`/daily-logs/${date}`, json('PUT', body)),
+  setRestDay: (date: string, rest_day: boolean) => request<DailyLog>(`/daily-logs/${date}/rest`, json('PUT', { rest_day })),
 
   weightFinder: (body: FinderInput) => request<FinderResult>('/tools/weight-finder', json('POST', body)),
 }

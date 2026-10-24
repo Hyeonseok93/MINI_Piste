@@ -50,7 +50,7 @@ export default function SettingsPage({ profile }: { profile: Profile }) {
           >
             <label className="field">
               <span className="field-label">이름</span>
-              <input className="input" value={name} onChange={(e) => setName(e.target.value)} maxLength={40} required />
+              <input className="input" value={name} onChange={(e) => setName(e.target.value)} maxLength={40} />
             </label>
             <div className="form-grid cols-3">
               <label className="field">

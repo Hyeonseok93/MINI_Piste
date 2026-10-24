@@ -39,7 +39,7 @@ export default function PisteTimeline({ phases, today }: Props) {
           const { icon, text } = splitName(p.name)
           const isCurrent = p === current
           return (
-            <div key={p.name} className={`piste-seg${isCurrent ? ' current' : ''}`} style={{ width: `${w}%` }} title={p.name}>
+            <div key={p.name} className={`piste-seg${isCurrent ? ' current' : ''}`} style={{ width: `${w}%` }} data-tip={`${p.name} · ${md(p.start_date)}–${p.end_date ? md(p.end_date) : ''}`} tabIndex={0}>
               {w > 4 && (
                 <span className="piste-icon" aria-hidden>
                   {icon}

@@ -191,6 +191,11 @@ class DailyLogIn(BaseModel):
 
 class DailyLogOut(ORM, DailyLogIn):
     date: date
+    rest_day: bool = False
+
+
+class RestDayIn(BaseModel):
+    rest_day: bool
 
 
 class TodayOut(BaseModel):
@@ -232,6 +237,7 @@ class CalendarDay(WeekDayOut):
     set_count: int
     cardio_minutes_done: int | None
     body_weight_kg: float | None
+    rest_day: bool = False
 
 
 class PhaseSpan(BaseModel):

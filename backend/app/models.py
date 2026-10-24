@@ -12,6 +12,7 @@ from sqlalchemy import (
     String,
     Text,
     UniqueConstraint,
+    false,
     func,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -175,6 +176,8 @@ class DailyLog(Base):
     steps: Mapped[int | None] = mapped_column(Integer)
     sleep_hours: Mapped[float | None] = mapped_column(Float)
     memo: Mapped[str | None] = mapped_column(Text)
+    # 계획은 운동일이지만 쉬기로 한 날 (빠짐이 아니라 휴식으로 센다)
+    rest_day: Mapped[bool] = mapped_column(Boolean, default=False, server_default=false())
 
 
 class Profile(Base):

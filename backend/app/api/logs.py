@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.db import get_db
 from app.models import DailyLog
-from app.schemas import DailyLogIn, DailyLogOut, FinderIn, FinderOut
+from app.schemas import DailyLogIn, DailyLogOut, FinderIn, FinderOut, RestDayIn
 from app.services.progression import FINDER_STEPS, FINDER_TEXT, weight_finder
 
 router = APIRouter(tags=["logs"])
@@ -27,6 +27,16 @@ def upsert_daily_log(day: date, body: DailyLogIn, db: Session = Depends(get_db))
     log = db.get(DailyLog, day) or DailyLog(date=day)
     for k, v in body.model_dump().items():
         setattr(log, k, v)
+    db.add(log)
+    db.commit()
+    return log
+
+
+@router.put("/daily-logs/{day}/rest", response_model=DailyLogOut)
+def set_rest_day(day: date, body: RestDayIn, db: Session = Depends(get_db)):
+    """계획된 운동일을 '오늘은 쉼'으로 바꾸거나 되돌린다."""
+    log = db.get(DailyLog, day) or DailyLog(date=day)
+    log.rest_day = body.rest_day
     db.add(log)
     db.commit()
     return log

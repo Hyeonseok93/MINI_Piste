@@ -51,7 +51,7 @@ export default function WelcomePage() {
         >
           <label className="field">
             <span className="field-label">이름</span>
-            <input className="input" value={name} onChange={(e) => setName(e.target.value)} placeholder="예: 홍길동" autoFocus maxLength={40} required />
+            <input className="input" value={name} onChange={(e) => setName(e.target.value)} placeholder="예: 홍길동" autoFocus maxLength={40} />
           </label>
           <label className="field">
             <span className="field-label">키</span>
