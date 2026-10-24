@@ -1,5 +1,5 @@
 [project]
-name = "gym-tracker-api"
+name = "piste-api"
 version = "0.1.0"
 description = "헬스 스케줄 관리 API"
 requires-python = ">=3.12"
