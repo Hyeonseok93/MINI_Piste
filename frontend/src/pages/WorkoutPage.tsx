@@ -100,7 +100,7 @@ function WorkoutView({ date, data }: { date: string; data: Today }) {
     <div className="stack loose">
       {restDay && !workout && (
         <div className={css.banner} role="status">
-          <b>이 날은 '못 함'으로 표시했어요.</b> 달력에 원래 일정과 함께 회색으로 표시되고 빠짐으로 세지 않습니다. 운동을 하게 되면 세트를 기록하거나 표시를 취소하세요.
+          <b>이 날은 '못 함'으로 표시했어요.</b> 달력에 원래 일정과 함께 회색으로 표시되고 연속 기록은 끊기지 않지만, 출석률에는 안 한 날로 들어갑니다. 운동을 하게 되면 세트를 기록하거나 표시를 취소하세요.
         </div>
       )}
       {items.length > 0 && (
@@ -199,7 +199,7 @@ function RestToggle({ date, rest }: { date: string; rest: boolean }) {
       <div>
         <h2 className="panel-title">{rest ? '못 함으로 표시했어요' : '오늘 못 하나요?'}</h2>
         <p className="row-sub mt-xs">
-          {rest ? '달력에 회색 \'못 함\'으로 표시되고, 출석률과 연속 기록에서 빠짐으로 세지 않아요.' : '아프거나 일정이 생겼으면 못 함으로 표시하세요. 빠짐으로 세지 않습니다.'}
+          {rest ? '달력에 회색 \'못 함\'으로 표시돼요. 연속 기록은 이어지고, 출석률에는 안 한 날로 들어가요.' : '아프거나 일정이 생겼으면 못 함으로 표시하세요. 연속 기록은 끊기지 않아요.'}
         </p>
       </div>
       <button

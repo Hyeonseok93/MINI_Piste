@@ -43,10 +43,10 @@ def test_streak_breaks_on_missed_day():
     assert compute_streak(days, date(2026, 10, 21)) == 1
 
 
-def test_chosen_rest_day_is_not_missed():
+def test_chosen_rest_day_keeps_streak_but_counts_as_absent():
     days = [day("2026-10-19", S, True), day("2026-10-20", C, False, rest_day=True), day("2026-10-21", S, True)]
-    assert compute_streak(days, date(2026, 10, 21)) == 2
-    assert attendance(days, date(2026, 10, 21)) == 1.0
+    assert compute_streak(days, date(2026, 10, 21)) == 2  # 연속 기록은 끊지 않는다
+    assert attendance(days, date(2026, 10, 21)) == 0.667  # 출석은 3일 중 2일
 
 
 def test_rest_day_endpoint_keeps_other_fields(client):
@@ -124,7 +124,7 @@ def test_dashboard_attendance_shows_its_basis(client):
     client.put("/api/daily-logs/2026-10-22/rest", json={"rest_day": True})
 
     s = client.get("/api/dashboard", params={"date": "2026-10-24"}).json()["stats"]
-    # 못 함은 빠짐으로 세지 않으므로 3일 중 3일 = 100%. 화면이 근거를 보여 줄 수 있게 숫자도 내려준다
-    assert s["attendance_28d"] == 1.0
-    assert (s["attendance_done"], s["attendance_days"], s["attendance_skipped"]) == (3, 3, 1)
+    # 해야 할 운동일 4일 중 3일 = 75% ('못 함'도 안 한 날). 화면이 근거를 보여 줄 수 있게 숫자도 내려준다
+    assert s["attendance_28d"] == 0.75
+    assert (s["attendance_done"], s["attendance_days"], s["attendance_skipped"]) == (3, 4, 1)
     assert s["attendance_since"] == "2026-10-19"  # 플랜 시작 전 날짜는 세지 않는다

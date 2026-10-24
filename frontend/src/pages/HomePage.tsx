@@ -91,7 +91,7 @@ function Board({ data, today }: { data: Dashboard; today: string }) {
         <WeekStrip days={data.week} today={today} />
         <p className={`row-sub ${s.basis}`}>
           출석은 {since ? `플랜 시작(${formatMD(since)})부터` : '최근 4주'} 지난 운동일 기준이에요.
-          {stats.attendance_skipped > 0 && ` 못 함으로 표시한 ${stats.attendance_skipped}일은 빼고 셉니다.`}
+          {stats.attendance_skipped > 0 && ` 못 함으로 표시한 ${stats.attendance_skipped}일도 안 한 날로 셉니다.`}
         </p>
       </section>
 

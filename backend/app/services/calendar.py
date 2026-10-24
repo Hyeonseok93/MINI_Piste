@@ -17,9 +17,14 @@ from app.schemas import (
 from app.services.planner import load_phases, plan_range
 
 
+def is_training_day(d: CalendarDay) -> bool:
+    """플랜상 운동일 (근력·유산소·야외). '못 함'으로 표시한 날도 포함."""
+    return d.kind not in (None, DayKind.rest)
+
+
 def is_planned_training(d: CalendarDay) -> bool:
-    """출석·연속 계산에 들어가는 운동일: 계획된 운동일이고 직접 쉬기로 하지 않은 날."""
-    return d.kind not in (None, DayKind.rest) and not d.rest_day
+    """연속 기록·다음 운동에 들어가는 운동일: 운동일이고 '못 함'으로 표시하지 않은 날."""
+    return is_training_day(d) and not d.rest_day
 
 
 def calendar_days(db: Session, start: date, end: date) -> list[CalendarDay]:
@@ -86,8 +91,8 @@ def compute_streak(days: list[CalendarDay], today: date) -> int:
 
 
 def attendance(days: list[CalendarDay], today: date) -> float | None:
-    """지난 운동일 중 해낸 비율 (오늘은 했을 때만 포함)."""
-    planned = [d for d in days if is_planned_training(d) and (d.date < today or d.done)]
+    """지난 운동일 중 해낸 비율 (오늘은 했을 때만 포함). '못 함'도 안 한 날로 센다: 4일 중 3일 했으면 75%."""
+    planned = [d for d in days if is_training_day(d) and (d.date < today or d.done)]
     if not planned:
         return None
     return round(sum(d.done for d in planned) / len(planned), 3)
@@ -118,7 +123,7 @@ def dashboard(db: Session, today: date) -> DashboardOut:
 
     week_planned = [d for d in week if is_planned_training(d) or d.done]
     counted = [d for d in last_28 if d.kind is not None]  # 플랜 기간 안의 날만
-    att_days = [d for d in counted if is_planned_training(d) and (d.date < today or d.done)]
+    att_days = [d for d in counted if is_training_day(d) and (d.date < today or d.done)]
     stats = DashboardStats(
         plan_start=plan_start,
         plan_end=plan_end,
@@ -130,7 +135,7 @@ def dashboard(db: Session, today: date) -> DashboardOut:
         attendance_since=min((d.date for d in counted), default=None),
         attendance_days=len(att_days),
         attendance_done=sum(d.done for d in att_days),
-        attendance_skipped=sum(d.rest_day and d.kind not in (None, DayKind.rest) and d.date < today for d in counted),
+        attendance_skipped=sum(d.rest_day and is_training_day(d) and not d.done for d in att_days),
         streak=compute_streak(past, today),
         latest_weight_kg=latest,
         start_weight_kg=profile.start_weight_kg if profile else None,
