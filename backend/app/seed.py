@@ -23,7 +23,7 @@ from app.models import (
     SetLog,
     Workout,
 )
-from app.muscles import DEFAULT_MUSCLES
+from app.muscles import DEFAULT_MUSCLES, SMALL_EXERCISES
 
 S, C = Category.strength, Category.core
 PIN, PLATE, SMITH, BW, ASSIST, BAR = (
@@ -308,6 +308,7 @@ def seed(db: Session) -> bool:
         )
     for name, e in ex.items():
         e.muscles = [ExerciseMuscle(muscle=m, role=r) for m, r in DEFAULT_MUSCLES.get(name, [])]
+        e.rest_sec = 60 if name in SMALL_EXERCISES else 90
     db.add_all(ex.values())
 
     routines = {}

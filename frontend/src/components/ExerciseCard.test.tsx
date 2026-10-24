@@ -15,6 +15,7 @@ const lat: Exercise = {
   setup_note: null,
   cue: null,
   archived: false,
+  rest_sec: 90,
   muscles: [{ muscle: 'lats', role: 'primary' }],
 }
 

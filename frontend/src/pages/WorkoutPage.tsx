@@ -1,7 +1,8 @@
-import { useRef, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
-import { useAddSet, useCreateWorkout, useDeleteSet, useDeleteWorkout, useExercises, useFinderChoices, useSetRestDay, useToday, useUpdateWorkout } from '../api/hooks'
+import { useState } from 'react'
+import { Link, useSearchParams } from 'react-router-dom'
+import { useDeleteWorkout, useExercises, useFinderChoices, useSetRestDay, useToday, useUpdateWorkout } from '../api/hooks'
 import type { SetInput, Today, Workout } from '../api/types'
+import { useWorkoutSession } from '../hooks/useWorkoutSession'
 import DailyLogForm from '../components/DailyLogForm'
 import ExerciseCard from '../components/ExerciseCard'
 import { ChevronLeft, ChevronRight } from '../components/icons'
@@ -32,7 +33,12 @@ export default function WorkoutPage() {
           <h1 className="page-title">{title}</h1>
           {data?.plan.label && <p className="page-sub">{data.plan.label}</p>}
         </div>
-        <div className="row">
+        <div className="row wrap">
+          {data && data.items.length > 0 && (
+            <Link to={`/session${date === today ? '' : `?date=${date}`}`} className="btn btn-primary btn-sm">
+              운동 모드 시작
+            </Link>
+          )}
           {date !== today && (
             <button className="btn btn-secondary btn-sm" onClick={() => setDate(today)}>
               오늘
@@ -70,44 +76,22 @@ function WorkoutView({ date, data }: { date: string; data: Today }) {
   const { plan, items, workout, daily_log } = data
   const exercises = useExercises()
   const finderChoices = useFinderChoices().data ?? []
-  const createWorkout = useCreateWorkout()
-  const addSet = useAddSet()
-  const deleteSet = useDeleteSet()
+  const session = useWorkoutSession(date, data)
+  const { ensureWorkout, setsOf, doneCount } = session
   const deleteWorkout = useDeleteWorkout()
   const toast = useToast()
   const confirm = useConfirm()
   const [extraIds, setExtraIds] = useState<number[]>([])
-  // 생성 요청 중 연타해도 세션이 하나만 생기도록 진행 중인 요청을 공유한다
-  const pending = useRef<Promise<Workout> | null>(null)
-
-  /** 처음 기록하는 순간 그날 세션을 자동으로 만든다 */
-  function ensureWorkout(): Promise<Workout> {
-    if (workout) return Promise.resolve(workout)
-    pending.current ??= createWorkout.mutateAsync({
-      date,
-      routine_id: plan.routine?.id ?? null,
-      title: plan.routine ? null : plan.kind ? KIND_LABEL[plan.kind] : '자유 운동',
-    })
-    pending.current.catch(() => (pending.current = null))
-    return pending.current
-  }
 
   const onAdd = async (body: SetInput) => {
-    const w = await ensureWorkout()
-    const s = await addSet.mutateAsync({ workoutId: w.id, body })
+    const s = await session.addSet(body)
     toast(`${s.set_no}세트 기록됨`)
     return s
   }
-
-  const setsOf = (id: number) => (workout?.sets ?? []).filter((s) => s.exercise_id === id)
   const routineIds = new Set(items.map((i) => i.item.exercise.id))
   const loggedExtra = [...new Set((workout?.sets ?? []).map((s) => s.exercise_id))].filter((id) => !routineIds.has(id))
   const extras = [...new Set([...loggedExtra, ...extraIds])].map((id) => exercises.data?.find((e) => e.id === id)).filter((e) => e != null)
 
-  const doneCount = items.filter((i) => {
-    const goal = i.item.sets * (i.item.exercise.unilateral ? 2 : 1)
-    return setsOf(i.item.exercise.id).filter((s) => s.kind === 'work').length >= goal
-  }).length
   const isRest = plan.kind == null || plan.kind === 'rest'
   const restDay = daily_log?.rest_day ?? false
 
@@ -135,11 +119,11 @@ function WorkoutView({ date, data }: { date: string; data: Today }) {
             sets={setsOf(it.item.exercise.id)}
             finderChoices={finderChoices}
             onAdd={onAdd}
-            onDelete={(id) => deleteSet.mutate(id)}
+            onDelete={session.removeSet}
           />
         ))}
         {extras.map((ex, i) => (
-          <ExerciseCard key={`x-${ex.id}`} index={items.length + i + 1} exercise={ex} sets={setsOf(ex.id)} finderChoices={finderChoices} onAdd={onAdd} onDelete={(id) => deleteSet.mutate(id)} />
+          <ExerciseCard key={`x-${ex.id}`} index={items.length + i + 1} exercise={ex} sets={setsOf(ex.id)} finderChoices={finderChoices} onAdd={onAdd} onDelete={session.removeSet} />
         ))}
         {exercises.data && (
           <div className="field">
@@ -202,8 +186,9 @@ function WorkoutView({ date, data }: { date: string; data: Today }) {
                 danger: true,
               })
               if (!ok) return
-              pending.current = null
-              deleteWorkout.mutate(workout.id, { onSuccess: () => toast('운동 기록을 삭제했습니다') })
+              session.resetPending()
+              await deleteWorkout.mutateAsync(workout.id)
+              toast('운동 기록을 삭제했습니다')
             }}
           >
             이 날 운동 기록 삭제
@@ -228,7 +213,12 @@ function RestToggle({ date, rest }: { date: string; rest: boolean }) {
       <button
         className={`btn ${rest ? 'btn-secondary' : 'btn-ghost rest-btn'}`}
         disabled={setRest.isPending}
-        onClick={() => setRest.mutate({ date, rest: !rest }, { onSuccess: () => toast(rest ? '못 함 표시를 취소했습니다' : '못 함으로 표시했습니다') })}
+        onClick={() =>
+          setRest
+            .mutateAsync({ date, rest: !rest })
+            .then(() => toast(rest ? '못 함 표시를 취소했습니다' : '못 함으로 표시했습니다'))
+            .catch(() => {}) // 오류는 화면의 isError 로 보여 준다
+        }
       >
         {rest ? '못 함 표시 취소' : '오늘은 못 함'}
       </button>
@@ -250,10 +240,11 @@ function WorkoutMeta({ workout, plannedCardio, onEnsure }: { workout: Workout | 
       onSubmit={async (e) => {
         e.preventDefault()
         const w = await onEnsure()
-        update.mutate(
-          { id: w.id, body: { cardio_minutes: cardio === '' ? null : Number(cardio), notes: notes.trim() || null } },
-          { onSuccess: () => toast('저장했습니다') },
-        )
+        // 첫 저장 때 세션이 생기면 이 폼이 다시 그려지므로 콜백 대신 Promise 로 알린다
+        await update
+          .mutateAsync({ id: w.id, body: { cardio_minutes: cardio === '' ? null : Number(cardio), notes: notes.trim() || null } })
+          .then(() => toast('저장했습니다'))
+          .catch(() => {}) // 오류는 화면의 isError 로 보여 준다
       }}
     >
       <label className="field">

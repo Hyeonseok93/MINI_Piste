@@ -41,6 +41,7 @@ class ExerciseOut(ORM):
     setup_note: str | None
     cue: str | None
     archived: bool = False
+    rest_sec: int = 90
     muscles: list[ExerciseMuscleIO] = []
 
 
@@ -53,6 +54,7 @@ class ExerciseCreate(BaseModel):
     alternative: str | None = None
     setup_note: str | None = None
     cue: str | None = None
+    rest_sec: int = Field(default=90, ge=15, le=600)
     muscles: list[ExerciseMuscleIO] = []
 
     @model_validator(mode="after")
@@ -69,6 +71,7 @@ class ExerciseUpdate(BaseModel):
     equipment: Equipment | None = None
     unilateral: bool | None = None
     archived: bool | None = None
+    rest_sec: int | None = Field(default=None, ge=15, le=600)
     name: str | None = Field(default=None, min_length=1, max_length=80)
 
 

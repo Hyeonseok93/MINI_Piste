@@ -11,7 +11,9 @@
     "test": "vitest run",
     "check": "npm run typecheck && npm run lint && npm run knip && npm run test",
     "preview": "vite preview",
-    "knip": "npx -y knip@5 --no-progress"
+    "knip": "npx -y knip@5 --no-progress",
+    "gen:api": "uv --directory ../backend run python -m app.export_openapi ../frontend/openapi.json && npx -y openapi-typescript@7 openapi.json -o src/api/schema.ts",
+    "e2e": "playwright test"
   },
   "dependencies": {
     "@fontsource/barlow-condensed": "^5.3.0",
@@ -22,6 +24,7 @@
     "react-router-dom": "^7.18.4"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.1",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
     "@testing-library/user-event": "^14.6.8",

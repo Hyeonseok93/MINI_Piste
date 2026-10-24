@@ -19,10 +19,11 @@ export default function DailyLogForm({ date, log }: { date: string; log: DailyLo
       className="form-grid"
       onSubmit={(e) => {
         e.preventDefault()
-        save.mutate(
-          { date, body: { body_weight_kg: num(weight), steps: num(steps), sleep_hours: num(sleep), memo: memo.trim() || null } },
-          { onSuccess: () => toast('몸 상태를 저장했습니다') },
-        )
+        // mutate 콜백은 저장 뒤 화면이 다시 그려지면 사라질 수 있어 Promise 로 알린다
+        save
+          .mutateAsync({ date, body: { body_weight_kg: num(weight), steps: num(steps), sleep_hours: num(sleep), memo: memo.trim() || null } })
+          .then(() => toast('몸 상태를 저장했습니다'))
+          .catch(() => {})
       }}
     >
       <div className="form-grid cols-3">

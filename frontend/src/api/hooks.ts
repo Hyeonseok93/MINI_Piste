@@ -1,111 +1,97 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { api } from './client'
-import type { DailyLogInput, ExerciseUpdate, ProfileInput, SetInput, WorkoutInput, WorkoutUpdate } from './types'
+import type {
+  DailyLogInput,
+  ExerciseCreate,
+  ExerciseMuscle,
+  ExerciseUpdate,
+  MeasurementInput,
+  PhaseDayInput,
+  ProfileInput,
+  RoutineCreate,
+  RoutineItemInput,
+  RoutineUpdate,
+  SetInput,
+  WorkoutInput,
+  WorkoutUpdate,
+} from './types'
 
-const keys = {
-  profile: ['profile'] as const,
-  dashboard: (date: string) => ['dashboard', date] as const,
-  calendar: (month: string) => ['calendar', month] as const,
-  today: (date: string) => ['today', date] as const,
-  phases: ['phases'] as const,
-  routines: ['routines'] as const,
-  routine: (id: number) => ['routine', id] as const,
-  exercises: ['exercises'] as const,
-  history: (id: number) => ['history', id] as const,
-  workouts: ['workouts'] as const,
-  workout: (id: number) => ['workout', id] as const,
-  dailyLogs: ['daily-logs'] as const,
-}
+type Range = { from?: string; to?: string }
 
-export const useProfile = () => useQuery({ queryKey: keys.profile, queryFn: api.profile, staleTime: Infinity })
-export const useDashboard = (date: string) => useQuery({ queryKey: keys.dashboard(date), queryFn: () => api.dashboard(date) })
-export const useCalendar = (month: string) => useQuery({ queryKey: keys.calendar(month), queryFn: () => api.calendar(month) })
-export const useToday = (date: string) => useQuery({ queryKey: keys.today(date), queryFn: () => api.today(date) })
+// --- 조회 ------------------------------------------------------------------
+export const useProfile = () => useQuery({ queryKey: ['profile'], queryFn: api.profile, staleTime: Infinity })
+export const useDashboard = (date: string) => useQuery({ queryKey: ['dashboard', date], queryFn: () => api.dashboard(date) })
+export const useCalendar = (month: string) => useQuery({ queryKey: ['calendar', month], queryFn: () => api.calendar(month) })
+export const useToday = (date: string) => useQuery({ queryKey: ['today', date], queryFn: () => api.today(date) })
 export const useFinderChoices = () => useQuery({ queryKey: ['finder-choices'], queryFn: api.finderChoices, staleTime: Infinity })
-export const usePhases = () => useQuery({ queryKey: keys.phases, queryFn: api.phases, staleTime: Infinity })
-export const useRoutines = () => useQuery({ queryKey: keys.routines, queryFn: api.routines, staleTime: Infinity })
-export const useRoutine = (id: number | null) =>
-  useQuery({ queryKey: keys.routine(id ?? 0), queryFn: () => api.routine(id!), enabled: id != null, staleTime: Infinity })
-export const useExercises = () => useQuery({ queryKey: keys.exercises, queryFn: api.exercises })
-export const useHistory = (id: number | null) =>
-  useQuery({ queryKey: keys.history(id ?? 0), queryFn: () => api.history(id!), enabled: id != null })
-export const useWorkouts = () => useQuery({ queryKey: keys.workouts, queryFn: () => api.workouts() })
-export const useWorkout = (id: number | null) =>
-  useQuery({ queryKey: keys.workout(id ?? 0), queryFn: () => api.workout(id!), enabled: id != null })
-export const useDailyLogs = () => useQuery({ queryKey: keys.dailyLogs, queryFn: () => api.dailyLogs() })
+export const useMuscles = () => useQuery({ queryKey: ['muscles'], queryFn: api.muscles, staleTime: Infinity })
 
-/** 기록이 바뀌면 오늘·주간·기록·추이 화면이 모두 영향을 받는다 */
-function useInvalidateLogs() {
+export const usePhases = () => useQuery({ queryKey: ['phases'], queryFn: api.phases })
+export const useRoutines = () => useQuery({ queryKey: ['routines'], queryFn: api.routines })
+export const useRoutine = (id: number | null) => useQuery({ queryKey: ['routine', id], queryFn: () => api.routine(id!), enabled: id != null })
+export const useExercises = () => useQuery({ queryKey: ['exercises'], queryFn: api.exercises })
+export const useHistory = (id: number | null) => useQuery({ queryKey: ['history', id], queryFn: () => api.history(id!), enabled: id != null })
+
+export const useWorkouts = () => useQuery({ queryKey: ['workouts'], queryFn: () => api.workouts() })
+export const useWorkout = (id: number | null) => useQuery({ queryKey: ['workout', id], queryFn: () => api.workout(id!), enabled: id != null })
+export const useDailyLogs = (range: Range = {}) => useQuery({ queryKey: ['daily-logs', range], queryFn: () => api.dailyLogs(range) })
+export const useMeasurements = () => useQuery({ queryKey: ['measurements'], queryFn: () => api.measurements() })
+
+export const useMuscleVolume = (range: Range) => useQuery({ queryKey: ['stats', 'muscles', range], queryFn: () => api.muscleVolume(range) })
+export const usePRs = () => useQuery({ queryKey: ['stats', 'prs'], queryFn: api.prs })
+export const useBalance = (range: Range) => useQuery({ queryKey: ['stats', 'balance', range], queryFn: () => api.balance(range) })
+
+// --- 변경 후 다시 불러올 범위 -------------------------------------------------------
+/** 기록(세트·세션·일일 기록)이 바뀌면 영향을 받는 화면 */
+const LOG_KEYS = ['today', 'workouts', 'workout', 'history', 'daily-logs', 'dashboard', 'calendar', 'stats', 'measurements']
+/** 플랜(루틴·요일·종목)이 바뀌면 영향을 받는 화면 */
+const PLAN_KEYS = ['phases', 'routines', 'routine', 'exercises', 'today', 'dashboard', 'calendar', 'stats']
+
+function useInvalidate(keys: string[]) {
   const qc = useQueryClient()
-  return () =>
-    Promise.all(
-      ['today', 'workouts', 'workout', 'history', 'daily-logs', 'dashboard', 'calendar'].map((k) =>
-        qc.invalidateQueries({ queryKey: [k] }),
-      ),
-    )
+  return () => Promise.all(keys.map((k) => qc.invalidateQueries({ queryKey: [k] })))
 }
 
-export function useCreateWorkout() {
-  const invalidate = useInvalidateLogs()
-  return useMutation({ mutationFn: (body: WorkoutInput) => api.createWorkout(body), onSuccess: invalidate })
+function useLogMutation<V, R>(fn: (v: V) => Promise<R>) {
+  const invalidate = useInvalidate(LOG_KEYS)
+  return useMutation({ mutationFn: fn, onSuccess: invalidate })
 }
 
-export function useUpdateWorkout() {
-  const invalidate = useInvalidateLogs()
-  return useMutation({
-    mutationFn: ({ id, body }: { id: number; body: WorkoutUpdate }) => api.updateWorkout(id, body),
-    onSuccess: invalidate,
-  })
+function usePlanMutation<V, R>(fn: (v: V) => Promise<R>) {
+  const invalidate = useInvalidate(PLAN_KEYS)
+  return useMutation({ mutationFn: fn, onSuccess: invalidate })
 }
 
-export function useDeleteWorkout() {
-  const invalidate = useInvalidateLogs()
-  return useMutation({ mutationFn: (id: number) => api.deleteWorkout(id), onSuccess: invalidate })
-}
+// --- 기록 ------------------------------------------------------------------
+export const useCreateWorkout = () => useLogMutation((body: WorkoutInput) => api.createWorkout(body))
+export const useUpdateWorkout = () => useLogMutation(({ id, body }: { id: number; body: WorkoutUpdate }) => api.updateWorkout(id, body))
+export const useDeleteWorkout = () => useLogMutation((id: number) => api.deleteWorkout(id))
+export const useAddSet = () => useLogMutation(({ workoutId, body }: { workoutId: number; body: SetInput }) => api.addSet(workoutId, body))
+export const useDeleteSet = () => useLogMutation((id: number) => api.deleteSet(id))
+export const useSaveDailyLog = () => useLogMutation(({ date, body }: { date: string; body: DailyLogInput }) => api.saveDailyLog(date, body))
+export const useSetRestDay = () => useLogMutation(({ date, rest }: { date: string; rest: boolean }) => api.setRestDay(date, rest))
+export const useSaveMeasurement = () => useLogMutation(({ date, body }: { date: string; body: MeasurementInput }) => api.saveMeasurement(date, body))
+export const useDeleteMeasurement = () => useLogMutation((date: string) => api.deleteMeasurement(date))
 
-export function useAddSet() {
-  const invalidate = useInvalidateLogs()
-  return useMutation({
-    mutationFn: ({ workoutId, body }: { workoutId: number; body: SetInput }) => api.addSet(workoutId, body),
-    onSuccess: invalidate,
-  })
-}
+// --- 플랜·종목 -----------------------------------------------------------------
+export const useCreateRoutine = () => usePlanMutation((body: RoutineCreate) => api.createRoutine(body))
+export const useUpdateRoutine = () => usePlanMutation(({ id, body }: { id: number; body: RoutineUpdate }) => api.updateRoutine(id, body))
+export const useSetRoutineItems = () => usePlanMutation(({ id, items }: { id: number; items: RoutineItemInput[] }) => api.setRoutineItems(id, items))
+export const useDeleteRoutine = () => usePlanMutation((id: number) => api.deleteRoutine(id))
+export const useSetPhaseDay = () =>
+  usePlanMutation(({ id, weekday, body }: { id: number; weekday: number; body: PhaseDayInput }) => api.setPhaseDay(id, weekday, body))
+export const useCreateExercise = () => usePlanMutation((body: ExerciseCreate) => api.createExercise(body))
+export const useUpdateExercise = () => usePlanMutation(({ id, body }: { id: number; body: ExerciseUpdate }) => api.updateExercise(id, body))
+export const useSetExerciseMuscles = () =>
+  usePlanMutation(({ id, muscles }: { id: number; muscles: ExerciseMuscle[] }) => api.setExerciseMuscles(id, muscles))
 
-export function useDeleteSet() {
-  const invalidate = useInvalidateLogs()
-  return useMutation({ mutationFn: (id: number) => api.deleteSet(id), onSuccess: invalidate })
-}
-
-export function useSetRestDay() {
-  const invalidate = useInvalidateLogs()
-  return useMutation({
-    mutationFn: ({ date, rest }: { date: string; rest: boolean }) => api.setRestDay(date, rest),
-    onSuccess: invalidate,
-  })
-}
-
-export function useSaveDailyLog() {
-  const invalidate = useInvalidateLogs()
-  return useMutation({
-    mutationFn: ({ date, body }: { date: string; body: DailyLogInput }) => api.saveDailyLog(date, body),
-    onSuccess: invalidate,
-  })
-}
-
-export function useUpdateExercise() {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: ({ id, body }: { id: number; body: ExerciseUpdate }) => api.updateExercise(id, body),
-    onSuccess: () => Promise.all([qc.invalidateQueries({ queryKey: keys.exercises }), qc.invalidateQueries({ queryKey: ['today'] })]),
-  })
-}
-
+// --- 프로필 -----------------------------------------------------------------
 export function useSaveProfile() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (body: ProfileInput) => api.saveProfile(body),
     onSuccess: (p) => {
-      qc.setQueryData(keys.profile, p)
+      qc.setQueryData(['profile'], p)
       return qc.invalidateQueries({ queryKey: ['dashboard'] })
     },
   })

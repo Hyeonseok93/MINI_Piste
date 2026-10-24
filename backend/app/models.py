@@ -74,6 +74,8 @@ class Exercise(Base):
     cue: Mapped[str | None] = mapped_column(Text)
     # 더 이상 안 하는 종목: 선택 목록에서 숨기되 과거 기록은 남긴다
     archived: Mapped[bool] = mapped_column(Boolean, default=False, server_default=false())
+    # 세트 사이 휴식(초). 플랜: 큰 종목 90초~2분, 작은 종목 60초
+    rest_sec: Mapped[int] = mapped_column(Integer, default=90, server_default="90")
 
     muscles: Mapped[list["ExerciseMuscle"]] = relationship(
         back_populates="exercise", cascade="all, delete-orphan", lazy="selectin", order_by="ExerciseMuscle.role"

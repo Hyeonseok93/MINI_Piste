@@ -1,0 +1,4629 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "PISTE API",
+    "version": "0.2.0"
+  },
+  "paths": {
+    "/api/health": {
+      "get": {
+        "tags": [
+          "meta"
+        ],
+        "summary": "Health",
+        "operationId": "health_api_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/profile": {
+      "get": {
+        "tags": [
+          "home"
+        ],
+        "summary": "Read Profile",
+        "operationId": "read_profile_api_profile_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileOut"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "home"
+        ],
+        "summary": "Save Profile",
+        "operationId": "save_profile_api_profile_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProfileIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/calendar": {
+      "get": {
+        "tags": [
+          "home"
+        ],
+        "summary": "Month Calendar",
+        "operationId": "month_calendar_api_calendar_get",
+        "parameters": [
+          {
+            "name": "month",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}$",
+              "title": "Month"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CalendarDay"
+                  },
+                  "title": "Response Month Calendar Api Calendar Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/dashboard": {
+      "get": {
+        "tags": [
+          "home"
+        ],
+        "summary": "Read Dashboard",
+        "operationId": "read_dashboard_api_dashboard_get",
+        "parameters": [
+          {
+            "name": "date",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "Date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/today": {
+      "get": {
+        "tags": [
+          "today"
+        ],
+        "summary": "Today",
+        "description": "그날 계획 + 종목별 지난 기록·추천 무게 + 이미 시작한 세션 + 일일 기록.",
+        "operationId": "today_api_today_get",
+        "parameters": [
+          {
+            "name": "date",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "Date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TodayOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/phases": {
+      "get": {
+        "tags": [
+          "plan"
+        ],
+        "summary": "List Phases",
+        "operationId": "list_phases_api_phases_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PhaseOut"
+                  },
+                  "type": "array",
+                  "title": "Response List Phases Api Phases Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/routines": {
+      "get": {
+        "tags": [
+          "plan"
+        ],
+        "summary": "List Routines",
+        "operationId": "list_routines_api_routines_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/RoutineSummary"
+                  },
+                  "type": "array",
+                  "title": "Response List Routines Api Routines Get"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "plan"
+        ],
+        "summary": "Create Routine",
+        "operationId": "create_routine_api_routines_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoutineCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoutineOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/routines/{routine_id}": {
+      "get": {
+        "tags": [
+          "plan"
+        ],
+        "summary": "Read Routine",
+        "operationId": "read_routine_api_routines__routine_id__get",
+        "parameters": [
+          {
+            "name": "routine_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Routine Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoutineOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "plan"
+        ],
+        "summary": "Update Routine",
+        "operationId": "update_routine_api_routines__routine_id__patch",
+        "parameters": [
+          {
+            "name": "routine_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Routine Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoutineUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoutineOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "plan"
+        ],
+        "summary": "Delete Routine",
+        "description": "플랜에 쓰이는 루틴은 지울 수 없다. 과거 운동 기록은 루틴 연결만 끊고 남긴다.",
+        "operationId": "delete_routine_api_routines__routine_id__delete",
+        "parameters": [
+          {
+            "name": "routine_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Routine Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/routines/{routine_id}/items": {
+      "put": {
+        "tags": [
+          "plan"
+        ],
+        "summary": "Replace Routine Items",
+        "description": "루틴 구성을 순서대로 통째로 바꾼다 (추가·삭제·순서 변경을 한 번에).",
+        "operationId": "replace_routine_items_api_routines__routine_id__items_put",
+        "parameters": [
+          {
+            "name": "routine_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Routine Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/RoutineItemIn"
+                },
+                "title": "Items"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoutineOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/phases/{phase_id}": {
+      "patch": {
+        "tags": [
+          "plan"
+        ],
+        "summary": "Update Phase",
+        "operationId": "update_phase_api_phases__phase_id__patch",
+        "parameters": [
+          {
+            "name": "phase_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Phase Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PhaseUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PhaseOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/phases/{phase_id}/days/{weekday}": {
+      "put": {
+        "tags": [
+          "plan"
+        ],
+        "summary": "Set Phase Day",
+        "description": "단계의 요일 하나(0=월 … 6=일)를 정한다.",
+        "operationId": "set_phase_day_api_phases__phase_id__days__weekday__put",
+        "parameters": [
+          {
+            "name": "phase_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Phase Id"
+            }
+          },
+          {
+            "name": "weekday",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Weekday"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PhaseDayIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PhaseOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/muscles": {
+      "get": {
+        "tags": [
+          "exercises"
+        ],
+        "summary": "List Muscles",
+        "description": "근육 부위 분류 (3D 몸 모델·통계가 같은 이름을 쓴다).",
+        "operationId": "list_muscles_api_muscles_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/MuscleInfo"
+                  },
+                  "type": "array",
+                  "title": "Response List Muscles Api Muscles Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/exercises": {
+      "get": {
+        "tags": [
+          "exercises"
+        ],
+        "summary": "List Exercises",
+        "description": "active=true 면 보관한 종목을 뺀다 (선택 목록용). 기본은 과거 기록 표시를 위해 전부.",
+        "operationId": "list_exercises_api_exercises_get",
+        "parameters": [
+          {
+            "name": "active",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Active"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ExerciseOut"
+                  },
+                  "title": "Response List Exercises Api Exercises Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "exercises"
+        ],
+        "summary": "Create Exercise",
+        "operationId": "create_exercise_api_exercises_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExerciseCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExerciseOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/exercises/{exercise_id}": {
+      "get": {
+        "tags": [
+          "exercises"
+        ],
+        "summary": "Read Exercise",
+        "operationId": "read_exercise_api_exercises__exercise_id__get",
+        "parameters": [
+          {
+            "name": "exercise_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Exercise Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExerciseOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "exercises"
+        ],
+        "summary": "Update Exercise",
+        "operationId": "update_exercise_api_exercises__exercise_id__patch",
+        "parameters": [
+          {
+            "name": "exercise_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Exercise Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExerciseUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExerciseOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/exercises/{exercise_id}/muscles": {
+      "put": {
+        "tags": [
+          "exercises"
+        ],
+        "summary": "Set Muscles",
+        "description": "종목이 쓰는 근육을 통째로 바꾼다.",
+        "operationId": "set_muscles_api_exercises__exercise_id__muscles_put",
+        "parameters": [
+          {
+            "name": "exercise_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Exercise Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExerciseMusclesIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExerciseOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/exercises/{exercise_id}/history": {
+      "get": {
+        "tags": [
+          "exercises"
+        ],
+        "summary": "Read History",
+        "operationId": "read_history_api_exercises__exercise_id__history_get",
+        "parameters": [
+          {
+            "name": "exercise_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Exercise Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/HistoryPoint"
+                  },
+                  "title": "Response Read History Api Exercises  Exercise Id  History Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/workouts": {
+      "get": {
+        "tags": [
+          "workouts"
+        ],
+        "summary": "List Workouts",
+        "operationId": "list_workouts_api_workouts_get",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "From"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "To"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WorkoutListItem"
+                  },
+                  "title": "Response List Workouts Api Workouts Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "workouts"
+        ],
+        "summary": "Create Workout",
+        "description": "그날 세션을 만든다. 이미 있으면 새로 만들지 않고 기존 세션을 200으로 돌려준다.",
+        "operationId": "create_workout_api_workouts_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkoutIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkoutOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/workouts/{workout_id}": {
+      "get": {
+        "tags": [
+          "workouts"
+        ],
+        "summary": "Read Workout",
+        "operationId": "read_workout_api_workouts__workout_id__get",
+        "parameters": [
+          {
+            "name": "workout_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Workout Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkoutOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "workouts"
+        ],
+        "summary": "Update Workout",
+        "operationId": "update_workout_api_workouts__workout_id__patch",
+        "parameters": [
+          {
+            "name": "workout_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Workout Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkoutUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkoutOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "workouts"
+        ],
+        "summary": "Delete Workout",
+        "operationId": "delete_workout_api_workouts__workout_id__delete",
+        "parameters": [
+          {
+            "name": "workout_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Workout Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/workouts/{workout_id}/sets": {
+      "post": {
+        "tags": [
+          "workouts"
+        ],
+        "summary": "Add Set",
+        "operationId": "add_set_api_workouts__workout_id__sets_post",
+        "parameters": [
+          {
+            "name": "workout_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Workout Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SetOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/sets/{set_id}": {
+      "patch": {
+        "tags": [
+          "workouts"
+        ],
+        "summary": "Update Set",
+        "operationId": "update_set_api_sets__set_id__patch",
+        "parameters": [
+          {
+            "name": "set_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Set Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SetOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "workouts"
+        ],
+        "summary": "Delete Set",
+        "operationId": "delete_set_api_sets__set_id__delete",
+        "parameters": [
+          {
+            "name": "set_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Set Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/daily-logs": {
+      "get": {
+        "tags": [
+          "logs"
+        ],
+        "summary": "List Daily Logs",
+        "operationId": "list_daily_logs_api_daily_logs_get",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "From"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "To"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DailyLogOut"
+                  },
+                  "title": "Response List Daily Logs Api Daily Logs Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/daily-logs/{day}": {
+      "put": {
+        "tags": [
+          "logs"
+        ],
+        "summary": "Upsert Daily Log",
+        "operationId": "upsert_daily_log_api_daily_logs__day__put",
+        "parameters": [
+          {
+            "name": "day",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "Day"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DailyLogIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DailyLogOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/daily-logs/{day}/rest": {
+      "put": {
+        "tags": [
+          "logs"
+        ],
+        "summary": "Set Rest Day",
+        "description": "계획된 운동일을 '오늘은 쉼'으로 바꾸거나 되돌린다.",
+        "operationId": "set_rest_day_api_daily_logs__day__rest_put",
+        "parameters": [
+          {
+            "name": "day",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "Day"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RestDayIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DailyLogOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tools/weight-finder/choices": {
+      "get": {
+        "tags": [
+          "logs"
+        ],
+        "summary": "Finder Choices",
+        "description": "무게 찾기 버튼 목록 (문구·판정 기준을 한 곳에서 관리).",
+        "operationId": "finder_choices_api_tools_weight_finder_choices_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/FinderChoiceOut"
+                  },
+                  "type": "array",
+                  "title": "Response Finder Choices Api Tools Weight Finder Choices Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tools/weight-finder": {
+      "post": {
+        "tags": [
+          "logs"
+        ],
+        "summary": "Finder",
+        "operationId": "finder_api_tools_weight_finder_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FinderIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FinderOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/measurements": {
+      "get": {
+        "tags": [
+          "measurements"
+        ],
+        "summary": "List Measurements",
+        "operationId": "list_measurements_api_measurements_get",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "From"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "To"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MeasurementOut"
+                  },
+                  "title": "Response List Measurements Api Measurements Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/measurements/{day}": {
+      "put": {
+        "tags": [
+          "measurements"
+        ],
+        "summary": "Save Measurement",
+        "operationId": "save_measurement_api_measurements__day__put",
+        "parameters": [
+          {
+            "name": "day",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "Day"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MeasurementIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeasurementOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "measurements"
+        ],
+        "summary": "Delete Measurement",
+        "operationId": "delete_measurement_api_measurements__day__delete",
+        "parameters": [
+          {
+            "name": "day",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "Day"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/stats/muscles": {
+      "get": {
+        "tags": [
+          "stats"
+        ],
+        "summary": "Muscles",
+        "description": "근육별 세트 수 (기본: 오늘까지 7일). 3D 몸 모델의 색칠 기준.",
+        "operationId": "muscles_api_stats_muscles_get",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "From"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "To"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MuscleVolume"
+                  },
+                  "title": "Response Muscles Api Stats Muscles Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/stats/prs": {
+      "get": {
+        "tags": [
+          "stats"
+        ],
+        "summary": "Prs",
+        "description": "종목별 최고 무게와 추정 1RM.",
+        "operationId": "prs_api_stats_prs_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PersonalRecord"
+                  },
+                  "type": "array",
+                  "title": "Response Prs Api Stats Prs Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/stats/balance": {
+      "get": {
+        "tags": [
+          "stats"
+        ],
+        "summary": "Balance",
+        "description": "한쪽씩 하는 종목의 좌우 비교 (기본: 오늘까지 28일).",
+        "operationId": "balance_api_stats_balance_get",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "From"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "To"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BalanceRow"
+                  },
+                  "title": "Response Balance Api Stats Balance Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Action": {
+        "type": "string",
+        "enum": [
+          "start",
+          "increase",
+          "keep",
+          "decrease",
+          "unknown"
+        ],
+        "title": "Action"
+      },
+      "BalanceRow": {
+        "properties": {
+          "exercise_id": {
+            "type": "integer",
+            "title": "Exercise Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "left": {
+            "$ref": "#/components/schemas/SideStats"
+          },
+          "right": {
+            "$ref": "#/components/schemas/SideStats"
+          },
+          "weaker": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weaker"
+          },
+          "diff_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Diff Pct"
+          }
+        },
+        "type": "object",
+        "required": [
+          "exercise_id",
+          "name",
+          "left",
+          "right",
+          "weaker",
+          "diff_pct"
+        ],
+        "title": "BalanceRow"
+      },
+      "CalendarDay": {
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date",
+            "title": "Date"
+          },
+          "phase": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phase"
+          },
+          "week_index": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Week Index"
+          },
+          "kind": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DayKind"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Label"
+          },
+          "cardio_minutes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cardio Minutes"
+          },
+          "routine": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RoutineSummary"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "workout_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Workout Id"
+          },
+          "done": {
+            "type": "boolean",
+            "title": "Done"
+          },
+          "workout_title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Workout Title"
+          },
+          "set_count": {
+            "type": "integer",
+            "title": "Set Count"
+          },
+          "cardio_minutes_done": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cardio Minutes Done"
+          },
+          "body_weight_kg": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Body Weight Kg"
+          },
+          "rest_day": {
+            "type": "boolean",
+            "title": "Rest Day",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "date",
+          "phase",
+          "week_index",
+          "kind",
+          "label",
+          "cardio_minutes",
+          "routine",
+          "workout_id",
+          "done",
+          "workout_title",
+          "set_count",
+          "cardio_minutes_done",
+          "body_weight_kg"
+        ],
+        "title": "CalendarDay"
+      },
+      "Category": {
+        "type": "string",
+        "enum": [
+          "strength",
+          "core",
+          "cardio"
+        ],
+        "title": "Category"
+      },
+      "DailyLogIn": {
+        "properties": {
+          "body_weight_kg": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 400.0,
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Body Weight Kg"
+          },
+          "steps": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 200000.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Steps"
+          },
+          "sleep_hours": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 24.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sleep Hours"
+          },
+          "memo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Memo"
+          }
+        },
+        "type": "object",
+        "title": "DailyLogIn"
+      },
+      "DailyLogOut": {
+        "properties": {
+          "body_weight_kg": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 400.0,
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Body Weight Kg"
+          },
+          "steps": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 200000.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Steps"
+          },
+          "sleep_hours": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 24.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sleep Hours"
+          },
+          "memo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Memo"
+          },
+          "date": {
+            "type": "string",
+            "format": "date",
+            "title": "Date"
+          },
+          "rest_day": {
+            "type": "boolean",
+            "title": "Rest Day",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "date"
+        ],
+        "title": "DailyLogOut"
+      },
+      "DashboardOut": {
+        "properties": {
+          "profile": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ProfileOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "today": {
+            "$ref": "#/components/schemas/CalendarDay"
+          },
+          "week": {
+            "items": {
+              "$ref": "#/components/schemas/CalendarDay"
+            },
+            "type": "array",
+            "title": "Week"
+          },
+          "upcoming": {
+            "items": {
+              "$ref": "#/components/schemas/CalendarDay"
+            },
+            "type": "array",
+            "title": "Upcoming"
+          },
+          "phases": {
+            "items": {
+              "$ref": "#/components/schemas/PhaseSpan"
+            },
+            "type": "array",
+            "title": "Phases"
+          },
+          "stats": {
+            "$ref": "#/components/schemas/DashboardStats"
+          }
+        },
+        "type": "object",
+        "required": [
+          "profile",
+          "today",
+          "week",
+          "upcoming",
+          "phases",
+          "stats"
+        ],
+        "title": "DashboardOut"
+      },
+      "DashboardStats": {
+        "properties": {
+          "plan_start": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Plan Start"
+          },
+          "plan_end": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Plan End"
+          },
+          "day_number": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Day Number"
+          },
+          "total_workouts": {
+            "type": "integer",
+            "title": "Total Workouts"
+          },
+          "week_done": {
+            "type": "integer",
+            "title": "Week Done"
+          },
+          "week_planned": {
+            "type": "integer",
+            "title": "Week Planned"
+          },
+          "attendance_28d": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Attendance 28D"
+          },
+          "streak": {
+            "type": "integer",
+            "title": "Streak"
+          },
+          "latest_weight_kg": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Weight Kg"
+          },
+          "start_weight_kg": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start Weight Kg"
+          },
+          "goal_weight_kg": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Goal Weight Kg"
+          }
+        },
+        "type": "object",
+        "required": [
+          "plan_start",
+          "plan_end",
+          "day_number",
+          "total_workouts",
+          "week_done",
+          "week_planned",
+          "attendance_28d",
+          "streak",
+          "latest_weight_kg",
+          "start_weight_kg",
+          "goal_weight_kg"
+        ],
+        "title": "DashboardStats"
+      },
+      "DayKind": {
+        "type": "string",
+        "enum": [
+          "strength",
+          "cardio",
+          "outdoor",
+          "rest"
+        ],
+        "title": "DayKind"
+      },
+      "DayPlanOut": {
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date",
+            "title": "Date"
+          },
+          "phase": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phase"
+          },
+          "week_index": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Week Index"
+          },
+          "kind": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DayKind"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Label"
+          },
+          "cardio_minutes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cardio Minutes"
+          },
+          "routine": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RoutineSummary"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "date",
+          "phase",
+          "week_index",
+          "kind",
+          "label",
+          "cardio_minutes",
+          "routine"
+        ],
+        "title": "DayPlanOut"
+      },
+      "Equipment": {
+        "type": "string",
+        "enum": [
+          "pin",
+          "assisted",
+          "plate",
+          "smith",
+          "barbell",
+          "bodyweight",
+          "cardio"
+        ],
+        "title": "Equipment"
+      },
+      "ExerciseCreate": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "category": {
+            "$ref": "#/components/schemas/Category",
+            "default": "strength"
+          },
+          "equipment": {
+            "$ref": "#/components/schemas/Equipment",
+            "default": "pin"
+          },
+          "increment_kg": {
+            "type": "number",
+            "maximum": 50.0,
+            "minimum": 0.0,
+            "title": "Increment Kg",
+            "default": 5.0
+          },
+          "unilateral": {
+            "type": "boolean",
+            "title": "Unilateral",
+            "default": false
+          },
+          "alternative": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Alternative"
+          },
+          "setup_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Setup Note"
+          },
+          "cue": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cue"
+          },
+          "rest_sec": {
+            "type": "integer",
+            "maximum": 600.0,
+            "minimum": 15.0,
+            "title": "Rest Sec",
+            "default": 90
+          },
+          "muscles": {
+            "items": {
+              "$ref": "#/components/schemas/ExerciseMuscleIO"
+            },
+            "type": "array",
+            "title": "Muscles",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "title": "ExerciseCreate"
+      },
+      "ExerciseMuscleIO": {
+        "properties": {
+          "muscle": {
+            "$ref": "#/components/schemas/Muscle"
+          },
+          "role": {
+            "$ref": "#/components/schemas/MuscleRole",
+            "default": "primary"
+          }
+        },
+        "type": "object",
+        "required": [
+          "muscle"
+        ],
+        "title": "ExerciseMuscleIO"
+      },
+      "ExerciseMusclesIn": {
+        "properties": {
+          "muscles": {
+            "items": {
+              "$ref": "#/components/schemas/ExerciseMuscleIO"
+            },
+            "type": "array",
+            "title": "Muscles"
+          }
+        },
+        "type": "object",
+        "required": [
+          "muscles"
+        ],
+        "title": "ExerciseMusclesIn"
+      },
+      "ExerciseOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "category": {
+            "$ref": "#/components/schemas/Category"
+          },
+          "equipment": {
+            "$ref": "#/components/schemas/Equipment"
+          },
+          "increment_kg": {
+            "type": "number",
+            "title": "Increment Kg"
+          },
+          "unilateral": {
+            "type": "boolean",
+            "title": "Unilateral"
+          },
+          "alternative": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Alternative"
+          },
+          "setup_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Setup Note"
+          },
+          "cue": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cue"
+          },
+          "archived": {
+            "type": "boolean",
+            "title": "Archived",
+            "default": false
+          },
+          "rest_sec": {
+            "type": "integer",
+            "title": "Rest Sec",
+            "default": 90
+          },
+          "muscles": {
+            "items": {
+              "$ref": "#/components/schemas/ExerciseMuscleIO"
+            },
+            "type": "array",
+            "title": "Muscles",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "category",
+          "equipment",
+          "increment_kg",
+          "unilateral",
+          "alternative",
+          "setup_note",
+          "cue"
+        ],
+        "title": "ExerciseOut"
+      },
+      "ExerciseUpdate": {
+        "properties": {
+          "increment_kg": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 50.0,
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Increment Kg"
+          },
+          "alternative": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Alternative"
+          },
+          "setup_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Setup Note"
+          },
+          "cue": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cue"
+          },
+          "equipment": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Equipment"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "unilateral": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unilateral"
+          },
+          "archived": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Archived"
+          },
+          "rest_sec": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 600.0,
+                "minimum": 15.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rest Sec"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 80,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          }
+        },
+        "type": "object",
+        "title": "ExerciseUpdate"
+      },
+      "FinderChoiceOut": {
+        "properties": {
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "completed": {
+            "type": "boolean",
+            "title": "Completed"
+          },
+          "rir": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rir"
+          }
+        },
+        "type": "object",
+        "required": [
+          "label",
+          "completed",
+          "rir"
+        ],
+        "title": "FinderChoiceOut"
+      },
+      "FinderIn": {
+        "properties": {
+          "completed": {
+            "type": "boolean",
+            "title": "Completed",
+            "description": "12회를 채웠는가"
+          },
+          "rir": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 20.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rir",
+            "description": "몇 개 더 할 수 있었나"
+          },
+          "weight_kg": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weight Kg"
+          },
+          "increment_kg": {
+            "anyOf": [
+              {
+                "type": "number",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Increment Kg"
+          }
+        },
+        "type": "object",
+        "required": [
+          "completed"
+        ],
+        "title": "FinderIn"
+      },
+      "FinderOut": {
+        "properties": {
+          "verdict": {
+            "$ref": "#/components/schemas/FinderVerdict"
+          },
+          "steps": {
+            "type": "integer",
+            "title": "Steps"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "next_weight_kg": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Weight Kg"
+          }
+        },
+        "type": "object",
+        "required": [
+          "verdict",
+          "steps",
+          "message",
+          "next_weight_kg"
+        ],
+        "title": "FinderOut"
+      },
+      "FinderVerdict": {
+        "type": "string",
+        "enum": [
+          "up2",
+          "up1",
+          "confirm",
+          "confirm_heavy",
+          "down1"
+        ],
+        "title": "FinderVerdict"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "HistoryPoint": {
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date",
+            "title": "Date"
+          },
+          "top_weight_kg": {
+            "type": "number",
+            "title": "Top Weight Kg"
+          },
+          "volume_kg": {
+            "type": "number",
+            "title": "Volume Kg"
+          },
+          "sets": {
+            "type": "integer",
+            "title": "Sets"
+          }
+        },
+        "type": "object",
+        "required": [
+          "date",
+          "top_weight_kg",
+          "volume_kg",
+          "sets"
+        ],
+        "title": "HistoryPoint"
+      },
+      "LastSession": {
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date",
+            "title": "Date"
+          },
+          "sets": {
+            "items": {
+              "$ref": "#/components/schemas/SetOut"
+            },
+            "type": "array",
+            "title": "Sets"
+          }
+        },
+        "type": "object",
+        "required": [
+          "date",
+          "sets"
+        ],
+        "title": "LastSession"
+      },
+      "MeasurementIn": {
+        "properties": {
+          "waist_cm": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 250.0,
+                "exclusiveMinimum": 30.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Waist Cm"
+          },
+          "chest_cm": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 250.0,
+                "exclusiveMinimum": 30.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Chest Cm"
+          },
+          "hip_cm": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 250.0,
+                "exclusiveMinimum": 30.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hip Cm"
+          },
+          "thigh_cm": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 150.0,
+                "exclusiveMinimum": 10.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Thigh Cm"
+          },
+          "arm_cm": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 100.0,
+                "exclusiveMinimum": 10.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Arm Cm"
+          },
+          "body_fat_pct": {
+            "anyOf": [
+              {
+                "type": "number",
+                "exclusiveMaximum": 70.0,
+                "exclusiveMinimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Body Fat Pct"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "type": "object",
+        "title": "MeasurementIn"
+      },
+      "MeasurementOut": {
+        "properties": {
+          "waist_cm": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 250.0,
+                "exclusiveMinimum": 30.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Waist Cm"
+          },
+          "chest_cm": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 250.0,
+                "exclusiveMinimum": 30.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Chest Cm"
+          },
+          "hip_cm": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 250.0,
+                "exclusiveMinimum": 30.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hip Cm"
+          },
+          "thigh_cm": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 150.0,
+                "exclusiveMinimum": 10.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Thigh Cm"
+          },
+          "arm_cm": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 100.0,
+                "exclusiveMinimum": 10.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Arm Cm"
+          },
+          "body_fat_pct": {
+            "anyOf": [
+              {
+                "type": "number",
+                "exclusiveMaximum": 70.0,
+                "exclusiveMinimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Body Fat Pct"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "date": {
+            "type": "string",
+            "format": "date",
+            "title": "Date"
+          },
+          "weight_avg_7d": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weight Avg 7D"
+          },
+          "weight_days": {
+            "type": "integer",
+            "title": "Weight Days",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "required": [
+          "date"
+        ],
+        "title": "MeasurementOut"
+      },
+      "Muscle": {
+        "type": "string",
+        "enum": [
+          "chest",
+          "shoulders",
+          "biceps",
+          "triceps",
+          "lats",
+          "upper_back",
+          "lower_back",
+          "abs",
+          "obliques",
+          "glutes",
+          "quads",
+          "hamstrings",
+          "calves"
+        ],
+        "title": "Muscle"
+      },
+      "MuscleInfo": {
+        "properties": {
+          "muscle": {
+            "$ref": "#/components/schemas/Muscle"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "side": {
+            "type": "string",
+            "title": "Side"
+          }
+        },
+        "type": "object",
+        "required": [
+          "muscle",
+          "label",
+          "side"
+        ],
+        "title": "MuscleInfo"
+      },
+      "MuscleRole": {
+        "type": "string",
+        "enum": [
+          "primary",
+          "secondary"
+        ],
+        "title": "MuscleRole"
+      },
+      "MuscleVolume": {
+        "properties": {
+          "muscle": {
+            "$ref": "#/components/schemas/Muscle"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "side": {
+            "type": "string",
+            "title": "Side"
+          },
+          "sets": {
+            "type": "number",
+            "title": "Sets"
+          },
+          "primary_sets": {
+            "type": "integer",
+            "title": "Primary Sets"
+          },
+          "secondary_sets": {
+            "type": "integer",
+            "title": "Secondary Sets"
+          },
+          "target_sets": {
+            "type": "integer",
+            "title": "Target Sets"
+          }
+        },
+        "type": "object",
+        "required": [
+          "muscle",
+          "label",
+          "side",
+          "sets",
+          "primary_sets",
+          "secondary_sets",
+          "target_sets"
+        ],
+        "title": "MuscleVolume"
+      },
+      "PersonalRecord": {
+        "properties": {
+          "exercise_id": {
+            "type": "integer",
+            "title": "Exercise Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "best_weight_kg": {
+            "type": "number",
+            "title": "Best Weight Kg"
+          },
+          "best_weight_reps": {
+            "type": "integer",
+            "title": "Best Weight Reps"
+          },
+          "best_weight_date": {
+            "type": "string",
+            "format": "date",
+            "title": "Best Weight Date"
+          },
+          "e1rm_kg": {
+            "type": "number",
+            "title": "E1Rm Kg"
+          },
+          "e1rm_date": {
+            "type": "string",
+            "format": "date",
+            "title": "E1Rm Date"
+          }
+        },
+        "type": "object",
+        "required": [
+          "exercise_id",
+          "name",
+          "best_weight_kg",
+          "best_weight_reps",
+          "best_weight_date",
+          "e1rm_kg",
+          "e1rm_date"
+        ],
+        "title": "PersonalRecord"
+      },
+      "PhaseDayIn": {
+        "properties": {
+          "kind": {
+            "$ref": "#/components/schemas/DayKind"
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "Label"
+          },
+          "routine_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Routine Id"
+          },
+          "alt_routine_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Alt Routine Id"
+          },
+          "cardio_minutes": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 300.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cardio Minutes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind",
+          "label"
+        ],
+        "title": "PhaseDayIn"
+      },
+      "PhaseDayOut": {
+        "properties": {
+          "weekday": {
+            "type": "integer",
+            "title": "Weekday"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/DayKind"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "cardio_minutes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cardio Minutes"
+          },
+          "routine": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RoutineSummary"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "alt_routine": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RoutineSummary"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "weekday",
+          "kind",
+          "label",
+          "cardio_minutes",
+          "routine",
+          "alt_routine"
+        ],
+        "title": "PhaseDayOut"
+      },
+      "PhaseOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "start_date": {
+            "type": "string",
+            "format": "date",
+            "title": "Start Date"
+          },
+          "end_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End Date"
+          },
+          "days": {
+            "items": {
+              "$ref": "#/components/schemas/PhaseDayOut"
+            },
+            "type": "array",
+            "title": "Days"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "start_date",
+          "end_date",
+          "days"
+        ],
+        "title": "PhaseOut"
+      },
+      "PhaseSpan": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "start_date": {
+            "type": "string",
+            "format": "date",
+            "title": "Start Date"
+          },
+          "end_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End Date"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "start_date",
+          "end_date"
+        ],
+        "title": "PhaseSpan"
+      },
+      "PhaseUpdate": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 80,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "start_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start Date"
+          },
+          "end_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End Date"
+          }
+        },
+        "type": "object",
+        "title": "PhaseUpdate"
+      },
+      "ProfileIn": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 40,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "height_cm": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 260.0,
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Height Cm"
+          },
+          "start_weight_kg": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 400.0,
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start Weight Kg"
+          },
+          "goal_weight_kg": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 400.0,
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Goal Weight Kg"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "title": "ProfileIn"
+      },
+      "ProfileOut": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 40,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "height_cm": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 260.0,
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Height Cm"
+          },
+          "start_weight_kg": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 400.0,
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start Weight Kg"
+          },
+          "goal_weight_kg": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 400.0,
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Goal Weight Kg"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "title": "ProfileOut"
+      },
+      "RecommendationOut": {
+        "properties": {
+          "action": {
+            "$ref": "#/components/schemas/Action"
+          },
+          "weight_kg": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weight Kg"
+          },
+          "last_weight_kg": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Weight Kg"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "action",
+          "weight_kg",
+          "last_weight_kg",
+          "reason"
+        ],
+        "title": "RecommendationOut"
+      },
+      "RestDayIn": {
+        "properties": {
+          "rest_day": {
+            "type": "boolean",
+            "title": "Rest Day"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rest_day"
+        ],
+        "title": "RestDayIn"
+      },
+      "RoutineCreate": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 40,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/RoutineItemIn"
+            },
+            "type": "array",
+            "title": "Items",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "title": "RoutineCreate"
+      },
+      "RoutineItemIn": {
+        "properties": {
+          "exercise_id": {
+            "type": "integer",
+            "title": "Exercise Id"
+          },
+          "sets": {
+            "type": "integer",
+            "maximum": 10.0,
+            "minimum": 1.0,
+            "title": "Sets"
+          },
+          "rep_min": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 100.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rep Min"
+          },
+          "rep_max": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 100.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rep Max"
+          },
+          "duration_sec": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 3600.0,
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Sec"
+          }
+        },
+        "type": "object",
+        "required": [
+          "exercise_id",
+          "sets"
+        ],
+        "title": "RoutineItemIn"
+      },
+      "RoutineItemOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "position": {
+            "type": "integer",
+            "title": "Position"
+          },
+          "sets": {
+            "type": "integer",
+            "title": "Sets"
+          },
+          "rep_min": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rep Min"
+          },
+          "rep_max": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rep Max"
+          },
+          "duration_sec": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Sec"
+          },
+          "exercise": {
+            "$ref": "#/components/schemas/ExerciseOut"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "position",
+          "sets",
+          "rep_min",
+          "rep_max",
+          "duration_sec",
+          "exercise"
+        ],
+        "title": "RoutineItemOut"
+      },
+      "RoutineOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "item_count": {
+            "type": "integer",
+            "title": "Item Count"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/RoutineItemOut"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "description",
+          "item_count",
+          "items"
+        ],
+        "title": "RoutineOut"
+      },
+      "RoutineSummary": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "item_count": {
+            "type": "integer",
+            "title": "Item Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "description",
+          "item_count"
+        ],
+        "title": "RoutineSummary"
+      },
+      "RoutineUpdate": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 40,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          }
+        },
+        "type": "object",
+        "title": "RoutineUpdate"
+      },
+      "SetIn": {
+        "properties": {
+          "exercise_id": {
+            "type": "integer",
+            "title": "Exercise Id"
+          },
+          "set_no": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Set No"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/SetKind",
+            "default": "work"
+          },
+          "weight_kg": {
+            "type": "number",
+            "maximum": 1000.0,
+            "minimum": 0.0,
+            "title": "Weight Kg"
+          },
+          "reps": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 200.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reps"
+          },
+          "duration_sec": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 3600.0,
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Sec"
+          },
+          "rir": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 20.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rir"
+          },
+          "side": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Side"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "exercise_id",
+          "weight_kg"
+        ],
+        "title": "SetIn"
+      },
+      "SetKind": {
+        "type": "string",
+        "enum": [
+          "work",
+          "find",
+          "warmup"
+        ],
+        "title": "SetKind"
+      },
+      "SetOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "exercise_id": {
+            "type": "integer",
+            "title": "Exercise Id"
+          },
+          "set_no": {
+            "type": "integer",
+            "title": "Set No"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/SetKind"
+          },
+          "weight_kg": {
+            "type": "number",
+            "title": "Weight Kg"
+          },
+          "reps": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reps"
+          },
+          "duration_sec": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Sec"
+          },
+          "rir": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rir"
+          },
+          "side": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Side"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "exercise_id",
+          "set_no",
+          "kind",
+          "weight_kg",
+          "reps",
+          "duration_sec",
+          "rir",
+          "side"
+        ],
+        "title": "SetOut"
+      },
+      "SetUpdate": {
+        "properties": {
+          "weight_kg": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 1000.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weight Kg"
+          },
+          "reps": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 200.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reps"
+          },
+          "duration_sec": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 3600.0,
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Sec"
+          },
+          "rir": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 20.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rir"
+          },
+          "kind": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SetKind"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "title": "SetUpdate"
+      },
+      "Side": {
+        "type": "string",
+        "enum": [
+          "L",
+          "R"
+        ],
+        "title": "Side"
+      },
+      "SideStats": {
+        "properties": {
+          "top_weight_kg": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Top Weight Kg"
+          },
+          "total_reps": {
+            "type": "integer",
+            "title": "Total Reps"
+          },
+          "sets": {
+            "type": "integer",
+            "title": "Sets"
+          }
+        },
+        "type": "object",
+        "required": [
+          "top_weight_kg",
+          "total_reps",
+          "sets"
+        ],
+        "title": "SideStats"
+      },
+      "TodayItem": {
+        "properties": {
+          "item": {
+            "$ref": "#/components/schemas/RoutineItemOut"
+          },
+          "last": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LastSession"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "recommendation": {
+            "$ref": "#/components/schemas/RecommendationOut"
+          }
+        },
+        "type": "object",
+        "required": [
+          "item",
+          "last",
+          "recommendation"
+        ],
+        "title": "TodayItem"
+      },
+      "TodayOut": {
+        "properties": {
+          "plan": {
+            "$ref": "#/components/schemas/DayPlanOut"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/TodayItem"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "workout": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/WorkoutOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "daily_log": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DailyLogOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "plan",
+          "items",
+          "workout",
+          "daily_log"
+        ],
+        "title": "TodayOut"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "WorkoutIn": {
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date",
+            "title": "Date"
+          },
+          "routine_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Routine Id"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 80
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "cardio_minutes": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 600.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cardio Minutes"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "date"
+        ],
+        "title": "WorkoutIn"
+      },
+      "WorkoutListItem": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "date": {
+            "type": "string",
+            "format": "date",
+            "title": "Date"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "routine_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Routine Id"
+          },
+          "cardio_minutes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cardio Minutes"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "set_count": {
+            "type": "integer",
+            "title": "Set Count"
+          },
+          "exercise_count": {
+            "type": "integer",
+            "title": "Exercise Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "date",
+          "title",
+          "routine_id",
+          "cardio_minutes",
+          "notes",
+          "set_count",
+          "exercise_count"
+        ],
+        "title": "WorkoutListItem"
+      },
+      "WorkoutOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "date": {
+            "type": "string",
+            "format": "date",
+            "title": "Date"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "routine_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Routine Id"
+          },
+          "cardio_minutes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cardio Minutes"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "sets": {
+            "items": {
+              "$ref": "#/components/schemas/SetOut"
+            },
+            "type": "array",
+            "title": "Sets"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "date",
+          "title",
+          "routine_id",
+          "cardio_minutes",
+          "notes",
+          "sets"
+        ],
+        "title": "WorkoutOut"
+      },
+      "WorkoutUpdate": {
+        "properties": {
+          "title": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 80
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "cardio_minutes": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 600.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cardio Minutes"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          }
+        },
+        "type": "object",
+        "title": "WorkoutUpdate"
+      }
+    }
+  }
+}

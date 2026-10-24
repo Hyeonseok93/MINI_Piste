@@ -1,99 +1,109 @@
 import { useState } from 'react'
-import { useExercises, usePhases, useRoutine, useRoutines, useUpdateExercise } from '../api/hooks'
-import type { Exercise } from '../api/types'
+import { useCreateRoutine, useExercises, useMuscles, usePhases, useRoutine, useRoutines } from '../api/hooks'
+import type { Phase } from '../api/types'
 import PisteTimeline from '../components/PisteTimeline'
+import ExerciseEditor from '../components/plan/ExerciseEditor'
+import PhaseDayEditor from '../components/plan/PhaseDayEditor'
+import RoutineEditor from '../components/plan/RoutineEditor'
+import { PlusIcon } from '../components/icons'
 import { useToast } from '../components/Toast'
 import { formatShort, todayISO, weekdayLabel } from '../lib/date'
-import { EQUIPMENT_LABEL, kg, targetShort } from '../lib/format'
+import { EQUIPMENT_LABEL, kg } from '../lib/format'
 import { shortTitle } from '../lib/status'
 
 type Tab = 'phases' | 'routines' | 'exercises'
+const TABS: [Tab, string][] = [
+  ['phases', '단계·요일'],
+  ['routines', '루틴'],
+  ['exercises', '종목'],
+]
+
+const isCurrent = (p: Phase, today: string) => p.start_date <= today && (!p.end_date || today <= p.end_date)
 
 export default function PlanPage() {
   const [tab, setTab] = useState<Tab>('phases')
   const phases = usePhases().data
   const today = todayISO()
-  const current = phases?.find((p) => p.start_date <= today && (!p.end_date || today <= p.end_date))
+  const current = phases?.find((p) => isCurrent(p, today))
   const trainDays = current?.days.filter((d) => d.kind !== 'rest').map((d) => weekdayLabel(d.weekday)) ?? []
   const restDays = current?.days.filter((d) => d.kind === 'rest').map((d) => weekdayLabel(d.weekday)) ?? []
+
   return (
     <>
       <header className="page-header">
         <div className="titles">
           <h1 className="page-title">플랜</h1>
           <p className="page-sub">
-            체지방 감량과 근력 유지·증가를 위한 1년 계획입니다.
+            요일 계획과 루틴, 종목을 여기서 바꿉니다.
             {current && ` 지금은 ${trainDays.join('·')} 운동, ${restDays.join('·')} 휴식.`}
           </p>
         </div>
         <div className="seg" role="tablist">
-          {(
-            [
-              ['phases', '단계'],
-              ['routines', '루틴'],
-              ['exercises', '종목'],
-            ] as const
-          ).map(([k, label]) => (
+          {TABS.map(([k, label]) => (
             <button key={k} role="tab" aria-selected={tab === k} onClick={() => setTab(k)}>
               {label}
             </button>
           ))}
         </div>
       </header>
-      {tab === 'phases' && <Phases />}
+      {tab === 'phases' && <Phases phases={phases} today={today} />}
       {tab === 'routines' && <Routines />}
       {tab === 'exercises' && <Exercises />}
     </>
   )
 }
 
-function Phases() {
-  const { data } = usePhases()
-  const today = todayISO()
-  if (!data) return <div className="skeleton lg" />
+function Phases({ phases, today }: { phases: Phase[] | undefined; today: string }) {
+  const [editing, setEditing] = useState<string | null>(null)
+  if (!phases) return <div className="skeleton lg" />
 
   return (
     <div className="grid">
       <section className="panel">
-        <PisteTimeline phases={data} today={today} />
+        <PisteTimeline phases={phases} today={today} />
       </section>
       <div className="grid cols-2">
-        {data.map((p) => {
-          const current = p.start_date <= today && (!p.end_date || today <= p.end_date)
-          return (
-            <section key={p.id} className="panel" style={current ? { borderColor: 'var(--ink)' } : undefined}>
-              <div className="panel-head">
-                <h2 className="panel-title">{p.name}</h2>
-                {current && <span className="pill strength">진행 중</span>}
-              </div>
-              <p className="row-sub num num-md phase-dates">
-                {formatShort(p.start_date)} – {p.end_date ? formatShort(p.end_date) : ''}
-              </p>
-              <ul className="rows">
-                {[...p.days]
-                  .sort((a, b) => a.weekday - b.weekday)
-                  .map((d) => (
-                    <li key={d.weekday} className="compact">
-                      <span className="muted wd-label">
-                        {weekdayLabel(d.weekday)}
-                      </span>
-                      <span className={`dot ${d.kind}`} />
-                      <span className={`grow${d.kind === 'rest' ? ' muted' : ''}`}>
-                        {d.routine ? (
-                          <>
-                            <b>{shortTitle(d)}</b>
-                            {d.alt_routine && <span className="muted">, 격주 {d.alt_routine.name}</span>}
-                          </>
-                        ) : (
-                          d.label
-                        )}
-                      </span>
+        {phases.map((p) => (
+          <section key={p.id} className={`panel${isCurrent(p, today) ? ' panel-current' : ''}`}>
+            <div className="panel-head">
+              <h2 className="panel-title">{p.name}</h2>
+              {isCurrent(p, today) && <span className="pill strength">진행 중</span>}
+            </div>
+            <p className="row-sub num num-md phase-dates">
+              {formatShort(p.start_date)} – {p.end_date ? formatShort(p.end_date) : ''}
+            </p>
+            <ul className="rows">
+              {[...p.days]
+                .sort((a, b) => a.weekday - b.weekday)
+                .map((d) => {
+                  const key = `${p.id}-${d.weekday}`
+                  return (
+                    <li key={d.weekday} className="compact block">
+                      {editing === key ? (
+                        <PhaseDayEditor phaseId={p.id} day={d} onDone={() => setEditing(null)} />
+                      ) : (
+                        <button type="button" className="row row-button day-row" onClick={() => setEditing(key)} aria-label={`${weekdayLabel(d.weekday)}요일 계획 수정`}>
+                          <span className="muted wd-label">{weekdayLabel(d.weekday)}</span>
+                          <span className={`dot ${d.kind}`} />
+                          <span className={`grow${d.kind === 'rest' ? ' muted' : ''}`}>
+                            {d.routine ? (
+                              <>
+                                <b>{shortTitle(d)}</b>
+                                {d.alt_routine && <span className="muted">, 격주 {d.alt_routine.name}</span>}
+                              </>
+                            ) : (
+                              d.label
+                            )}
+                          </span>
+                          <span className="muted edit-hint">수정</span>
+                        </button>
+                      )}
                     </li>
-                  ))}
-              </ul>
-            </section>
-          )
-        })}
+                  )
+                })}
+            </ul>
+          </section>
+        ))}
       </div>
     </div>
   )
@@ -101,9 +111,21 @@ function Phases() {
 
 function Routines() {
   const { data } = useRoutines()
+  const create = useCreateRoutine()
+  const toast = useToast()
   const [id, setId] = useState<number | null>(null)
   const selected = id ?? data?.[0]?.id ?? null
   const routine = useRoutine(selected)
+
+  async function addRoutine() {
+    const base = '새 루틴'
+    const names = new Set(data?.map((r) => r.name))
+    let name = base
+    for (let n = 2; names.has(name); n++) name = `${base} ${n}`
+    const r = await create.mutateAsync({ name, items: [] })
+    setId(r.id)
+    toast(`${name}을 만들었습니다. 이름과 종목을 정하세요`)
+  }
 
   return (
     <div className="grid">
@@ -111,103 +133,71 @@ function Routines() {
         {data?.map((r) => (
           <button key={r.id} className={`btn btn-sm ${r.id === selected ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setId(r.id)}>
             {r.name}
+            <span className="muted-inline">{r.item_count}</span>
           </button>
         ))}
+        <button className="btn btn-ghost btn-sm" onClick={addRoutine} disabled={create.isPending}>
+          <PlusIcon /> 새 루틴
+        </button>
       </div>
-      {routine.data && (
-        <section className="panel narrow-sm">
-          <div className="panel-head">
-            <h2 className="panel-title">{routine.data.name}</h2>
-            <span className="muted">{routine.data.description}</span>
-          </div>
-          <ol className="rows">
-            {routine.data.items.map((it) => (
-              <li key={it.id}>
-                <span className="ex-pos">{it.position}</span>
-                <span className="grow">
-                  <span className="row-title block">
-                    {it.exercise.name}
-                  </span>
-                  {it.exercise.alternative && <span className="row-sub">없으면 {it.exercise.alternative}</span>}
-                </span>
-                <span className="num num-lg">
-                  {targetShort(it)}
-                </span>
-              </li>
-            ))}
-          </ol>
-        </section>
-      )}
+      {routine.data && <RoutineEditor key={`${routine.data.id}-${routine.dataUpdatedAt}`} routine={routine.data} onDeleted={() => setId(null)} />}
     </div>
   )
 }
 
 function Exercises() {
   const { data } = useExercises()
-  return (
-    <div className="grid cols-2">
-      {data?.map((e) => (
-        <ExerciseRow key={e.id} exercise={e} />
-      ))}
-    </div>
-  )
-}
-
-function ExerciseRow({ exercise }: { exercise: Exercise }) {
-  const update = useUpdateExercise()
-  const toast = useToast()
-  const [editing, setEditing] = useState(false)
-  const [inc, setInc] = useState(String(exercise.increment_kg))
-  const [note, setNote] = useState(exercise.setup_note ?? '')
+  const labels = new Map((useMuscles().data ?? []).map((m) => [m.muscle, m.label]))
+  const [open, setOpen] = useState<number | 'new' | null>(null)
+  const [query, setQuery] = useState('')
+  const [showArchived, setShowArchived] = useState(false)
+  const list = (data ?? []).filter((e) => (showArchived || !e.archived) && e.name.includes(query.trim()))
 
   return (
-    <section className="panel stack tight">
-      <div className="row">
-        <div className="grow">
-          <h3 className="row-title">{exercise.name}</h3>
-          <p className="row-sub">
-            {EQUIPMENT_LABEL[exercise.equipment]}, 한 번에 {kg(exercise.increment_kg)}씩 증량
-            {exercise.unilateral && ', 좌우 따로'}
-          </p>
-        </div>
-        <button className="btn btn-ghost btn-sm" onClick={() => setEditing(!editing)} aria-expanded={editing}>
-          {editing ? '닫기' : '수정'}
+    <div className="grid">
+      <div className="row wrap">
+        <input className="input search-input" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="종목 검색" aria-label="종목 검색" />
+        <label className="check">
+          <input type="checkbox" checked={showArchived} onChange={(e) => setShowArchived(e.target.checked)} />
+          보관한 종목도 보기
+        </label>
+        <span className="grow" />
+        <button className="btn btn-primary btn-sm" onClick={() => setOpen('new')}>
+          <PlusIcon /> 새 종목
         </button>
       </div>
-      {!editing && exercise.setup_note && <p className="cue">{exercise.setup_note}</p>}
-      {editing && (
-        <form
-          className="form-grid"
-          onSubmit={(ev) => {
-            ev.preventDefault()
-            update.mutate(
-              { id: exercise.id, body: { increment_kg: Number(inc), setup_note: note.trim() || null } },
-              {
-                onSuccess: () => {
-                  setEditing(false)
-                  toast(`${exercise.name} 정보를 저장했습니다`)
-                },
-              },
-            )
-          }}
-        >
-          <label className="field">
-            <span className="field-label">증량 단위</span>
-            <span className="input-suffix">
-              <input className="input" inputMode="decimal" value={inc} onChange={(e) => setInc(e.target.value)} />
-              <span>kg</span>
-            </span>
-          </label>
-          <label className="field">
-            <span className="field-label">세팅 메모 (의자 높이, 패드 위치)</span>
-            <textarea className="textarea" rows={2} value={note} onChange={(e) => setNote(e.target.value)} />
-          </label>
-          {update.isError && <p className="error-text">{update.error.message}</p>}
-          <button className="btn btn-primary btn-sm" type="submit" disabled={update.isPending}>
-            저장
-          </button>
-        </form>
+      {open === 'new' && (
+        <section className="panel">
+          <h2 className="panel-title mb-lg">새 종목</h2>
+          <ExerciseEditor onDone={() => setOpen(null)} />
+        </section>
       )}
-    </section>
+      <div className="grid cols-2">
+        {list.map((e) => (
+          <section key={e.id} className={`panel stack tight${e.archived ? ' is-archived' : ''}`}>
+            <div className="row">
+              <div className="grow">
+                <h3 className="row-title">
+                  {e.name}
+                  {e.archived && <span className="pill ml-sm">보관</span>}
+                </h3>
+                <p className="row-sub">
+                  {EQUIPMENT_LABEL[e.equipment]}, 한 번에 {kg(e.increment_kg)}씩, 휴식 {e.rest_sec}초{e.unilateral && ', 좌우 따로'}
+                </p>
+                <p className="row-sub">
+                  {e.muscles.length
+                    ? e.muscles.map((m) => `${labels.get(m.muscle) ?? m.muscle}${m.role === 'secondary' ? '(보조)' : ''}`).join(', ')
+                    : '근육 미지정'}
+                </p>
+              </div>
+              <button className="btn btn-ghost btn-sm" onClick={() => setOpen(open === e.id ? null : e.id)} aria-expanded={open === e.id}>
+                {open === e.id ? '닫기' : '수정'}
+              </button>
+            </div>
+            {open === e.id && <ExerciseEditor exercise={e} onDone={() => setOpen(null)} />}
+          </section>
+        ))}
+      </div>
+    </div>
   )
 }

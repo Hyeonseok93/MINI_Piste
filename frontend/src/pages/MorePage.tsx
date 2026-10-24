@@ -2,8 +2,8 @@ import { Link } from 'react-router-dom'
 import { ChartIcon, ChevronRight, PlanIcon, SettingsIcon } from '../components/icons'
 
 const ITEMS = [
-  { to: '/progress', label: '통계', icon: ChartIcon },
-  { to: '/plan', label: '플랜 · 루틴 · 종목', icon: PlanIcon },
+  { to: '/analysis', label: '분석 · 운동 기록', icon: ChartIcon },
+  { to: '/plan', label: '플랜 · 루틴 · 종목 편집', icon: PlanIcon },
   { to: '/settings', label: '프로필 설정', icon: SettingsIcon },
 ]
 

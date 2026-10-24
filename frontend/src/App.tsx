@@ -1,12 +1,13 @@
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { useProfile } from './api/hooks'
 import AppShell from './components/AppShell'
+import AnalysisPage from './pages/AnalysisPage'
+import BodyPage from './pages/BodyPage'
 import CalendarPage from './pages/CalendarPage'
-import HistoryPage from './pages/HistoryPage'
 import HomePage from './pages/HomePage'
 import MorePage from './pages/MorePage'
 import PlanPage from './pages/PlanPage'
-import ProgressPage from './pages/ProgressPage'
+import SessionPage from './pages/SessionPage'
 import SettingsPage from './pages/SettingsPage'
 import WelcomePage from './pages/WelcomePage'
 import WorkoutPage from './pages/WorkoutPage'
@@ -33,12 +34,17 @@ export default function App() {
   return (
     <Routes>
       <Route path="/welcome" element={<Navigate to="/" replace />} />
+      {/* 운동 모드는 메뉴 없이 전체 화면 */}
+      <Route path="/session" element={<SessionPage />} />
       <Route element={<AppShell profile={profile} />}>
         <Route index element={<HomePage profile={profile} />} />
         <Route path="workout" element={<WorkoutPage />} />
         <Route path="calendar" element={<CalendarPage />} />
-        <Route path="history" element={<HistoryPage />} />
-        <Route path="progress" element={<ProgressPage />} />
+        <Route path="body" element={<BodyPage />} />
+        <Route path="analysis" element={<AnalysisPage />} />
+        {/* 예전 주소 */}
+        <Route path="history" element={<Navigate to="/analysis?tab=history" replace />} />
+        <Route path="progress" element={<Navigate to="/analysis?tab=trend" replace />} />
         <Route path="plan" element={<PlanPage />} />
         <Route path="settings" element={<SettingsPage profile={profile} />} />
         <Route path="more" element={<MorePage />} />

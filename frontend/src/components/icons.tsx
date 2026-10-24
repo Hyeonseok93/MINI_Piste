@@ -22,9 +22,15 @@ export function CalendarIcon(props: IconProps) {
     <path d="M3.5 10h17M8 3v4M16 3v4" />
   </></Svg>
 }
-export function ListIcon(props: IconProps) {
-  return <Svg {...props}><path d="M9 6.5h11M9 12h11M9 17.5h11M4.5 6.5h.01M4.5 12h.01M4.5 17.5h.01" /></Svg>
+export function BodyIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <circle cx="12" cy="4.5" r="2" />
+      <path d="M6 9.5c2 .8 4 1.2 6 1.2s4-.4 6-1.2M12 10.7V15m0 0-2.5 6M12 15l2.5 6" />
+    </Svg>
+  )
 }
+
 export function ChartIcon(props: IconProps) {
   return <Svg {...props}><path d="M4 19.5h16M7 16v-5M12 16V7M17 16v-8" /></Svg>
 }

@@ -1,4 +1,13 @@
 {
   "$schema": "https://unpkg.com/knip@5/schema.json",
-  "ignoreDependencies": ["pretendard", "@fontsource/barlow-condensed"]
+  "ignoreDependencies": [
+    "pretendard",
+    "@fontsource/barlow-condensed"
+  ],
+  "ignore": [
+    "src/api/schema.ts"
+  ],
+  "ignoreBinaries": [
+    "uv"
+  ]
 }

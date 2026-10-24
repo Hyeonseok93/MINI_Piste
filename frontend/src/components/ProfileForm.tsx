@@ -26,10 +26,10 @@ export default function ProfileForm({ initial, submitLabel, onNameChange, onSave
       className="form-grid"
       onSubmit={(e) => {
         e.preventDefault()
-        save.mutate(
-          { name: name.trim(), height_cm: toNum(height), start_weight_kg: toNum(weight), goal_weight_kg: toNum(goal) },
-          { onSuccess: (p) => onSaved?.(p) },
-        )
+        save
+          .mutateAsync({ name: name.trim(), height_cm: toNum(height), start_weight_kg: toNum(weight), goal_weight_kg: toNum(goal) })
+          .then((p) => onSaved?.(p))
+          .catch(() => {}) // 오류는 화면의 isError 로 보여 준다
       }}
     >
       <label className="field">

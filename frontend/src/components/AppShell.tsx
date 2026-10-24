@@ -3,16 +3,7 @@ import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import type { Profile } from '../api/types'
 import { initial } from '../lib/format'
 import ErrorBoundary from './ErrorBoundary'
-import {
-  BrandMark,
-  CalendarIcon,
-  ChartIcon,
-  DumbbellIcon,
-  HomeIcon,
-  ListIcon,
-  MoreIcon,
-  PlanIcon,
-} from './icons'
+import { BodyIcon, BrandMark, CalendarIcon, ChartIcon, DumbbellIcon, HomeIcon, MoreIcon, PlanIcon } from './icons'
 
 type Item = { to: string; label: string; icon: ComponentType<SVGProps<SVGSVGElement>> }
 
@@ -20,8 +11,8 @@ const SIDEBAR: Item[] = [
   { to: '/', label: '홈', icon: HomeIcon },
   { to: '/workout', label: '오늘 운동', icon: DumbbellIcon },
   { to: '/calendar', label: '달력', icon: CalendarIcon },
-  { to: '/history', label: '운동 기록', icon: ListIcon },
-  { to: '/progress', label: '통계', icon: ChartIcon },
+  { to: '/body', label: '몸', icon: BodyIcon },
+  { to: '/analysis', label: '분석', icon: ChartIcon },
   { to: '/plan', label: '플랜', icon: PlanIcon },
 ]
 
@@ -29,7 +20,7 @@ const TABS: Item[] = [
   { to: '/', label: '홈', icon: HomeIcon },
   { to: '/workout', label: '운동', icon: DumbbellIcon },
   { to: '/calendar', label: '달력', icon: CalendarIcon },
-  { to: '/history', label: '기록', icon: ListIcon },
+  { to: '/body', label: '몸', icon: BodyIcon },
   { to: '/more', label: '더보기', icon: MoreIcon },
 ]
 

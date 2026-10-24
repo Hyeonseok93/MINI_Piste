@@ -33,6 +33,8 @@ package = false
 [tool.ruff]
 line-length = 120
 target-version = "py312"
+# 자동 생성되는 마이그레이션 파일은 검사하지 않는다
+extend-exclude = ["alembic/versions"]
 
 [tool.ruff.lint]
 # 오류(F), 버그 패턴(B), 단순화(SIM), 최신 문법(UP), import 정렬(I), 미사용 인자(ARG)

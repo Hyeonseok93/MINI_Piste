@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { useExercises, useWorkout, useWorkouts } from '../api/hooks'
-import type { WorkoutListItem } from '../api/types'
-import { ChevronRight } from '../components/icons'
-import { parseISODate, weekdayIndex, weekdayLabel } from '../lib/date'
-import { summarizeSets } from '../lib/format'
+import { useExercises, useWorkout, useWorkouts } from '../../api/hooks'
+import type { WorkoutListItem } from '../../api/types'
+import { ChevronRight } from '../icons'
+import { parseISODate, weekdayIndex, weekdayLabel } from '../../lib/date'
+import { summarizeSets } from '../../lib/format'
 
 function byMonth(list: WorkoutListItem[]) {
   const groups = new Map<string, WorkoutListItem[]>()
@@ -15,19 +15,14 @@ function byMonth(list: WorkoutListItem[]) {
   return [...groups.entries()]
 }
 
-export default function HistoryPage() {
+/** 월별 운동 기록 목록 (분석 화면의 '기록' 탭) */
+export default function HistoryList() {
   const { data, isPending, isError, error } = useWorkouts()
   const [open, setOpen] = useState<number | null>(null)
 
   return (
     <>
-      <header className="page-header">
-        <div className="titles">
-          <h1 className="page-title">운동 기록</h1>
-          <p className="page-sub">{data ? `지금까지 ${data.length}번 운동했어요` : ' '}</p>
-        </div>
-      </header>
-
+      {data && <p className="page-sub mb-lg">지금까지 {data.length}번 운동했어요</p>}
       {isPending && <div className="skeleton md" />}
       {isError && <p className="error-text">{error.message}</p>}
       {data?.length === 0 && (
