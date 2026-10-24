@@ -32,17 +32,22 @@ export default function PisteTimeline({ phases, today }: Props) {
         {phases.map((p) => {
           const w = (days(p.start_date, p.end_date ?? p.start_date) + 1) / total
           const { icon, text } = splitName(p.name)
-          // 좁은 칸은 이름이 잘리므로 아이콘만
-          const wide = w > 0.1
+          // 칸 폭에 맞춰 이름은 말줄임, 아주 좁으면 아이콘만 (CSS 컨테이너 쿼리)
           return (
             <div
               key={p.name}
-              className={`${s.seg}${wide ? ` ${s.wide}` : ''}${p === current ? ` ${s.current}` : ''}`}
+              className={`${s.seg}${p === current ? ` ${s.current}` : ''}`}
               style={{ flex: w }}
               data-tip={`${p.name}, ${formatYMDot(p.start_date)}–${p.end_date ? formatYMDot(p.end_date) : ''}`}
             >
-              {w > 0.03 && <span aria-hidden>{icon}</span>}
-              {wide && <span className={s.name}>{text}</span>}
+              <span className={s.inner}>
+                {icon && (
+                  <span className={s.icon} aria-hidden>
+                    {icon}
+                  </span>
+                )}
+                <span className={s.name}>{text}</span>
+              </span>
             </div>
           )
         })}

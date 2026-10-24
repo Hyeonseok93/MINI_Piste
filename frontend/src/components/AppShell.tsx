@@ -12,7 +12,7 @@ const SIDEBAR: Item[] = [
   { to: '/', label: '홈', icon: HomeIcon },
   { to: '/workout', label: '오늘 운동', icon: DumbbellIcon },
   { to: '/calendar', label: '달력', icon: CalendarIcon },
-  { to: '/body', label: '몸', icon: BodyIcon },
+  { to: '/body', label: '몸 기록', icon: BodyIcon },
   { to: '/analysis', label: '분석', icon: ChartIcon },
   { to: '/plan', label: '플랜', icon: PlanIcon },
 ]
@@ -21,7 +21,7 @@ const TABS: Item[] = [
   { to: '/', label: '홈', icon: HomeIcon },
   { to: '/workout', label: '운동', icon: DumbbellIcon },
   { to: '/calendar', label: '달력', icon: CalendarIcon },
-  { to: '/body', label: '몸', icon: BodyIcon },
+  { to: '/body', label: '몸 기록', icon: BodyIcon },
   { to: '/more', label: '더보기', icon: MoreIcon },
 ]
 

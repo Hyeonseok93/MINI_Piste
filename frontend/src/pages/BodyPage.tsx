@@ -39,7 +39,7 @@ export default function BodyPage() {
     <div className="page-col">
       <header className="page-header">
         <div className="titles">
-          <h1 className="page-title">몸</h1>
+          <h1 className="page-title">몸 기록</h1>
           <p className="page-sub">체중은 매일 아침 공복에, 둘레는 매월 마지막 주에 잽니다.</p>
         </div>
       </header>

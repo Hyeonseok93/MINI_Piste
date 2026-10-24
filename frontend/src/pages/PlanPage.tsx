@@ -26,19 +26,13 @@ export default function PlanPage() {
   const [tab, setTab] = useState<Tab>('phases')
   const phases = usePhases().data
   const today = todayISO()
-  const current = phases?.find((p) => isCurrent(p, today))
-  const trainDays = current?.days.filter((d) => d.kind !== 'rest').map((d) => weekdayLabel(d.weekday)) ?? []
-  const restDays = current?.days.filter((d) => d.kind === 'rest').map((d) => weekdayLabel(d.weekday)) ?? []
 
   return (
     <>
       <header className="page-header">
         <div className="titles">
           <h1 className="page-title">플랜</h1>
-          <p className="page-sub">
-            요일 계획과 루틴, 종목을 여기서 바꿉니다.
-            {current && ` 지금은 ${trainDays.join('·')} 운동, ${restDays.join('·')} 휴식이에요.`}
-          </p>
+          <p className="page-sub">요일 계획과 루틴, 종목을 여기서 바꿉니다.</p>
         </div>
         <div className="seg" role="tablist">
           {TABS.map(([k, label]) => (
