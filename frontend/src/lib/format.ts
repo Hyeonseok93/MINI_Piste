@@ -50,14 +50,5 @@ export function targetShort(t: Target): string {
 export const toNum = (v: string): number | null => (v.trim() === '' ? null : Number(v))
 export const toStr = (v: number | null | undefined): string => (v == null ? '' : String(v))
 
-/** n일 이동평균 (null 은 건너뜀) */
-export function movingAverage(values: (number | null)[], window: number): (number | null)[] {
-  return values.map((_, i) => {
-    const slice = values.slice(Math.max(0, i - window + 1), i + 1).filter((v): v is number => v != null)
-    return slice.length ? +(slice.reduce((a, b) => a + b, 0) / slice.length).toFixed(2) : null
-  })
-}
-
-
 /** 아바타에 쓰는 이름 첫 글자 */
 export const initial = (name: string) => name.trim().slice(0, 1).toUpperCase()

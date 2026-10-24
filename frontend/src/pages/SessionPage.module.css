@@ -1,0 +1,163 @@
+.session {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  max-width: 640px;
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding: calc(12px + env(safe-area-inset-top)) 16px calc(170px + env(safe-area-inset-bottom));
+}
+
+.state {
+  place-content: center;
+  justify-items: center;
+  text-align: center;
+  color: var(--muted);
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.steps {
+  display: flex;
+  gap: 6px;
+}
+
+.step {
+  flex: 1;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--surface-3);
+}
+
+.step.done {
+  background: var(--hit);
+}
+
+.step.current {
+  background: var(--primary);
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.count {
+  flex: 1;
+  text-align: center;
+  color: var(--muted);
+}
+
+.summary {
+  display: grid;
+  gap: 14px;
+  text-align: center;
+}
+
+.finished {
+  color: var(--hit);
+  font-weight: 700;
+}
+
+.summaryTitle {
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.stats b {
+  display: block;
+  font-size: 34px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.prs {
+  text-align: left;
+}
+
+/* 휴식 타이머: 화면 아래에 떠 있는 시트 */
+.rest {
+  position: fixed;
+  left: 50%;
+  bottom: calc(12px + env(safe-area-inset-bottom));
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: min(608px, calc(100% - 24px));
+  padding: 14px 16px;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-card);
+  background: var(--surface);
+  box-shadow: var(--shadow-pop);
+  transform: translateX(-50%);
+  animation: sheet-in 180ms ease-out;
+}
+
+@keyframes sheet-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 12px);
+  }
+}
+
+.ring {
+  position: relative;
+  flex: none;
+  width: 104px;
+  height: 104px;
+}
+
+.ring svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.track {
+  fill: none;
+  stroke: var(--surface-3);
+  stroke-width: 9;
+}
+
+.fill {
+  fill: none;
+  stroke: var(--primary);
+  stroke-width: 9;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 250ms linear;
+}
+
+.time {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 30px;
+  font-weight: 600;
+}
+
+.restLabel {
+  font-size: 17px;
+  font-weight: 700;
+}

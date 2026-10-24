@@ -1,0 +1,179 @@
+/* 플랜 화면과 편집기들이 같이 쓰는 모양 */
+
+.current {
+  border-color: color-mix(in srgb, var(--primary) 45%, var(--line));
+}
+
+.dates {
+  margin: -8px 0 12px;
+  font-size: 16px;
+  color: var(--muted);
+}
+
+/* 요일 한 줄: 누르면 그 자리에서 편집기가 열린다 */
+.days > li {
+  padding: 3px 0;
+}
+
+.days > li + li {
+  border-top: 1px solid var(--line);
+}
+
+.dayRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 42px;
+  padding: 0 8px;
+  margin: 0 -8px;
+  border-radius: 10px;
+  text-align: left;
+  box-sizing: content-box;
+}
+
+.dayRow:hover {
+  background: var(--surface-2);
+}
+
+.wd {
+  width: 20px;
+  color: var(--muted);
+}
+
+.editHint {
+  font-size: 12.5px;
+  color: var(--muted);
+  opacity: 0;
+  transition: opacity 120ms;
+}
+
+.dayRow:hover .editHint,
+.dayRow:focus-visible .editHint {
+  opacity: 1;
+}
+
+.editor {
+  padding: 10px 0 6px;
+}
+
+.count {
+  margin-left: 6px;
+  font-family: var(--font-num);
+  opacity: 0.6;
+}
+
+.search {
+  max-width: 260px;
+}
+
+.archived {
+  opacity: 0.7;
+}
+
+/* 루틴 구성 */
+.rows {
+  display: grid;
+  gap: 8px;
+}
+
+.row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px;
+  border-radius: var(--r-ctl);
+  background: var(--surface-2);
+}
+
+.pos {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--surface-3);
+  font-family: var(--font-num);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.fields {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.mini {
+  display: grid;
+  gap: 3px;
+  width: 84px;
+}
+
+.mini span {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.mini :global(.input) {
+  height: 38px;
+  padding: 0 10px;
+  background: var(--surface);
+  text-align: center;
+  font-family: var(--font-num);
+  font-size: 17px;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+}
+
+.flip {
+  transform: rotate(180deg);
+}
+
+/* 근육 칩: 누를 때마다 안 씀 → 주동 → 보조 */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 34px;
+  padding: 0 12px;
+  border: 1px solid var(--line-2);
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.chip:hover {
+  border-color: var(--muted);
+}
+
+.chip small {
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.chip.primary {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: var(--primary-ink);
+}
+
+.chip.secondary {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+  color: var(--primary);
+}

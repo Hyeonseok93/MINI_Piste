@@ -1,10 +1,14 @@
-import { useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
+import s from './LineChart.module.css'
 
 interface Series {
   values: (number | null)[]
   color: string
   label: string
-  dashed?: boolean
+  /** line: 선과 점 / dots: 점만 (하루 값처럼 흩어진 값) */
+  style?: 'line' | 'dots'
+  /** 선 아래를 옅게 채운다 */
+  area?: boolean
 }
 
 interface Props {
@@ -12,126 +16,164 @@ interface Props {
   series: Series[]
   unit?: string
   height?: number
+  /** 목표선 (예: 목표 체중) */
+  guide?: { value: number; label: string; color: string }
 }
 
-const W = 520
-const PAD = { t: 16, r: 12, b: 26, l: 40 }
+const PAD = { t: 18, r: 14, b: 28, l: 38 }
+
+/** 실제 폭을 재서 그린다. viewBox 로 늘이면 휴대폰에서 글자가 너무 작아진다 */
+function useWidth() {
+  const [width, setWidth] = useState(0)
+  const observer = useRef<ResizeObserver | null>(null)
+  // 데이터가 늦게 와서 figure 가 나중에 생겨도 잴 수 있게 콜백 ref 를 쓴다
+  const ref = useCallback((el: HTMLElement | null) => {
+    observer.current?.disconnect()
+    if (!el) return
+    setWidth(el.clientWidth)
+    if (typeof ResizeObserver === 'undefined') return
+    observer.current = new ResizeObserver(([e]) => setWidth(Math.round(e.contentRect.width)))
+    observer.current.observe(el)
+  }, [])
+  return [ref, width] as const
+}
 
 /** 의존성 없는 가벼운 SVG 선 그래프 */
-export default function LineChart({ labels, series, unit = '', height = 200 }: Props) {
+export default function LineChart({ labels, series, unit = '', height = 200, guide }: Props) {
+  const [ref, measured] = useWidth()
   // 브라우저 기본 툴팁(<title>) 대신 쓰는 커스텀 말풍선
   const [hover, setHover] = useState<number | null>(null)
-  const all = series.flatMap((s) => s.values).filter((v): v is number => v != null)
+  const all = series.flatMap((sr) => sr.values).filter((v): v is number => v != null)
   if (all.length === 0) return <p className="empty">아직 데이터가 없습니다</p>
 
-  let min = Math.min(...all)
-  let max = Math.max(...all)
+  const W = measured || 520
+  let min = Math.min(...all, ...(guide ? [guide.value] : []))
+  let max = Math.max(...all, ...(guide ? [guide.value] : []))
   if (min === max) {
-    min -= 5
-    max += 5
+    min -= 2
+    max += 2
   }
   const span = max - min
-  min -= span * 0.1
-  max += span * 0.1
+  min -= span * 0.12
+  max += span * 0.12
 
   const n = labels.length
   const x = (i: number) => PAD.l + (n === 1 ? (W - PAD.l - PAD.r) / 2 : (i * (W - PAD.l - PAD.r)) / (n - 1))
   const y = (v: number) => PAD.t + ((max - v) / (max - min)) * (height - PAD.t - PAD.b)
   const ticks = [max, (max + min) / 2, min].map((v) => +v.toFixed(1))
-  const labelEvery = Math.max(1, Math.ceil(n / 6))
+  const labelEvery = Math.max(1, Math.ceil(n / Math.max(2, Math.floor(W / 90))))
+  const bottom = height - PAD.b
 
   return (
-    <figure className="chart-fig" onPointerLeave={() => setHover(null)}>
-      <svg className="chart" viewBox={`0 0 ${W} ${height}`} role="img" aria-label={series.map((s) => s.label).join(', ')}>
+    <figure className={s.fig} ref={ref} onPointerLeave={() => setHover(null)}>
+      <svg className={s.svg} width={W} height={height} viewBox={`0 0 ${W} ${height}`} role="img" aria-label={series.map((sr) => sr.label).join(', ')}>
         {ticks.map((t) => (
           <g key={t}>
-            <line x1={PAD.l} x2={W - PAD.r} y1={y(t)} y2={y(t)} stroke="var(--line)" strokeDasharray="3 4" />
-            <text x={PAD.l - 6} y={y(t) + 4} textAnchor="end" fontSize="11" fill="var(--text-3)">
+            <line className={s.grid} x1={PAD.l} x2={W - PAD.r} y1={y(t)} y2={y(t)} />
+            <text className={s.axis} x={PAD.l - 8} y={y(t) + 4} textAnchor="end">
               {t}
             </text>
           </g>
         ))}
         {labels.map((l, i) =>
           i % labelEvery === 0 || i === n - 1 ? (
-            <text
-              key={i}
-              x={x(i)}
-              y={height - 6}
-              textAnchor={n > 1 && i === n - 1 ? 'end' : n > 1 && i === 0 ? 'start' : 'middle'}
-              fontSize="11"
-              fill="var(--text-3)"
-            >
+            <text key={i} className={s.axis} x={x(i)} y={height - 6} textAnchor={n > 1 && i === n - 1 ? 'end' : n > 1 && i === 0 ? 'start' : 'middle'}>
               {l}
             </text>
           ) : null,
         )}
-        {series.map((s) => {
-          const pts = s.values.map((v, i) => (v == null ? null : ([x(i), y(v)] as const)))
-          const d = pts
-            .reduce<string[]>((acc, p, i) => {
-              if (!p) return acc
-              acc.push(`${acc.length && pts[i - 1] ? 'L' : 'M'}${p[0].toFixed(1)},${p[1].toFixed(1)}`)
-              return acc
-            }, [])
-            .join(' ')
+        {guide && (
+          <g>
+            <line className={s.guide} x1={PAD.l} x2={W - PAD.r} y1={y(guide.value)} y2={y(guide.value)} stroke={guide.color} />
+            <text className={s.guideLabel} x={W - PAD.r} y={y(guide.value) - 6} textAnchor="end" fill={guide.color}>
+              {guide.label}
+            </text>
+          </g>
+        )}
+        {hover != null && <line className={s.cursor} x1={x(hover)} x2={x(hover)} y1={PAD.t} y2={bottom} />}
+        {series.map((sr) => {
+          const pts = sr.values.map((v, i) => (v == null ? null : ([x(i), y(v)] as const)))
+          const segs = pts.reduce<string[]>((acc, p, i) => {
+            if (p) acc.push(`${acc.length && pts[i - 1] ? 'L' : 'M'}${p[0].toFixed(1)},${p[1].toFixed(1)}`)
+            return acc
+          }, [])
+          const d = segs.join(' ')
+          const valid = pts.filter((p) => p != null)
+          const dots = sr.style === 'dots'
           return (
-            <g key={s.label}>
-              <path d={d} fill="none" stroke={s.color} strokeWidth="2.5" strokeDasharray={s.dashed ? '6 5' : undefined} strokeLinejoin="round" />
-              {!s.dashed &&
-                pts.map((p, i) =>
-                  p ? (
-                    <g key={i}>
-                      <circle cx={p[0]} cy={p[1]} r={hover === i ? 5.5 : 3.5} fill={s.color} stroke="var(--surface)" strokeWidth={hover === i ? 2 : 0} />
-                      <circle
-                        cx={p[0]}
-                        cy={p[1]}
-                        r="14"
-                        fill="transparent"
-                        tabIndex={0}
-                        aria-label={`${labels[i]} ${s.values[i]}${unit}`}
-                        onPointerEnter={() => setHover(i)}
-                        onFocus={() => setHover(i)}
-                        onBlur={() => setHover(null)}
-                        className="chart-hit"
-                      />
-                    </g>
-                  ) : null,
-                )}
+            <g key={sr.label}>
+              {sr.area && valid.length > 1 && (
+                <path d={`${d} L${valid.at(-1)![0]},${bottom} L${valid[0][0]},${bottom} Z`} fill={sr.color} opacity="0.12" />
+              )}
+              {!dots && <path d={d} fill="none" stroke={sr.color} strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" />}
+              {pts.map((p, i) =>
+                p ? (
+                  <circle
+                    key={i}
+                    cx={p[0]}
+                    cy={p[1]}
+                    r={hover === i ? 5.5 : dots ? 3 : 3.5}
+                    fill={sr.color}
+                    opacity={dots && hover !== i ? 0.55 : 1}
+                    stroke="var(--surface)"
+                    strokeWidth={hover === i ? 2 : 0}
+                  />
+                ) : null,
+              )}
             </g>
           )
         })}
+        {/* 보이지 않는 넓은 칸: 마우스·키보드로 날짜를 고른다 */}
+        {labels.map((l, i) => {
+          const w = n > 1 ? (W - PAD.l - PAD.r) / (n - 1) : W
+          const vals = series.map((sr) => sr.values[i]).filter((v) => v != null)
+          if (vals.length === 0) return null
+          return (
+            <rect
+              key={i}
+              className={s.hit}
+              x={x(i) - w / 2}
+              y={PAD.t}
+              width={w}
+              height={bottom - PAD.t}
+              fill="transparent"
+              tabIndex={0}
+              aria-label={`${l} ${series.map((sr) => (sr.values[i] != null ? `${sr.label} ${sr.values[i]}${unit}` : '')).join(' ')}`}
+              onPointerEnter={() => setHover(i)}
+              onFocus={() => setHover(i)}
+              onBlur={() => setHover(null)}
+            />
+          )
+        })}
       </svg>
-      {hover != null && (() => {
-        const v = series[0].values[hover] ?? series.find((sr) => sr.values[hover] != null)?.values[hover]
-        if (v == null) return null
-        return (
-          <div
-            className="chart-tip"
-            style={{ left: `${(x(hover) / W) * 100}%`, top: `${(y(v) / height) * 100}%` }}
-            role="status"
-          >
-            <span className="chart-tip-date">{labels[hover]}</span>
-            {series.map((sr) =>
-              sr.values[hover] != null ? (
-                <span key={sr.label} className="chart-tip-row">
-                  <i style={{ background: sr.color }} />
-                  {series.length > 1 && `${sr.label} `}
-                  <b className="num">
-                    {sr.values[hover]}
-                    {unit}
-                  </b>
-                </span>
-              ) : null,
-            )}
-          </div>
-        )
-      })()}
+      {hover != null &&
+        (() => {
+          const v = series.map((sr) => sr.values[hover]).find((val) => val != null)
+          if (v == null) return null
+          return (
+            <div className={s.tip} style={{ left: x(hover), top: y(v) }} role="status">
+              <span className={s.tipDate}>{labels[hover]}</span>
+              {series.map((sr) =>
+                sr.values[hover] != null ? (
+                  <span key={sr.label} className={s.tipRow}>
+                    <i style={{ background: sr.color }} />
+                    {series.length > 1 && `${sr.label} `}
+                    <b className="num">
+                      {sr.values[hover]}
+                      {unit}
+                    </b>
+                  </span>
+                ) : null,
+              )}
+            </div>
+          )
+        })()}
       {series.length > 1 && (
-        <figcaption className="chart-legend">
-          {series.map((s) => (
-            <span key={s.label} className="chart-legend-item">
-              <span className="legend-dot" style={{ background: s.color }} />
-              {s.label}
+        <figcaption className={s.legend}>
+          {series.map((sr) => (
+            <span key={sr.label}>
+              <i className={sr.style === 'dots' ? s.dot : undefined} style={{ background: sr.color }} />
+              {sr.label}
             </span>
           ))}
         </figcaption>

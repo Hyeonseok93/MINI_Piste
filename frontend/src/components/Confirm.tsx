@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
+import s from './Confirm.module.css'
 
 interface ConfirmOptions {
   title: string
@@ -66,17 +67,17 @@ function Dialog({ title, message, confirmLabel = '확인', cancelLabel = '취소
   }, [onClose])
 
   return (
-    <div className="dialog-backdrop" onPointerDown={(e) => e.target === e.currentTarget && onClose(false)}>
-      <div className="dialog" role="alertdialog" aria-modal="true" aria-labelledby="dialog-title" aria-describedby={message ? 'dialog-msg' : undefined}>
-        <h2 id="dialog-title" className="dialog-title">
+    <div className={s.backdrop} onPointerDown={(e) => e.target === e.currentTarget && onClose(false)}>
+      <div className={s.dialog} role="alertdialog" aria-modal="true" aria-labelledby="dialog-title" aria-describedby={message ? 'dialog-msg' : undefined}>
+        <h2 id="dialog-title" className={s.title}>
           {title}
         </h2>
         {message && (
-          <div id="dialog-msg" className="dialog-msg">
+          <div id="dialog-msg" className={s.msg}>
             {message}
           </div>
         )}
-        <div className="dialog-actions">
+        <div className={s.actions}>
           <button ref={cancel} type="button" className="btn btn-secondary" onClick={() => onClose(false)}>
             {cancelLabel}
           </button>

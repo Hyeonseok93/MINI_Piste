@@ -72,7 +72,7 @@ export default function ProfileForm({ initial, submitLabel, onNameChange, onSave
         </label>
       </div>
       {save.isError && <p className="error-text">{save.error.message}</p>}
-      <button className="btn btn-primary btn-block mt-sm" type="submit" disabled={!name.trim() || save.isPending}>
+      <button className="btn btn-primary btn-lg btn-block mt-sm" type="submit" disabled={!name.trim() || save.isPending}>
         {save.isPending ? '저장 중…' : submitLabel}
       </button>
     </form>

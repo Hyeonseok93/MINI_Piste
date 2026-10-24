@@ -5,8 +5,12 @@ import { BrowserRouter } from 'react-router-dom'
 import App from './App'
 import { ConfirmProvider } from './components/Confirm'
 import { ToastProvider } from './components/Toast'
-import './index.css'
-import './features.css'
+import { initTheme } from './lib/theme'
+import './styles/tokens.css'
+import './styles/base.css'
+import './styles/ui.css'
+
+initTheme()
 
 const queryClient = new QueryClient({
   defaultOptions: {

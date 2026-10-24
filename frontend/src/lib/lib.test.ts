@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { addDays, formatShort, mondayOf, todayISO, weekdayIndex } from './date'
-import { kg, movingAverage, summarizeSets, targetShort, targetText, toNum, toStr } from './format'
+import { kg, summarizeSets, targetShort, targetText, toNum, toStr } from './format'
+import { weightTrend } from './weight'
 
 describe('date', () => {
   it('uses local date, not UTC', () => {
@@ -48,8 +49,12 @@ describe('format', () => {
     expect(summarizeSets([{ weight_kg: 0, reps: null, duration_sec: 30, side: null }])).toBe('30초')
   })
 
-  it('moving average skips gaps', () => {
-    expect(movingAverage([110, null, 109, 108], 3)).toEqual([110, 110, 109.5, 108.5])
+  it('7-day weight average uses calendar days, not entries', () => {
+    const log = (date: string, w: number | null) => ({ date, body_weight_kg: w, steps: null, sleep_hours: null, memo: null, rest_day: false })
+    // 10/12 은 10/19 기준 7일(10/13~19) 밖이라 평균에서 빠진다
+    const t = weightTrend([log('2026-10-19', 108), log('2026-10-12', 112), log('2026-10-15', 110), log('2026-10-16', null)])
+    expect(t.map((p) => p.date)).toEqual(['2026-10-12', '2026-10-15', '2026-10-19'])
+    expect(t.map((p) => p.avg7)).toEqual([112, 111, 109])
   })
 })
 

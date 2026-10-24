@@ -1,29 +1,29 @@
 import { Link } from 'react-router-dom'
 import type { CalendarDay } from '../api/types'
-import { parseISODate, weekdayLabel } from '../lib/date'
+import { parseISODate, weekdayIndex, weekdayLabel } from '../lib/date'
 import { dayStatus, shortTitle, STATUS_LABEL } from '../lib/status'
-import { CheckIcon, MinusIcon, XIcon } from './icons'
+import s from './WeekStrip.module.css'
 
+/** 이번 주 7일: 날짜와 그날 상태 막대 */
 export default function WeekStrip({ days, today }: { days: CalendarDay[]; today: string }) {
   return (
-    <ol className="week-strip">
-      {days.map((d, i) => {
+    <ol className={s.days}>
+      {days.map((d) => {
         const st = dayStatus(d, today)
-        const title = shortTitle(d)
+        const title = st === 'rest' ? '휴식' : st === 'skipped' ? '못 함' : shortTitle(d)
+        const wd = weekdayLabel(weekdayIndex(d.date))
         return (
           <li key={d.date}>
             <Link
               to={`/workout?date=${d.date}`}
-              className={`wk-day ${st} ${d.kind ?? ''}`}
-              aria-label={`${weekdayLabel(i)}요일 ${title} ${STATUS_LABEL[st]}`}
+              className={`${s.day} ${s[st] ?? ''}`}
+              aria-label={`${wd}요일 ${title} ${STATUS_LABEL[st]}`}
               aria-current={d.date === today ? 'date' : undefined}
             >
-              <span className="wk-name">{weekdayLabel(i)}</span>
-              <span className="wk-num num">{parseISODate(d.date).getDate()}</span>
-              <span className="wk-mark" aria-hidden>
-                {st === 'done' ? <CheckIcon /> : st === 'missed' ? <XIcon /> : st === 'skipped' ? <MinusIcon /> : null}
-              </span>
-              <span className="wk-title">{st === 'rest' ? '휴식' : title}</span>
+              <span className={s.wd}>{wd}</span>
+              <span className={`${s.d} num`}>{parseISODate(d.date).getDate()}</span>
+              <span className={s.bar} aria-hidden />
+              <span className={s.t}>{title || ' '}</span>
             </Link>
           </li>
         )

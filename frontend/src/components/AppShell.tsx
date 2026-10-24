@@ -2,6 +2,7 @@ import type { ComponentType, SVGProps } from 'react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import type { Profile } from '../api/types'
 import { initial } from '../lib/format'
+import s from './AppShell.module.css'
 import ErrorBoundary from './ErrorBoundary'
 import { BodyIcon, BrandMark, CalendarIcon, ChartIcon, DumbbellIcon, HomeIcon, MoreIcon, PlanIcon } from './icons'
 
@@ -24,55 +25,54 @@ const TABS: Item[] = [
   { to: '/more', label: '더보기', icon: MoreIcon },
 ]
 
+function Brand() {
+  return (
+    <Link to="/" className={s.brand}>
+      <BrandMark className={s.brandMark} />
+      PISTE
+    </Link>
+  )
+}
+
 export default function AppShell({ profile }: { profile: Profile }) {
   const { pathname } = useLocation()
   return (
-    <div className="shell">
-      <aside className="sidebar" aria-label="사이드바">
-        <Link to="/" className="brand">
-          <BrandMark className="brand-mark" />
-          PISTE
-        </Link>
-        <nav className="nav" aria-label="주요 메뉴">
+    <div className={s.shell}>
+      <aside className={s.sidebar} aria-label="사이드바">
+        <Brand />
+        <nav className={s.nav} aria-label="주요 메뉴">
           {SIDEBAR.map(({ to, label, icon: Icon }) => (
-            <NavLink key={to} to={to} end={to === '/'} className={({ isActive }) => (isActive ? 'active' : '')}>
+            <NavLink key={to} to={to} end={to === '/'}>
               <Icon />
               {label}
             </NavLink>
           ))}
         </nav>
-        <div className="sidebar-foot">
-          <NavLink to="/settings" className="me">
-            <span className="avatar">{initial(profile.name)}</span>
-            <span className="grow">
-              <span className="me-name">
-                {profile.name}
-              </span>
-              <span className="me-sub">프로필 · 설정</span>
-            </span>
-          </NavLink>
-        </div>
+        <NavLink to="/settings" className={s.me}>
+          <span className={s.avatar}>{initial(profile.name)}</span>
+          <span>
+            <span className={s.meName}>{profile.name}</span>
+            <span className={s.meSub}>프로필과 설정</span>
+          </span>
+        </NavLink>
       </aside>
 
-      <header className="topbar">
-        <Link to="/" className="brand grow">
-          <BrandMark className="brand-mark" />
-          PISTE
-        </Link>
-        <Link to="/settings" aria-label="프로필 설정">
-          <span className="avatar sm">{initial(profile.name)}</span>
+      <header className={s.topbar}>
+        <Brand />
+        <Link to="/settings" aria-label="프로필과 설정">
+          <span className={s.avatar}>{initial(profile.name)}</span>
         </Link>
       </header>
 
-      <main className="content">
+      <main className={s.content}>
         <ErrorBoundary key={pathname}>
           <Outlet />
         </ErrorBoundary>
       </main>
 
-      <nav className="tabbar" aria-label="하단 메뉴">
+      <nav className={s.tabbar} aria-label="하단 메뉴">
         {TABS.map(({ to, label, icon: Icon }) => (
-          <NavLink key={to} to={to} end={to === '/'} className={({ isActive }) => (isActive ? 'active' : '')}>
+          <NavLink key={to} to={to} end={to === '/'}>
             <Icon />
             {label}
           </NavLink>

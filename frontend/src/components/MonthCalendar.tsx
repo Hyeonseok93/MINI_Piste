@@ -1,6 +1,7 @@
 import type { CalendarDay } from '../api/types'
 import { parseISODate, weekdayIndex, weekdayLabel } from '../lib/date'
 import { dayStatus, shortTitle, STATUS_LABEL } from '../lib/status'
+import css from './MonthCalendar.module.css'
 
 interface Props {
   days: CalendarDay[]
@@ -13,17 +14,17 @@ export default function MonthCalendar({ days, today, selected, onSelect }: Props
   const lead = days.length ? weekdayIndex(days[0].date) : 0
 
   return (
-    <div className="cal" role="grid" aria-label="월간 달력">
-      <div className="cal-head" role="row">
+    <div role="grid" aria-label="월간 달력">
+      <div className={css.head} role="row">
         {Array.from({ length: 7 }, (_, i) => (
-          <span key={i} role="columnheader" className={i >= 5 ? 'weekend' : ''}>
+          <span key={i} role="columnheader" className={i >= 5 ? css.weekend : undefined}>
             {weekdayLabel(i)}
           </span>
         ))}
       </div>
-      <div className="cal-body">
+      <div className={css.body}>
         {Array.from({ length: lead }, (_, i) => (
-          <span key={`lead-${i}`} className="cal-cell blank" aria-hidden />
+          <span key={`lead-${i}`} className={`${css.cell} ${css.blank}`} aria-hidden />
         ))}
         {days.map((d) => {
           const st = dayStatus(d, today)
@@ -33,14 +34,14 @@ export default function MonthCalendar({ days, today, selected, onSelect }: Props
               key={d.date}
               type="button"
               role="gridcell"
-              className={`cal-cell ${st} ${d.kind ?? ''}${selected === d.date ? ' selected' : ''}`}
+              className={[css.cell, css[st], d.kind && css[d.kind], selected === d.date && css.selected, d.date === today && css.today].filter(Boolean).join(' ')}
               aria-selected={selected === d.date}
               aria-label={`${d.date} ${title} ${STATUS_LABEL[st]}`}
               onClick={() => onSelect(d.date)}
             >
-              <span className={`cal-num num${d.date === today ? ' is-today' : ''}`}>{parseISODate(d.date).getDate()}</span>
-              {st === 'rest' ? <span className="cal-title">휴식</span> : d.kind && <span className="cal-title">{title}</span>}
-              {st === 'done' || st === 'missed' || st === 'skipped' ? <span className={`cal-flag ${st}`}>{STATUS_LABEL[st]}</span> : null}
+              <span className={`num ${css.num}`}>{parseISODate(d.date).getDate()}</span>
+              {st === 'rest' ? <span className={css.title}>휴식</span> : d.kind && <span className={css.title}>{title}</span>}
+              {st === 'done' || st === 'missed' || st === 'skipped' ? <span className={`${css.flag} ${css[st]}`}>{STATUS_LABEL[st]}</span> : null}
             </button>
           )
         })}

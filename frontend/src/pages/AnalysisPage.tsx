@@ -50,7 +50,7 @@ function Summary() {
 
   return (
     <div className="grid cols-2">
-      <section className="panel stack">
+      <section className="panel">
         <div className="panel-head">
           <h2 className="panel-title">최근 7일 근육별 세트</h2>
           <span className="muted">
@@ -72,7 +72,7 @@ function Summary() {
                 <span className="grow">
                   <span className="row-title block">{p.name}</span>
                   <span className="row-sub">
-                    {formatShort(p.best_weight_date)} · 추정 1RM {kg(p.e1rm_kg)}
+                    {formatShort(p.best_weight_date)}, 추정 1RM {kg(p.e1rm_kg)}
                   </span>
                 </span>
                 <span className="num num-lg">
@@ -96,7 +96,7 @@ function Summary() {
                   <span className="grow">
                     <span className="row-title block">{b.name}</span>
                     <span className="row-sub">
-                      왼쪽 {kg(b.left.top_weight_kg)} · 오른쪽 {kg(b.right.top_weight_kg)}
+                      왼쪽 {kg(b.left.top_weight_kg)}, 오른쪽 {kg(b.right.top_weight_kg)}
                     </span>
                   </span>
                   {b.weaker ? (

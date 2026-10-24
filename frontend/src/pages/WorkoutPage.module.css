@@ -1,0 +1,57 @@
+.dateNav {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border-radius: var(--r-ctl);
+  background: var(--surface-2);
+}
+
+.dateNav :global(.icon-btn) {
+  width: 36px;
+  height: 36px;
+}
+
+.dateNav :global(.icon-btn):hover {
+  background: var(--surface-3);
+}
+
+.dateLabel {
+  min-width: 100px;
+  text-align: center;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.progress {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--surface-3);
+}
+
+.progress > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--hit);
+  transition: width 240ms ease;
+}
+
+.banner {
+  padding: 14px 16px;
+  border: 1px dashed var(--line-2);
+  border-radius: var(--r-card);
+  background: var(--surface-2);
+  color: var(--ink-2);
+  font-size: 14.5px;
+}
+
+.banner b {
+  color: var(--ink);
+}
+
+.restPanel.isRest {
+  border-style: dashed;
+  background: var(--surface-2);
+}

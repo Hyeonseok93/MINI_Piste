@@ -1,0 +1,309 @@
+.ex {
+  container-type: inline-size;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  background: var(--surface);
+}
+
+.done {
+  border-color: color-mix(in srgb, var(--hit) 40%, var(--line));
+}
+
+.top {
+  display: flex;
+  gap: 14px;
+  padding: 18px 20px 12px;
+}
+
+.pos {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  font-family: var(--font-num);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.done .pos {
+  background: var(--hit);
+  color: var(--on-ink);
+}
+
+.pos svg {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2.6;
+}
+
+.name {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.3;
+}
+
+.meta {
+  margin-top: 2px;
+  font-size: var(--fs-sm);
+  color: var(--muted);
+}
+
+.target {
+  flex: none;
+  text-align: right;
+}
+
+.target :global(.num) {
+  display: block;
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.target small {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.increase :global(.num) {
+  color: var(--primary);
+}
+
+.decrease :global(.num) {
+  color: var(--cardio);
+}
+
+.unknown :global(.num) {
+  color: var(--find);
+  font-family: var(--font-sans);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.reason {
+  margin: 0 20px;
+  padding: 10px 12px;
+  border-radius: var(--r-ctl);
+  background: var(--surface-2);
+  font-size: var(--fs-sm);
+  color: var(--ink-2);
+}
+
+.reason.increase {
+  background: var(--primary-soft);
+}
+
+.body {
+  display: grid;
+  gap: 12px;
+  padding: 14px 20px 18px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.table th {
+  padding: 0 0 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--muted);
+  text-align: left;
+}
+
+.table td {
+  padding: 6px 0;
+  border-top: 1px solid var(--line);
+  font-weight: 600;
+}
+
+.n {
+  width: 44px;
+  font-family: var(--font-num);
+  font-size: 17px;
+  color: var(--muted);
+}
+
+.v {
+  font-family: var(--font-num);
+  font-size: 20px;
+}
+
+.act {
+  width: 40px;
+  text-align: right;
+}
+
+.rir {
+  margin-left: 6px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.inputs {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 0.75fr);
+  gap: 8px;
+}
+
+.inputs.single {
+  grid-template-columns: 1fr;
+}
+
+/* 카드가 좁으면(사이드 패널 옆, 휴대폰) 입력칸을 두 줄로: 숫자가 잘리지 않게 */
+@container (max-width: 460px) {
+  .inputs {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .inputs > :nth-child(3) {
+    grid-column: span 2;
+  }
+}
+
+.stepper {
+  display: flex;
+  height: 50px;
+  overflow: hidden;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-ctl);
+  background: var(--surface-2);
+}
+
+.stepper:focus-within {
+  border-color: var(--primary);
+  box-shadow: var(--focus);
+}
+
+.stepper button {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  color: var(--ink-2);
+}
+
+.stepper button:hover {
+  background: var(--surface-3);
+  color: var(--ink);
+}
+
+.stepper button svg {
+  width: 16px;
+  height: 16px;
+}
+
+.stepper input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  text-align: center;
+  font-family: var(--font-num);
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.stepper input:focus {
+  outline: none;
+}
+
+.record {
+  flex: 1;
+}
+
+.finder {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px dashed color-mix(in srgb, var(--find) 50%, transparent);
+  border-radius: var(--r-ctl);
+  background: var(--find-soft);
+}
+
+.finderQ {
+  font-size: 14px;
+}
+
+.finderGrid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.finderGrid button {
+  height: 42px;
+  padding: 0 2px;
+  font-size: 13px;
+  background: var(--surface);
+}
+
+.finderResult {
+  font-size: 14.5px;
+  font-weight: 700;
+}
+
+.cue {
+  font-size: var(--fs-sm);
+  color: var(--ink-2);
+}
+
+.cue summary {
+  cursor: pointer;
+  list-style: none;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.cue summary::-webkit-details-marker {
+  display: none;
+}
+
+.cue summary:hover {
+  color: var(--ink);
+}
+
+.cue p {
+  margin-top: 6px;
+}
+
+/* 운동 모드: 헬스장에서 한 손으로 누르기 좋게 크게 */
+.big .name {
+  font-size: 24px;
+}
+
+.big .target :global(.num) {
+  font-size: 40px;
+}
+
+.big .stepper {
+  height: 58px;
+}
+
+.big .stepper input {
+  font-size: 28px;
+}
+
+.big .record {
+  height: 58px;
+  font-size: 17px;
+}
+
+.inputs :global(.input) {
+  height: 50px;
+  font-family: var(--font-num);
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.big .inputs :global(.input) {
+  height: 58px;
+}

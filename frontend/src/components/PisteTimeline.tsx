@@ -1,5 +1,6 @@
 import type { PhaseSpan } from '../api/types'
 import { formatYMDot, parseISODate } from '../lib/date'
+import s from './PisteTimeline.module.css'
 
 interface Props {
   phases: PhaseSpan[]
@@ -26,31 +27,30 @@ export default function PisteTimeline({ phases, today }: Props) {
   const current = phases.find((p) => p.start_date <= today && (!p.end_date || today <= p.end_date))
 
   return (
-    <div className="piste-wrap">
-      <div className="piste" role="img" aria-label={`1년 플랜 중 ${elapsed}일째, 전체의 ${Math.round(pct)}%`}>
-        <div className="piste-fill" style={{ width: `${pct}%` }} />
+    <div>
+      <div className={s.track} role="img" aria-label={`1년 플랜 중 ${elapsed}일째, 전체의 ${Math.round(pct)}%${current ? `, 지금은 ${current.name}` : ''}`}>
         {phases.map((p) => {
-          const w = ((days(p.start_date, p.end_date ?? p.start_date) + 1) / total) * 100
+          const w = (days(p.start_date, p.end_date ?? p.start_date) + 1) / total
           const { icon, text } = splitName(p.name)
-          const isCurrent = p === current
+          // 좁은 칸은 이름이 잘리므로 아이콘만
+          const wide = w > 0.1
           return (
-            <div key={p.name} className={`piste-seg${isCurrent ? ' current' : ''}`} style={{ width: `${w}%` }} data-tip={`${p.name} · ${formatYMDot(p.start_date)}–${p.end_date ? formatYMDot(p.end_date) : ''}`}>
-              {w > 4 && (
-                <span className="piste-icon" aria-hidden>
-                  {icon}
-                </span>
-              )}
-              {w > 13 && <span className="piste-name">{text}</span>}
+            <div
+              key={p.name}
+              className={`${s.seg}${wide ? ` ${s.wide}` : ''}${p === current ? ` ${s.current}` : ''}`}
+              style={{ flex: w }}
+              data-tip={`${p.name}, ${formatYMDot(p.start_date)}–${p.end_date ? formatYMDot(p.end_date) : ''}`}
+            >
+              {w > 0.03 && <span aria-hidden>{icon}</span>}
+              {wide && <span className={s.name}>{text}</span>}
             </div>
           )
         })}
-        <div className="piste-marker" style={{ left: `${pct}%` }}>
-          <span className="piste-flag num">{elapsed}일째</span>
-        </div>
+        {elapsed > 0 && elapsed < total && <span className={s.marker} style={{ left: `${pct}%` }} aria-hidden />}
       </div>
-      <div className="piste-ends num">
+      <div className={`${s.ends} num`}>
         <span>{formatYMDot(start)} 시작</span>
-        <span>{formatYMDot(end)} 종료</span>
+        <span>{formatYMDot(end)} 끝</span>
       </div>
     </div>
   )

@@ -1,0 +1,177 @@
+.head,
+.body {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.head span {
+  padding: 0 0 8px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.head .weekend {
+  color: color-mix(in srgb, var(--miss) 80%, var(--muted));
+}
+
+.body {
+  gap: 4px;
+}
+
+.cell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  min-height: 64px;
+  padding: 6px 2px;
+  border-radius: var(--r-ctl);
+  background: var(--surface-2);
+  text-align: center;
+}
+
+.blank {
+  background: transparent;
+}
+
+button.cell:hover {
+  background: var(--surface-3);
+}
+
+.cell.selected {
+  box-shadow: inset 0 0 0 2px var(--primary);
+}
+
+.num {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.today .num {
+  background: var(--ink);
+  color: var(--on-ink);
+}
+
+.title {
+  max-width: 100%;
+  padding: 2px 5px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--muted);
+}
+
+.strength .title {
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+.cardio .title,
+.outdoor .title {
+  background: var(--cardio-soft);
+  color: var(--cardio);
+}
+
+.rest .num,
+.off .num {
+  color: var(--muted);
+}
+
+.skipped .title {
+  opacity: 0.55;
+}
+
+/* 결과 표시: 완료 초록 / 빠짐 빨강 / 못 함 회색 막대 */
+.flag {
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.flag.done {
+  color: var(--hit);
+}
+
+.flag.missed {
+  color: var(--miss);
+}
+
+.flag.skipped {
+  color: var(--muted);
+}
+
+.cell.done {
+  background: color-mix(in srgb, var(--hit) 10%, var(--surface-2));
+}
+
+@media (max-width: 640px) {
+  .body {
+    gap: 3px;
+  }
+
+  .cell {
+    min-height: 58px;
+    padding: 4px 1px;
+    gap: 2px;
+  }
+
+  .title {
+    padding: 1px 3px;
+    font-size: 10px;
+  }
+
+  .flag {
+    display: none;
+  }
+
+  .cell.done::after,
+  .cell.missed::after,
+  .cell.skipped::after {
+    content: '';
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--hit);
+  }
+
+  .cell.missed::after {
+    background: var(--miss);
+  }
+
+  .cell.skipped::after {
+    background: var(--muted);
+  }
+}
+
+@media (min-width: 1024px) {
+  .cell {
+    align-items: flex-start;
+    min-height: 100px;
+    padding: 8px;
+    text-align: left;
+  }
+
+  .title {
+    font-size: 12.5px;
+  }
+
+  .flag {
+    margin-top: auto;
+  }
+}

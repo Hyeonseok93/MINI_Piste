@@ -2,6 +2,7 @@ import type { Exercise, FinderChoice, Recommendation, RoutineItem, SetInput, Set
 import { useSetLogger } from '../hooks/useSetLogger'
 import { formatShort } from '../lib/date'
 import { kg, setAmount, summarizeSets, targetText } from '../lib/format'
+import css from './ExerciseCard.module.css'
 import { CheckIcon, MinusIcon, PlusIcon, XIcon } from './icons'
 
 interface Props {
@@ -15,6 +16,8 @@ interface Props {
   finderChoices: FinderChoice[]
   onAdd: (body: SetInput) => Promise<unknown>
   onDelete: (setId: number) => void
+  /** 운동 모드: 글자·버튼을 크게 */
+  big?: boolean
 }
 
 const KIND_LABEL: Record<SetKind, string> = { work: '', find: '찾기', warmup: '워밍업' }
@@ -24,7 +27,7 @@ function Stepper({ label, value, onChange, step, decimal }: { label: string; val
   return (
     <div className="field">
       <span className="field-label">{label}</span>
-      <div className="stepper">
+      <div className={css.stepper}>
         <button type="button" aria-label={`${label} 줄이기`} onClick={() => bump(-step)}>
           <MinusIcon />
         </button>
@@ -37,26 +40,26 @@ function Stepper({ label, value, onChange, step, decimal }: { label: string; val
   )
 }
 
-export default function ExerciseCard({ index, exercise, item, recommendation, last, sets, finderChoices, onAdd, onDelete }: Props) {
+export default function ExerciseCard({ index, exercise, item, recommendation, last, sets, finderChoices, onAdd, onDelete, big }: Props) {
   const s = useSetLogger({ exercise, item, recommendation, last, sets, onAdd })
   const action = recommendation?.action ?? 'keep'
 
   return (
-    <article className={`ex${s.done ? ' is-done' : ''}`} aria-label={exercise.name}>
-      <div className="ex-top">
-        <span className="ex-pos" aria-label={s.done ? '완료' : `${index}번째`}>
+    <article className={`${css.ex}${s.done ? ` ${css.done}` : ''}${big ? ` ${css.big}` : ''}`} aria-label={exercise.name}>
+      <div className={css.top}>
+        <span className={css.pos} aria-label={s.done ? '완료' : `${index}번째`}>
           {s.done ? <CheckIcon /> : index}
         </span>
         <div className="grow">
-          <h3 className="ex-name">{exercise.name}</h3>
-          <p className="ex-meta">
+          <h3 className={css.name}>{exercise.name}</h3>
+          <p className={css.meta}>
             {item ? targetText(item) : '루틴 외 종목'}
             {exercise.unilateral && ', 좌우 각각'}
           </p>
-          {exercise.alternative && <p className="ex-meta">기구가 없으면 {exercise.alternative}</p>}
+          {exercise.alternative && <p className={css.meta}>기구가 없으면 {exercise.alternative}</p>}
         </div>
         {recommendation && !s.timed && (
-          <div className={`ex-target ${action}`}>
+          <div className={`${css.target} ${css[action] ?? ''}`}>
             <span className="num">{recommendation.weight_kg != null ? kg(recommendation.weight_kg) : '무게 찾기'}</span>
             <small>{action === 'increase' ? '올린 무게' : action === 'unknown' ? '처음 하는 종목' : '오늘 무게'}</small>
           </div>
@@ -64,7 +67,7 @@ export default function ExerciseCard({ index, exercise, item, recommendation, la
       </div>
 
       {recommendation && !s.timed && (
-        <p className={`ex-reason ${action}`}>
+        <p className={`${css.reason} ${css[action] ?? ''}`}>
           {recommendation.reason}
           {last && (
             <>
@@ -77,9 +80,9 @@ export default function ExerciseCard({ index, exercise, item, recommendation, la
         </p>
       )}
 
-      <div className="ex-body">
+      <div className={css.body}>
         {sets.length > 0 && (
-          <table className="set-table">
+          <table className={css.table}>
             <thead>
               <tr>
                 <th>세트</th>
@@ -93,16 +96,16 @@ export default function ExerciseCard({ index, exercise, item, recommendation, la
             <tbody>
               {sets.map((set) => (
                 <tr key={set.id}>
-                  <td className="n">
+                  <td className={css.n}>
                     {set.side ?? ''}
                     {set.set_no}
                   </td>
-                  <td className="v">{s.timed ? setAmount(set) : `${kg(set.weight_kg)} × ${setAmount(set)}`}</td>
+                  <td className={css.v}>{s.timed ? setAmount(set) : `${kg(set.weight_kg)} × ${setAmount(set)}`}</td>
                   <td>
                     {set.kind !== 'work' && <span className="pill find">{KIND_LABEL[set.kind]}</span>}
-                    {set.rir != null && <span className="muted set-rir">여유 {set.rir}개</span>}
+                    {set.rir != null && <span className={css.rir}>여유 {set.rir}개</span>}
                   </td>
-                  <td className="act">
+                  <td className={css.act}>
                     <button className="icon-btn" aria-label={`${set.set_no}세트 삭제`} onClick={() => onDelete(set.id)}>
                       <XIcon />
                     </button>
@@ -113,7 +116,7 @@ export default function ExerciseCard({ index, exercise, item, recommendation, la
           </table>
         )}
 
-        <div className={`set-inputs${s.timed ? ' single' : ''}`}>
+        <div className={`${css.inputs}${s.timed ? ` ${css.single}` : ''}`}>
           {!s.timed && <Stepper label="무게(kg)" value={s.weight} onChange={s.setWeight} step={exercise.increment_kg || 1} decimal />}
           <Stepper label={s.timed ? '시간(초)' : '횟수'} value={s.amount} onChange={s.setAmount} step={s.timed ? 5 : 1} />
           {!s.timed && !s.finding && (
@@ -135,14 +138,14 @@ export default function ExerciseCard({ index, exercise, item, recommendation, la
         )}
 
         {s.finding ? (
-          <div className="finder">
-            <p className="finder-q">
+          <div className={css.finder}>
+            <p className={css.finderQ}>
               <b>
                 {s.weight}kg × {s.amount}회
               </b>{' '}
               하고 나서, 몇 개 더 할 수 있었나요? 누르면 바로 기록됩니다.
             </p>
-            <div className="finder-grid">
+            <div className={css.finderGrid}>
               {finderChoices.map((c) => (
                 <button key={c.label} className="btn btn-secondary" disabled={s.busy} onClick={() => s.pickFinder(c)}>
                   {c.label}
@@ -150,7 +153,7 @@ export default function ExerciseCard({ index, exercise, item, recommendation, la
               ))}
             </div>
             {s.finderResult && (
-              <p className="finder-result" role="status">
+              <p className={css.finderResult} role="status">
                 {s.finderResult.message}
                 {s.finderResult.steps !== 0 && s.finderResult.next_weight_kg != null && `, 다음 세트 ${kg(s.finderResult.next_weight_kg)}`}
               </p>
@@ -161,7 +164,7 @@ export default function ExerciseCard({ index, exercise, item, recommendation, la
           </div>
         ) : (
           <div className="row">
-            <button className="btn btn-primary grow" disabled={s.busy} onClick={() => s.submit('work')}>
+            <button className={`btn btn-primary ${css.record}`} disabled={s.busy} onClick={() => s.submit('work')}>
               {s.workSets.length + 1}세트 기록
             </button>
             {!s.timed && (
@@ -175,7 +178,7 @@ export default function ExerciseCard({ index, exercise, item, recommendation, la
         {s.error && <p className="error-text">{s.error}</p>}
 
         {(exercise.cue || exercise.setup_note) && (
-          <details className="cue">
+          <details className={css.cue}>
             <summary>자세·세팅 메모</summary>
             {exercise.setup_note && <p>{exercise.setup_note}</p>}
             {exercise.cue && <p>{exercise.cue}</p>}

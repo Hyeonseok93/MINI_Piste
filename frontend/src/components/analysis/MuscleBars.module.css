@@ -1,0 +1,59 @@
+.bars {
+  display: grid;
+  gap: 18px;
+}
+
+.group {
+  display: grid;
+  gap: 10px;
+}
+
+.bar {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr) 40px;
+  align-items: center;
+  gap: 12px;
+}
+
+.label {
+  font-size: var(--fs-sm);
+  color: var(--ink-2);
+}
+
+.track {
+  position: relative;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--surface-3);
+}
+
+.fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: inherit;
+  background: var(--primary);
+}
+
+.fill.met {
+  background: var(--hit);
+}
+
+.fill.zero {
+  display: none;
+}
+
+.target {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  width: 2px;
+  border-radius: 2px;
+  background: var(--ink);
+  opacity: 0.4;
+}
+
+.value {
+  text-align: right;
+  font-size: 18px;
+  font-weight: 600;
+}

@@ -1,11 +1,22 @@
 <!doctype html>
-<html lang="ko">
+<html lang="ko" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#12161f" />
+    <meta name="theme-color" content="#0d121c" />
     <title>PISTE · 운동 스케줄</title>
+    <script>
+      // 첫 화면이 그려지기 전에 테마를 정해 깜빡임을 막는다 (lib/theme.ts 와 같은 규칙)
+      try {
+        var p = localStorage.getItem('piste-theme')
+        var light = p === 'light' || (p === 'system' && matchMedia('(prefers-color-scheme: light)').matches)
+        if (light) {
+          document.documentElement.dataset.theme = 'light'
+          document.querySelector('meta[name="theme-color"]').content = '#f4f5f8'
+        }
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

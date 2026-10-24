@@ -7,6 +7,7 @@ import MonthCalendar from '../components/MonthCalendar'
 import { formatLong, todayISO } from '../lib/date'
 import { kg, summarizeSets, targetShort } from '../lib/format'
 import { dayStatus, KIND_LABEL, shortTitle, STATUS_LABEL } from '../lib/status'
+import css from './CalendarPage.module.css'
 
 function shiftMonth(month: string, n: number) {
   const [y, m] = month.split('-').map(Number)
@@ -41,13 +42,13 @@ export default function CalendarPage() {
         </div>
       </header>
 
-      <div className="grid cols-cal">
+      <div className={`grid ${css.layout}`}>
         <section className="panel">
-          <div className="cal-toolbar">
+          <div className={css.toolbar}>
             <button className="icon-btn" onClick={() => go(-1)} aria-label="이전 달">
               <ChevronLeft />
             </button>
-            <h2 className="cal-month">{month.replace('-', '.')}</h2>
+            <h2 className={css.month}>{month.replace('-', '.')}</h2>
             <button className="icon-btn" onClick={() => go(1)} aria-label="다음 달">
               <ChevronRight />
             </button>
@@ -67,7 +68,7 @@ export default function CalendarPage() {
           {isPending && <div className="skeleton lg" />}
           {isError && <p className="error-text">{error.message}</p>}
           {data && <MonthCalendar days={data} today={today} selected={selected} onSelect={setSelected} />}
-          <div className="cal-legend">
+          <div className={css.legend}>
             <span>
               <i className="dot strength" /> 근력
             </span>
@@ -120,8 +121,8 @@ function DayDetail({ day, today }: { day: CalendarDay; today: string }) {
         <div>
           <p className="row-title">{day.kind === 'rest' ? '휴식' : shortTitle(day)}</p>
           <p className="row-sub">
-            {day.phase} · {KIND_LABEL[day.kind]}
-            {day.cardio_minutes != null && ` · 유산소 ${day.cardio_minutes}분`}
+            {day.phase}, {KIND_LABEL[day.kind]}
+            {day.cardio_minutes != null && `, 유산소 ${day.cardio_minutes}분`}
           </p>
         </div>
       ) : (
@@ -130,7 +131,7 @@ function DayDetail({ day, today }: { day: CalendarDay; today: string }) {
 
       {workout.data && (
         <div className="stack tight">
-          <p className="field-label">기록 · {workout.data.title}</p>
+          <p className="field-label">기록: {workout.data.title}</p>
           <ul className="rows">
             {groups.map((g) => (
               <li key={g.id} className="align-start">

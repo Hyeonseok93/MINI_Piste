@@ -12,6 +12,7 @@ import { useToast } from '../components/Toast'
 import { EQUIPMENT_LABEL } from '../lib/format'
 import { addDays, formatLong, formatShort, todayISO } from '../lib/date'
 import { KIND_LABEL } from '../lib/status'
+import css from './WorkoutPage.module.css'
 
 export default function WorkoutPage() {
   const [params, setParams] = useSearchParams()
@@ -26,29 +27,29 @@ export default function WorkoutPage() {
     <>
       <header className="page-header">
         <div className="titles">
-          <p className="greet-date">
+          <p className="page-date">
             {formatLong(date)}
-            {data?.plan.phase && ` · ${data.plan.phase}`}
+            {data?.plan.phase && `, ${data.plan.phase}`}
           </p>
           <h1 className="page-title">{title}</h1>
           {data?.plan.label && <p className="page-sub">{data.plan.label}</p>}
         </div>
         <div className="row wrap">
           {data && data.items.length > 0 && (
-            <Link to={`/session${date === today ? '' : `?date=${date}`}`} className="btn btn-primary btn-sm">
+            <Link to={`/session${date === today ? '' : `?date=${date}`}`} className="btn btn-primary">
               운동 모드 시작
             </Link>
           )}
           {date !== today && (
-            <button className="btn btn-secondary btn-sm" onClick={() => setDate(today)}>
+            <button className="btn btn-secondary" onClick={() => setDate(today)}>
               오늘
             </button>
           )}
-          <div className="date-nav">
+          <div className={css.dateNav}>
             <button className="icon-btn" aria-label="전날" onClick={() => setDate(addDays(date, -1))}>
               <ChevronLeft />
             </button>
-            <span className="label num num-md">
+            <span className={`num ${css.dateLabel}`}>
               {formatShort(date)}
             </span>
             <button className="icon-btn" aria-label="다음날" onClick={() => setDate(addDays(date, 1))}>
@@ -99,7 +100,7 @@ function WorkoutView({ date, data }: { date: string; data: Today }) {
     <div className="grid cols-main-aside">
       <div className="stack">
         {restDay && !workout && (
-          <div className="rest-banner" role="status">
+          <div className={css.banner} role="status">
             <b>이 날은 '못 함'으로 표시했어요.</b> 달력에 원래 일정과 함께 회색으로 표시되고 빠짐으로 세지 않습니다. 운동을 하게 되면 세트를 기록하거나 표시를 취소하세요.
           </div>
         )}
@@ -152,7 +153,7 @@ function WorkoutView({ date, data }: { date: string; data: Today }) {
                 {doneCount}/{items.length}
               </span>
             </div>
-            <div className="progress-bar" role="progressbar" aria-valuemin={0} aria-valuemax={items.length} aria-valuenow={doneCount}>
+            <div className={css.progress} role="progressbar" aria-label="종목 진행" aria-valuemin={0} aria-valuemax={items.length} aria-valuenow={doneCount}>
               <span style={{ width: `${(doneCount / items.length) * 100}%` }} />
             </div>
             <p className="row-sub">세트마다 2~3개 남기고 멈추세요. 모든 세트를 목표 횟수까지 채우면 다음에 무게가 올라갑니다.</p>
@@ -163,7 +164,7 @@ function WorkoutView({ date, data }: { date: string; data: Today }) {
 
         <section className="panel">
           <div className="panel-head">
-            <h2 className="panel-title">유산소 · 메모</h2>
+            <h2 className="panel-title">유산소와 메모</h2>
           </div>
           <WorkoutMeta key={workout?.id ?? 'none'} workout={workout} plannedCardio={plan.cardio_minutes} onEnsure={ensureWorkout} />
         </section>
@@ -181,7 +182,7 @@ function WorkoutView({ date, data }: { date: string; data: Today }) {
             onClick={async () => {
               const ok = await confirm({
                 title: `${formatShort(date)} 운동 기록을 삭제할까요?`,
-                message: `${workout.title} · 세트 ${workout.sets.length}개${workout.cardio_minutes != null ? ` · 유산소 ${workout.cardio_minutes}분` : ''}. 삭제하면 되돌릴 수 없습니다.`,
+                message: `${workout.title}, 세트 ${workout.sets.length}개${workout.cardio_minutes != null ? `, 유산소 ${workout.cardio_minutes}분` : ''}. 삭제하면 되돌릴 수 없습니다.`,
                 confirmLabel: '삭제',
                 danger: true,
               })
@@ -203,7 +204,7 @@ function RestToggle({ date, rest }: { date: string; rest: boolean }) {
   const setRest = useSetRestDay()
   const toast = useToast()
   return (
-    <section className={`panel stack rest-panel${rest ? ' is-rest' : ''}`}>
+    <section className={`panel stack ${css.restPanel}${rest ? ` ${css.isRest}` : ''}`}>
       <div>
         <h2 className="panel-title">{rest ? '못 함으로 표시했어요' : '오늘 못 하나요?'}</h2>
         <p className="row-sub mt-xs">
@@ -211,7 +212,7 @@ function RestToggle({ date, rest }: { date: string; rest: boolean }) {
         </p>
       </div>
       <button
-        className={`btn ${rest ? 'btn-secondary' : 'btn-ghost rest-btn'}`}
+        className="btn btn-secondary"
         disabled={setRest.isPending}
         onClick={() =>
           setRest

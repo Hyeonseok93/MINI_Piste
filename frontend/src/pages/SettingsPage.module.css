@@ -1,0 +1,23 @@
+.me {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.avatar {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--surface-3);
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.name {
+  font-size: 18px;
+  font-weight: 700;
+}

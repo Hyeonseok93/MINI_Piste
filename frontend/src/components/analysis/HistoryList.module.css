@@ -1,0 +1,10 @@
+/* 펼친 세션 상세: 날짜 칸 너비만큼 들여 쓴다 */
+.detail {
+  padding: 12px 0 4px 60px;
+}
+
+@media (max-width: 480px) {
+  .detail {
+    padding-left: 0;
+  }
+}

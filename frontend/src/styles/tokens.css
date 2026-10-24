@@ -1,0 +1,101 @@
+/*
+ * 디자인 토큰. 다크가 기본이고 <html data-theme="light"> 일 때 라이트로 바뀐다.
+ * 테마 선택(다크·라이트·시스템)은 lib/theme.ts 가 data-theme 으로 정한다.
+ * 컴포넌트는 여기 있는 변수만 쓰고 색·크기를 직접 적지 않는다.
+ */
+:root {
+  /* 면: 배경 → 카드 → 카드 안 강조 → 눌린/선택 */
+  --bg: #0d121c;
+  --surface: #141b28;
+  --surface-2: #1b2333;
+  --surface-3: #252f43;
+  --bar: rgba(16, 22, 34, 0.8);
+  --overlay: rgba(4, 7, 12, 0.6);
+
+  /* 선 */
+  --line: rgba(255, 255, 255, 0.07);
+  --line-2: rgba(255, 255, 255, 0.13);
+
+  /* 글자 */
+  --ink: #eef1f6;
+  --ink-2: #b3bccd;
+  --muted: #7d879b;
+  --on-ink: #0d121c; /* ink 색 배경 위 글자 */
+
+  /* 강조: 파랑 하나. 초록·빨강은 완료·빠짐 같은 의미에만 */
+  --primary: #6f8cff;
+  --primary-hover: #8aa1ff;
+  --primary-ink: #0b1020;
+  --primary-soft: rgba(111, 140, 255, 0.14);
+  --hit: #3ccf8e;
+  --hit-soft: rgba(60, 207, 142, 0.14);
+  --miss: #ff6b6b;
+  --miss-soft: rgba(255, 107, 107, 0.14);
+  --find: #f0b93a;
+  --find-soft: rgba(240, 185, 58, 0.14);
+  --cardio: #4cc3d9;
+  --cardio-soft: rgba(76, 195, 217, 0.14);
+
+  --shadow-pop: 0 18px 48px -12px rgba(0, 0, 0, 0.6);
+  --focus: 0 0 0 3px color-mix(in srgb, var(--primary) 40%, transparent);
+
+  /* 글꼴 */
+  --font-sans: 'Pretendard Variable', Pretendard, -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', system-ui, sans-serif;
+  --font-num: 'Barlow Condensed', var(--font-sans);
+
+  /* 글자 크기 */
+  --fs-xs: 12px;
+  --fs-sm: 13.5px;
+  --fs-md: 15px;
+  --fs-lg: 17px;
+  --fs-xl: 22px;
+  --fs-2xl: 28px;
+  --fs-3xl: 34px;
+
+  /* 모서리: 카드 > 컨트롤 > 알약 */
+  --r-card: 18px;
+  --r-ctl: 12px;
+  --r-sm: 8px;
+
+  /* 셸 */
+  --sidebar-w: 224px;
+  --topbar-h: 56px;
+  --tabbar-h: 60px;
+  --content-max: 1160px;
+
+  color-scheme: dark;
+}
+
+:root[data-theme='light'] {
+  --bg: #f4f5f8;
+  --surface: #ffffff;
+  --surface-2: #f2f4f8;
+  --surface-3: #e6eaf1;
+  --bar: rgba(255, 255, 255, 0.84);
+  --overlay: rgba(15, 20, 30, 0.42);
+
+  --line: rgba(17, 24, 39, 0.08);
+  --line-2: rgba(17, 24, 39, 0.14);
+
+  --ink: #141a26;
+  --ink-2: #485266;
+  --muted: #747d90;
+  --on-ink: #ffffff;
+
+  --primary: #2f55e4;
+  --primary-hover: #2546c4;
+  --primary-ink: #ffffff;
+  --primary-soft: rgba(47, 85, 228, 0.09);
+  --hit: #0f9d63;
+  --hit-soft: rgba(15, 157, 99, 0.1);
+  --miss: #e5484d;
+  --miss-soft: rgba(229, 72, 77, 0.1);
+  --find: #a36b00;
+  --find-soft: rgba(214, 150, 20, 0.13);
+  --cardio: #0a8ea4;
+  --cardio-soft: rgba(10, 142, 164, 0.1);
+
+  --shadow-pop: 0 18px 48px -14px rgba(20, 30, 50, 0.28);
+
+  color-scheme: light;
+}

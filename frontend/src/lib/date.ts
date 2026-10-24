@@ -60,3 +60,9 @@ export function formatLong(s: string): string {
   const d = parseISODate(s)
   return `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일 ${WEEKDAYS[weekdayIndex(s)]}요일`
 }
+
+/** 2026-10-19 → "10월 19일 월요일" */
+export function formatDay(s: string): string {
+  const d = parseISODate(s)
+  return `${d.getMonth() + 1}월 ${d.getDate()}일 ${WEEKDAYS[weekdayIndex(s)]}요일`
+}

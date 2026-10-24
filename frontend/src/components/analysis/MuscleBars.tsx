@@ -1,6 +1,7 @@
 import type { MuscleVolume } from '../../api/types'
+import s from './MuscleBars.module.css'
 
-/** 근육별 세트 수 막대. 목표선 대비 채운 정도로 보여 준다 (3단계에서 3D 몸 모델로 대체 예정) */
+/** 근육별 세트 수 막대. 목표선 대비 채운 정도로 보여 준다 */
 export default function MuscleBars({ data }: { data: MuscleVolume[] }) {
   const groups: [string, MuscleVolume[]][] = [
     ['몸 앞쪽', data.filter((m) => m.side === 'front')],
@@ -10,21 +11,21 @@ export default function MuscleBars({ data }: { data: MuscleVolume[] }) {
   const max = Math.max(target * 1.5, ...data.map((m) => m.sets))
 
   return (
-    <div className="muscle-bars">
+    <div className={s.bars}>
       {groups.map(([title, list]) => (
-        <div key={title} className="stack tight">
+        <div key={title} className={s.group}>
           <p className="field-label">{title}</p>
           {list.map((m) => {
             const pct = Math.min(100, (m.sets / max) * 100)
-            const state = m.sets === 0 ? 'zero' : m.sets >= m.target_sets ? 'met' : 'low'
+            const state = m.sets === 0 ? s.zero : m.sets >= m.target_sets ? s.met : ''
             return (
-              <div key={m.muscle} className="mbar" data-tip={`주동 ${m.primary_sets}세트, 보조 ${m.secondary_sets}세트`}>
-                <span className="mbar-label">{m.label}</span>
-                <span className="mbar-track">
-                  <span className={`mbar-fill ${state}`} style={{ width: `${pct}%` }} />
-                  <span className="mbar-target" style={{ left: `${(m.target_sets / max) * 100}%` }} aria-hidden />
+              <div key={m.muscle} className={s.bar} data-tip={`주동 ${m.primary_sets}세트, 보조 ${m.secondary_sets}세트`}>
+                <span className={s.label}>{m.label}</span>
+                <span className={s.track}>
+                  <span className={`${s.fill} ${state}`} style={{ width: `${pct}%` }} />
+                  <span className={s.target} style={{ left: `${(m.target_sets / max) * 100}%` }} aria-hidden />
                 </span>
-                <span className="num mbar-value">{m.sets}</span>
+                <span className={`num ${s.value}`}>{m.sets}</span>
               </div>
             )
           })}

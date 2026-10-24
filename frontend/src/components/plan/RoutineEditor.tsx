@@ -6,6 +6,7 @@ import { useConfirm } from '../Confirm'
 import { ChevronDown, XIcon } from '../icons'
 import Select from '../Select'
 import { useToast } from '../Toast'
+import css from './Plan.module.css'
 
 type Row = RoutineItemInput & { key: string; name: string }
 
@@ -82,7 +83,7 @@ export default function RoutineEditor({ routine, onDeleted }: { routine: Routine
 
   return (
     <section className="panel stack">
-      <div className="form-grid cols-2-auto">
+      <div className="form-grid cols-2">
         <label className="field">
           <span className="field-label">루틴 이름</span>
           <input className="input" value={name} maxLength={40} onChange={(e) => setName(e.target.value)} />
@@ -93,31 +94,31 @@ export default function RoutineEditor({ routine, onDeleted }: { routine: Routine
         </label>
       </div>
 
-      <ol className="routine-rows">
+      <ol className={css.rows}>
         {rows.map((r, i) => {
           const timed = r.duration_sec != null
           return (
-            <li key={r.key} className="routine-row">
-              <span className="ex-pos">{i + 1}</span>
+            <li key={r.key} className={css.row}>
+              <span className={css.pos}>{i + 1}</span>
               <div className="grow">
                 <p className="row-title">{r.name}</p>
-                <div className="routine-fields">
-                  <label className="mini-field">
+                <div className={css.fields}>
+                  <label className={css.mini}>
                     <span>세트</span>
                     <input className="input" inputMode="numeric" value={r.sets} onChange={(e) => patch(r.key, { sets: num(e.target.value, r.sets) })} />
                   </label>
                   {timed ? (
-                    <label className="mini-field">
+                    <label className={css.mini}>
                       <span>시간(초)</span>
                       <input className="input" inputMode="numeric" value={r.duration_sec ?? ''} onChange={(e) => patch(r.key, { duration_sec: num(e.target.value, 30) })} />
                     </label>
                   ) : (
                     <>
-                      <label className="mini-field">
+                      <label className={css.mini}>
                         <span>최소 횟수</span>
                         <input className="input" inputMode="numeric" value={r.rep_min ?? ''} onChange={(e) => patch(r.key, { rep_min: num(e.target.value, 10) })} />
                       </label>
-                      <label className="mini-field">
+                      <label className={css.mini}>
                         <span>최대 횟수</span>
                         <input className="input" inputMode="numeric" value={r.rep_max ?? ''} onChange={(e) => patch(r.key, { rep_max: num(e.target.value, 12) })} />
                       </label>
@@ -132,9 +133,9 @@ export default function RoutineEditor({ routine, onDeleted }: { routine: Routine
                   </button>
                 </div>
               </div>
-              <div className="row-actions">
+              <div className={css.actions}>
                 <button type="button" className="icon-btn" aria-label={`${r.name} 위로`} disabled={i === 0} onClick={() => move(i, -1)}>
-                  <ChevronDown className="flip" />
+                  <ChevronDown className={css.flip} />
                 </button>
                 <button type="button" className="icon-btn" aria-label={`${r.name} 아래로`} disabled={i === rows.length - 1} onClick={() => move(i, 1)}>
                   <ChevronDown />

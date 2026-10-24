@@ -5,6 +5,7 @@ import type { WorkoutListItem } from '../../api/types'
 import { ChevronRight } from '../icons'
 import { parseISODate, weekdayIndex, weekdayLabel } from '../../lib/date'
 import { summarizeSets } from '../../lib/format'
+import css from './HistoryList.module.css'
 
 function byMonth(list: WorkoutListItem[]) {
   const groups = new Map<string, WorkoutListItem[]>()
@@ -80,12 +81,12 @@ export default function HistoryList() {
 function Detail({ id, date }: { id: number; date: string }) {
   const { data } = useWorkout(id)
   const exercises = useExercises()
-  if (!data || !exercises.data) return <p className="muted detail-indent">불러오는 중…</p>
+  if (!data || !exercises.data) return <p className={`muted ${css.detail}`}>불러오는 중…</p>
   const nameOf = (eid: number) => exercises.data.find((e) => e.id === eid)?.name ?? `#${eid}`
   const order = [...new Set(data.sets.map((s) => s.exercise_id))]
 
   return (
-    <div className="stack tight detail-indent">
+    <div className={`stack tight ${css.detail}`}>
       {order.map((eid) => {
         const sets = data.sets.filter((s) => s.exercise_id === eid)
         return (

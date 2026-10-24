@@ -138,7 +138,7 @@ function MeasurementList({ list }: { list: Measurement[] }) {
                 <span className="row-title block">{formatShort(m.date)}</span>
                 <span className="row-sub">
                   {m.weight_avg_7d != null ? `7일 평균 ${kg(m.weight_avg_7d)} (${m.weight_days}일)` : '체중 기록 없음'}
-                  {m.body_fat_pct != null && ` · 체지방 ${m.body_fat_pct}%`}
+                  {m.body_fat_pct != null && `, 체지방 ${m.body_fat_pct}%`}
                 </span>
                 {m.note && <span className="row-sub block">{m.note}</span>}
               </span>

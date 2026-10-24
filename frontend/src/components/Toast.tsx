@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useRef, useState, type ReactNode } from 'react'
+import s from './Toast.module.css'
 
 const ToastContext = createContext<(message: string) => void>(() => {})
 
@@ -16,7 +17,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     <ToastContext.Provider value={show}>
       {children}
       {toast && (
-        <div className="toast" role="status" key={toast.id}>
+        <div className={s.toast} role="status" key={toast.id}>
           {toast.text}
         </div>
       )}

@@ -1,0 +1,102 @@
+.fig {
+  position: relative;
+  min-width: 0;
+}
+
+.svg {
+  display: block;
+  width: 100%;
+  overflow: visible;
+}
+
+.grid {
+  stroke: var(--line);
+}
+
+.axis {
+  fill: var(--muted);
+  font-family: var(--font-num);
+  font-size: 12.5px;
+}
+
+.guide {
+  stroke-dasharray: 3 5;
+}
+
+.guideLabel {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.hit {
+  cursor: pointer;
+  outline: none;
+}
+
+.cursor {
+  stroke: var(--line-2);
+}
+
+.tip {
+  position: absolute;
+  z-index: 5;
+  display: grid;
+  gap: 2px;
+  padding: 7px 10px;
+  border-radius: var(--r-sm);
+  background: var(--ink);
+  color: var(--on-ink);
+  font-size: 12.5px;
+  white-space: nowrap;
+  pointer-events: none;
+  transform: translate(-50%, calc(-100% - 12px));
+}
+
+.tipDate {
+  opacity: 0.7;
+  font-weight: 600;
+}
+
+.tipRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tipRow i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.tipRow b {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend i {
+  width: 12px;
+  height: 3px;
+  border-radius: 999px;
+}
+
+.legend i.dot {
+  width: 7px;
+  height: 7px;
+}

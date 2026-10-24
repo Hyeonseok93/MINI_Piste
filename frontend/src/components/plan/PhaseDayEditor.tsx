@@ -5,6 +5,7 @@ import { weekdayLabel } from '../../lib/date'
 import { KIND_LABEL } from '../../lib/status'
 import Select from '../Select'
 import { useToast } from '../Toast'
+import css from './Plan.module.css'
 
 const KINDS: DayKind[] = ['strength', 'cardio', 'outdoor', 'rest']
 
@@ -24,7 +25,7 @@ export default function PhaseDayEditor({ phaseId, day, onDone }: { phaseId: numb
 
   return (
     <form
-      className="form-grid day-editor"
+      className={`form-grid ${css.editor}`}
       onSubmit={(e) => {
         e.preventDefault()
         save
@@ -54,7 +55,7 @@ export default function PhaseDayEditor({ phaseId, day, onDone }: { phaseId: numb
         ))}
       </div>
       {strength && (
-        <div className="form-grid cols-2-auto">
+        <div className="form-grid cols-2">
           <div className="field">
             <span className="field-label">루틴</span>
             <Select label="루틴" placeholder="루틴 선택" value={routineId} onChange={setRoutineId} options={options} />
@@ -70,7 +71,7 @@ export default function PhaseDayEditor({ phaseId, day, onDone }: { phaseId: numb
           </div>
         </div>
       )}
-      <div className="form-grid cols-2-auto">
+      <div className="form-grid cols-2">
         <label className="field">
           <span className="field-label">표시 이름</span>
           <input className="input" value={label} maxLength={80} onChange={(e) => setLabel(e.target.value)} />

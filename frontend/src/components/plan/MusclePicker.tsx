@@ -1,4 +1,5 @@
 import type { ExerciseMuscle, MuscleInfo, MuscleRole } from '../../api/types'
+import css from './Plan.module.css'
 
 const NEXT: Record<'none' | MuscleRole, 'none' | MuscleRole> = { none: 'primary', primary: 'secondary', secondary: 'none' }
 const LABEL: Record<MuscleRole, string> = { primary: '주동', secondary: '보조' }
@@ -14,14 +15,14 @@ export default function MusclePicker({ all, value, onChange }: { all: MuscleInfo
   }
 
   return (
-    <div className="muscle-chips" role="group" aria-label="쓰는 근육">
+    <div className={css.chips} role="group" aria-label="쓰는 근육">
       {all.map((m) => {
         const role = roleOf(m.muscle)
         return (
           <button
             key={m.muscle}
             type="button"
-            className={`muscle-chip ${role}`}
+            className={`${css.chip} ${role === 'none' ? '' : css[role]}`}
             aria-pressed={role !== 'none'}
             aria-label={`${m.label} ${role === 'none' ? '안 씀' : LABEL[role]}`}
             onClick={() => toggle(m.muscle)}

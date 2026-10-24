@@ -1,5 +1,6 @@
 import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react'
 import { CheckIcon, ChevronDown, SearchIcon } from './icons'
+import css from './Select.module.css'
 
 interface SelectOption<T extends string | number> {
   value: T
@@ -140,11 +141,11 @@ export default function Select<T extends string | number>({
   const activeId = filtered[active] ? `${id}-opt-${active}` : undefined
 
   return (
-    <div className={`sel${open ? ' is-open' : ''}${dropUp ? ' drop-up' : ''}`} ref={root}>
+    <div className={`${css.sel}${open ? ` ${css.open}` : ''}${dropUp ? ` ${css.up}` : ''}`} ref={root}>
       <button
         ref={trigger}
         type="button"
-        className="sel-trigger"
+        className={css.trigger}
         role="combobox"
         aria-label={label}
         aria-haspopup="listbox"
@@ -154,15 +155,15 @@ export default function Select<T extends string | number>({
         onClick={() => (open ? close() : openList())}
         onKeyDown={onKeyDown}
       >
-        <span className={shown ? 'sel-value' : 'sel-placeholder'}>{shown?.label ?? placeholder}</span>
-        {shown?.hint && <span className="sel-hint">{shown.hint}</span>}
-        <ChevronDown className="sel-chevron" />
+        <span className={shown ? css.value : css.placeholder}>{shown?.label ?? placeholder}</span>
+        {shown?.hint && <span className={css.hint}>{shown.hint}</span>}
+        <ChevronDown className={css.chevron} />
       </button>
 
       {open && (
-        <div className="sel-pop">
+        <div className={css.pop}>
           {searchable && (
-            <div className="sel-search">
+            <div className={css.search}>
               <SearchIcon />
               <input
                 ref={search}
@@ -179,8 +180,8 @@ export default function Select<T extends string | number>({
               />
             </div>
           )}
-          <ul className="sel-list" id={`${id}-list`} role="listbox" aria-label={label} ref={list}>
-            {filtered.length === 0 && <li className="sel-empty">일치하는 종목이 없습니다</li>}
+          <ul className={css.list} id={`${id}-list`} role="listbox" aria-label={label} ref={list}>
+            {filtered.length === 0 && <li className={css.empty}>일치하는 종목이 없습니다</li>}
             {filtered.map((o, i) => {
               const isSel = o.value === value && !resetAfterSelect
               return (
@@ -192,14 +193,14 @@ export default function Select<T extends string | number>({
                   data-index={i}
                   role="option"
                   aria-selected={isSel}
-                  className={`sel-opt${i === active ? ' is-active' : ''}`}
+                  className={`${css.opt}${i === active ? ` ${css.active}` : ''}`}
                   onPointerMove={() => setActive(i)}
                   onPointerDown={(e) => e.preventDefault()}
                   onClick={() => choose(o)}
                 >
-                  <span className="sel-opt-label">{o.label}</span>
-                  {o.hint && <span className="sel-hint">{o.hint}</span>}
-                  <span className="sel-check" aria-hidden>
+                  <span className={css.optLabel}>{o.label}</span>
+                  {o.hint && <span className={css.hint}>{o.hint}</span>}
+                  <span className={css.check} aria-hidden>
                     {isSel && <CheckIcon />}
                   </span>
                 </li>

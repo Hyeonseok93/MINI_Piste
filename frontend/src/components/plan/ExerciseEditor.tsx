@@ -65,7 +65,7 @@ export default function ExerciseEditor({ exercise, onDone }: { exercise?: Exerci
         <span className="field-label">이름</span>
         <input className="input" value={name} maxLength={80} onChange={(e) => setName(e.target.value)} placeholder="예: 케이블 크런치" />
       </label>
-      <div className="form-grid cols-2-auto">
+      <div className="form-grid cols-2">
         <div className="field">
           <span className="field-label">분류</span>
           <Select label="분류" value={category} onChange={setCategory} options={categoryOptions} />
@@ -75,7 +75,7 @@ export default function ExerciseEditor({ exercise, onDone }: { exercise?: Exerci
           <Select label="기구" value={equipment} onChange={setEquipment} options={equipmentOptions} />
         </div>
       </div>
-      <div className="form-grid cols-2-auto">
+      <div className="form-grid cols-2">
         <label className="field">
           <span className="field-label">증량 단위</span>
           <span className="input-suffix">

@@ -11,6 +11,7 @@ import { useWorkoutSession } from '../hooks/useWorkoutSession'
 import { formatShort, todayISO } from '../lib/date'
 import { primeAudio } from '../lib/feedback'
 import { kg } from '../lib/format'
+import css from './SessionPage.module.css'
 
 /** 운동 모드: 한 종목씩 크게, 세트를 기록하면 휴식 타이머가 돈다. 헬스장에서 폰으로 쓰는 화면. */
 export default function SessionPage() {
@@ -22,11 +23,11 @@ export default function SessionPage() {
   useWakeLock(true)
 
   const back = date === today ? '/workout' : `/workout?date=${date}`
-  if (isError) return <div className="session empty">{error.message}</div>
-  if (!data || !prs.data) return <div className="session empty">불러오는 중…</div>
+  if (isError) return <div className={`${css.session} ${css.state}`}>{error.message}</div>
+  if (!data || !prs.data) return <div className={`${css.session} ${css.state}`}>불러오는 중…</div>
   if (data.items.length === 0)
     return (
-      <div className="session empty">
+      <div className={`${css.session} ${css.state}`}>
         <p>이 날은 근력 종목이 없습니다.</p>
         <Link to={back} className="btn btn-secondary mt-md">
           운동 화면으로
@@ -84,25 +85,25 @@ function Session({ date, data, prsBefore, back }: { date: string; data: Today; p
   const go = (d: number) => setIndex((i) => (i + d + items.length) % items.length)
 
   return (
-    <div className="session" onPointerDown={primeAudio}>
-      <header className="session-top">
+    <div className={css.session} onPointerDown={primeAudio}>
+      <header className={css.top}>
         <Link to={back} className="icon-btn" aria-label="운동 모드 끝내기">
           <XIcon />
         </Link>
         <div className="grow">
-          <p className="session-title">{data.workout?.title ?? data.plan.routine?.name}</p>
+          <p className={css.title}>{data.workout?.title ?? data.plan.routine?.name}</p>
           <p className="muted">
-            {formatShort(date)} · {session.doneCount}/{items.length} 종목
+            {formatShort(date)}, {session.doneCount}/{items.length} 종목
           </p>
         </div>
       </header>
 
-      <nav className="session-steps" aria-label="종목 순서">
+      <nav className={css.steps} aria-label="종목 순서">
         {items.map((it, k) => (
           <button
             key={it.item.id}
             type="button"
-            className={`step${k === index ? ' current' : ''}${session.isDone(it.item) ? ' done' : ''}`}
+            className={`${css.step}${k === index ? ` ${css.current}` : ''}${session.isDone(it.item) ? ` ${css.done}` : ''}`}
             aria-label={`${k + 1}. ${it.item.exercise.name}${session.isDone(it.item) ? ' 완료' : ''}`}
             aria-current={k === index ? 'step' : undefined}
             onClick={() => setIndex(k)}
@@ -111,10 +112,10 @@ function Session({ date, data, prsBefore, back }: { date: string; data: Today; p
       </nav>
 
       {allDone ? (
-        <section className="panel session-summary" aria-live="polite">
-          <p className="eyebrow-text">오늘 근력 운동 끝</p>
-          <h1 className="summary-title">수고했어요</h1>
-          <div className="summary-stats">
+        <section className={`panel ${css.summary}`} aria-live="polite">
+          <p className={css.finished}>오늘 근력 운동 끝</p>
+          <h1 className={css.summaryTitle}>수고했어요</h1>
+          <div className={css.stats}>
             <div>
               <b className="num">{session.workout?.sets.length ?? 0}</b>세트
             </div>
@@ -126,7 +127,7 @@ function Session({ date, data, prsBefore, back }: { date: string; data: Today; p
             </div>
           </div>
           {newPRs.length > 0 && (
-            <ul className="rows">
+            <ul className={`rows ${css.prs}`}>
               {newPRs.map((p) => (
                 <li key={p.name}>
                   <span className="grow">🏆 {p.name}</span>
@@ -138,7 +139,7 @@ function Session({ date, data, prsBefore, back }: { date: string; data: Today; p
             </ul>
           )}
           <p className="row-sub">유산소와 메모는 운동 화면에서 기록하세요.</p>
-          <Link to={back} className="btn btn-primary btn-block">
+          <Link to={back} className="btn btn-primary btn-lg btn-block">
             유산소·메모 기록하러 가기
           </Link>
         </section>
@@ -154,15 +155,16 @@ function Session({ date, data, prsBefore, back }: { date: string; data: Today; p
           finderChoices={finderChoices}
           onAdd={onAdd}
           onDelete={session.removeSet}
+          big
         />
       )}
 
       {!allDone && (
-        <div className="session-nav">
+        <div className={css.nav}>
           <button className="btn btn-secondary" onClick={() => go(-1)} aria-label="이전 종목">
             <ChevronLeft />
           </button>
-          <span className="muted grow center-text">
+          <span className={css.count}>
             {index + 1} / {items.length}
           </span>
           <button className="btn btn-secondary" onClick={() => go(1)} aria-label="다음 종목">
@@ -183,18 +185,18 @@ function RestSheet({ remaining, total, label, onAdd, onSkip }: { remaining: numb
   const mm = Math.floor(remaining / 60)
   const ss = String(remaining % 60).padStart(2, '0')
   return (
-    <section className="rest-sheet" role="timer" aria-label={`휴식 ${remaining}초 남음`}>
-      <div className="rest-ring">
+    <section className={css.rest} role="timer" aria-label={`휴식 ${remaining}초 남음`}>
+      <div className={css.ring}>
         <svg viewBox="0 0 120 120" aria-hidden>
-          <circle cx="60" cy="60" r={r} className="ring-track" />
-          <circle cx="60" cy="60" r={r} className="ring-fill" strokeDasharray={circ} strokeDashoffset={circ * (1 - ratio)} />
+          <circle cx="60" cy="60" r={r} className={css.track} />
+          <circle cx="60" cy="60" r={r} className={css.fill} strokeDasharray={circ} strokeDashoffset={circ * (1 - ratio)} />
         </svg>
-        <span className="num rest-time">
+        <span className={`num ${css.time}`}>
           {mm}:{ss}
         </span>
       </div>
-      <div className="rest-info">
-        <p className="rest-label">휴식 중</p>
+      <div>
+        <p className={css.restLabel}>휴식 중</p>
         <p className="muted">{label} 다음 세트 준비</p>
         <div className="row wrap mt-sm">
           <button className="btn btn-secondary btn-sm" onClick={() => onAdd(-15)}>

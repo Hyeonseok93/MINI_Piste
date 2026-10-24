@@ -1,0 +1,111 @@
+.welcome {
+  display: grid;
+  min-height: 100dvh;
+}
+
+.side {
+  display: none;
+}
+
+.main {
+  display: grid;
+  align-content: center;
+  width: 100%;
+  max-width: 460px;
+  margin: 0 auto;
+  padding: 40px 20px calc(40px + env(safe-area-inset-bottom));
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 40px;
+  font-family: var(--font-num);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
+.brand svg {
+  width: 26px;
+  height: 26px;
+}
+
+.title {
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.25;
+}
+
+.lead {
+  margin: 10px 0 30px;
+  color: var(--ink-2);
+}
+
+@media (min-width: 1024px) {
+  .welcome {
+    grid-template-columns: 1.05fr 1fr;
+  }
+
+  .side {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 48px 56px;
+    border-right: 1px solid var(--line);
+    background: var(--surface);
+  }
+
+  .side h2 {
+    max-width: 14ch;
+    font-size: 40px;
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    line-height: 1.2;
+  }
+
+  .side p {
+    max-width: 36ch;
+    margin-top: 14px;
+    color: var(--ink-2);
+  }
+
+  /* 위에서 본 피스트: 양 끝 경고 구역과 중앙선 */
+  .piste {
+    position: relative;
+    display: grid;
+    grid-template-columns: 12% 1fr 12%;
+    height: 56px;
+    overflow: hidden;
+    border-radius: 10px;
+    background: var(--surface-2);
+  }
+
+  .piste::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 2px;
+    background: var(--line-2);
+  }
+
+  .piste span:first-child {
+    background: var(--miss);
+  }
+
+  .piste span:last-child {
+    background: var(--hit);
+  }
+
+  .main {
+    padding: 48px 56px;
+  }
+
+  .main .brand {
+    display: none;
+  }
+}
