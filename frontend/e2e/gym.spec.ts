@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-// 헬스장에서 실제로 하는 흐름: 처음 시작 → 운동 모드로 세트 기록·휴식 → 루틴 수정 → 몸 기록 → 못 한 날 표시.
+// 헬스장에서 실제로 하는 흐름: 처음 시작 → 운동 모드로 세트 기록·휴식 → 루틴 수정 → 홈 체중 → 단계 기간 → 몸 기록 → 못 한 날 표시.
 // 날짜는 시드 플랜 기준으로 고정한다 (2026-10-25 일요일 = 전신 A, 10/16 무게 찾기 기록 있음).
 const API = 'http://127.0.0.1:8100/api'
 
@@ -69,6 +69,33 @@ test('플랜: 루틴에 종목을 추가하고 저장한다', async ({ page, req
   await expect(page.getByRole('button', { name: new RegExp(`^전신 A\\s*${before + 1}$`) })).toBeVisible()
 })
 
+test('홈: 오늘 아침 체중을 바로 기록한다', async ({ page }, info) => {
+  const d = dev(info.project.name)
+  const w = (Number(d.bodyWeight) + 0.4).toFixed(1)
+  await page.goto('/')
+  const card = page.locator('section').filter({ has: page.getByRole('heading', { name: '체중' }) })
+  await card.getByLabel('오늘 아침 체중(kg)').fill(w)
+  await card.getByRole('button', { name: /^(기록|수정)$/ }).click()
+  await expect(page.getByRole('status').filter({ hasText: '오늘 체중을 기록했습니다' })).toBeVisible()
+})
+
+test('플랜: 단계 종료일을 날짜 선택기로 하루 당긴다', async ({ page }) => {
+  await page.goto('/plan')
+  const edit = page.getByRole('button', { name: /이름과 기간 수정$/ }).last()
+  await edit.click()
+  const end = page.getByRole('button', { name: /^종료일, / })
+  const before = await end.getAttribute('aria-label')
+  await end.click()
+  // 달력이 열리면 고른 날짜에 포커스가 간다: 왼쪽 화살표로 하루 전, Enter 로 고른다
+  await expect(page.getByRole('dialog', { name: '종료일 달력' })).toBeVisible()
+  await page.keyboard.press('ArrowLeft')
+  await page.keyboard.press('Enter')
+  await expect(page.getByRole('dialog', { name: '종료일 달력' })).toBeHidden()
+  await expect(end).not.toHaveAttribute('aria-label', before!)
+  await page.getByRole('button', { name: '저장', exact: true }).click()
+  await expect(page.getByRole('status').filter({ hasText: '단계를 저장했습니다' })).toBeVisible()
+})
+
 test('몸: 오늘 체중을 저장하면 그래프에 반영된다', async ({ page }, info) => {
   const d = dev(info.project.name)
   await page.goto('/body')
@@ -86,7 +113,9 @@ test('못 한 날: 운동일을 못 함으로 표시하면 달력에 회색으�
   await expect(page.getByText("이 날은 '못 함'으로 표시했어요.")).toBeVisible()
 
   await page.goto('/calendar')
-  // 달력은 오늘 기준 달을 연다. 2026-10 이 아니면 해당 달로 이동
+  // isVisible 은 기다리지 않으므로 달력 데이터가 뜬 뒤에 확인한다
+  await expect(page.getByRole('grid', { name: '월간 달력' })).toBeVisible()
+  // 달력은 오늘 기준 달을 연다. 2026-10 이 아니면 건너뛴다
   const cell = page.getByRole('gridcell', { name: new RegExp(`^${d.skipDay} `) })
   if (!(await cell.isVisible())) test.skip(true, '오늘이 2026년 10월이 아님')
   await expect(cell).toHaveAccessibleName(/못 함/)
