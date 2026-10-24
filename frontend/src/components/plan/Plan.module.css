@@ -177,3 +177,8 @@
   background: var(--primary-soft);
   color: var(--primary);
 }
+
+/* 전체 일정에서 단계를 누르면 이 카드로 스크롤: 휴대폰 상단 바에 가리지 않게 */
+.phaseCard {
+  scroll-margin-top: 72px;
+}

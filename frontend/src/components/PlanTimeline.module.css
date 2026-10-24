@@ -1,10 +1,9 @@
-/* 전체 일정: 위에 단계 이름, 가운데 단계 막대, 아래 월 축 (모두 절대 위치, 실제 폭 기준) */
-.timeline {
-  position: relative;
-  min-width: 0;
+/* 전체 일정: 점과 세로선으로 잇는 단계 목록 */
+.list {
+  display: grid;
 }
 
-/* 단계 종류별 색: 이름 앞 이모지로 정한다 (PlanTimeline.tsx 의 KIND) */
+/* 단계 종류별 점 색: 이름 앞 이모지로 정한다 (PlanTimeline.tsx 의 KIND) */
 .start {
   --c: var(--hit);
 }
@@ -29,99 +28,131 @@
   --c: var(--muted);
 }
 
-/* 말풍선용 전역 [data-tip] { position: relative } 보다 우선하도록 .timeline 을 앞에 붙인다 */
-.timeline .bar {
+.item {
+  position: relative;
+  padding-left: 26px;
+}
+
+/* 점 사이를 잇는 세로선 (마지막 단계 아래는 없음) */
+.item::before {
+  content: '';
   position: absolute;
-  display: flex;
-  align-items: center;
-  height: 30px;
-  overflow: hidden;
-  border-radius: 6px;
-  background: color-mix(in srgb, var(--c) 20%, var(--surface-2));
-}
-
-/* 쉬어 가는 단계는 빗금 */
-.pause .bar {
-  background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--c) 28%, transparent) 0 4px, var(--surface-2) 4px 9px);
-}
-
-.timeline .bar.current {
-  background: color-mix(in srgb, var(--c) 38%, var(--surface-2));
-  box-shadow: inset 0 0 0 1.5px var(--c);
-}
-
-.inside {
-  padding: 0 8px;
-  font-size: 12.5px;
-  font-weight: 600;
-  color: color-mix(in srgb, var(--c) 30%, var(--ink));
-  white-space: nowrap;
-  pointer-events: none;
-}
-
-.callout {
-  position: absolute;
-  height: 20px;
-  line-height: 18px;
-  font-size: 12.5px;
-  font-weight: 600;
-  color: color-mix(in srgb, var(--c) 75%, var(--ink));
-  white-space: nowrap;
-  pointer-events: none;
-}
-
-/* 막대 밖 이름과 막대를 잇는 짧은 선 */
-.leader {
-  position: absolute;
-  width: 1px;
-  background: color-mix(in srgb, var(--c) 50%, transparent);
-  pointer-events: none;
-}
-
-.axis {
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 1px;
+  left: 7px;
+  top: 22px;
+  bottom: -22px;
+  width: 2px;
   background: var(--line-2);
 }
 
-.tick {
+.item:last-child::before {
+  display: none;
+}
+
+.dot {
   position: absolute;
-  height: 22px;
-  padding-top: 6px;
-  border-left: 1px solid var(--line-2);
-  font-size: 12px;
+  left: 2px;
+  top: 16px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--c);
+  box-shadow: 0 0 0 3px var(--surface);
+}
+
+.past .dot {
+  background: var(--surface-3);
+}
+
+.current .dot {
+  box-shadow:
+    0 0 0 3px var(--surface),
+    0 0 0 5px color-mix(in srgb, var(--c) 45%, transparent);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: 'name meta' 'dates dates' 'bar bar';
+  column-gap: 12px;
+  width: 100%;
+  margin: 2px 0;
+  padding: 9px 12px;
+  border-radius: var(--r-ctl);
+  text-align: left;
+}
+
+button.row:hover {
+  background: var(--surface-2);
+}
+
+.current .row {
+  background: color-mix(in srgb, var(--c) 10%, var(--surface-2));
+}
+
+.name {
+  grid-area: name;
+  min-width: 0;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dates {
+  grid-area: dates;
+  font-size: 15px;
+  color: var(--muted);
+}
+
+.meta {
+  grid-area: meta;
+  align-self: center;
+  font-size: 13px;
   color: var(--muted);
   white-space: nowrap;
 }
 
-.tick span {
-  position: relative;
-  left: 4px;
-}
-
-.year {
-  color: var(--ink-2);
-  font-weight: 600;
-}
-
-/* 오늘 */
-.today {
-  position: absolute;
-  width: 2px;
-  margin-left: -1px;
-  border-radius: 2px;
-  background: var(--ink);
-  pointer-events: none;
-}
-
-.todayLabel {
-  position: absolute;
-  padding-top: 8px;
-  font-size: 12px;
+.meta b {
   font-weight: 600;
   color: var(--ink);
-  white-space: nowrap;
-  transform: translateX(-50%);
+}
+
+.past .name,
+.past .dates {
+  color: var(--muted);
+}
+
+.progress {
+  grid-area: bar;
+  height: 6px;
+  margin-top: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--surface-3);
+}
+
+.progress i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--c);
+}
+
+/* 넓은 화면: 이름 · 날짜 · 상태를 한 줄에 */
+@media (min-width: 768px) {
+  .row {
+    grid-template-columns: minmax(0, 1fr) 150px 120px;
+    grid-template-areas: 'name dates meta' 'bar bar bar';
+    align-items: center;
+  }
+
+  .meta {
+    text-align: right;
+  }
+}
+
+.more {
+  margin: 6px 0 0 38px;
+  font-size: 13px;
+  color: var(--muted);
 }

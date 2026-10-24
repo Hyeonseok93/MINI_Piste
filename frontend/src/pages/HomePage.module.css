@@ -394,16 +394,7 @@
   padding: 16px;
 }
 
-/* ---------- 1년 플랜 ---------- */
-.planNow {
-  font-size: 14px;
-  color: var(--muted);
-}
 
-.planNow b {
-  color: var(--ink);
-  font-weight: 600;
-}
 
 .nextUp {
   display: grid;

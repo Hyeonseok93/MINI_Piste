@@ -64,7 +64,7 @@ function Phases({ phases, today }: { phases: Phase[] | undefined; today: string 
             </button>
           )}
         </div>
-        <PlanTimeline phases={phases} today={today} />
+        <PlanTimeline phases={phases} today={today} onSelect={(i) => document.getElementById(`phase-${i}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })} />
       </section>
       {editing === 'new' && (
         <section className="panel" aria-label="새 단계">
@@ -73,8 +73,8 @@ function Phases({ phases, today }: { phases: Phase[] | undefined; today: string 
         </section>
       )}
       <div className="grid cols-2">
-        {phases.map((p) => (
-          <section key={p.id} className={`panel${isCurrent(p, today) ? ` ${css.current}` : ''}`}>
+        {phases.map((p, idx) => (
+          <section key={p.id} id={`phase-${idx}`} className={`panel ${css.phaseCard}${isCurrent(p, today) ? ` ${css.current}` : ''}`}>
             <div className="panel-head">
               <h2 className="panel-title">{p.name}</h2>
               {isCurrent(p, today) && <span className="pill strength">진행 중</span>}

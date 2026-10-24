@@ -135,16 +135,11 @@ function Board({ data, today }: { data: Dashboard; today: string }) {
           <h2 className="panel-title" id="plan-title">
             전체 일정
           </h2>
-          {data.today.phase && stats.day_number != null && (
-            <span className={s.planNow}>
-              {data.today.phase}, <b className="num">{stats.day_number}</b>일째
-            </span>
-          )}
           <Link to="/plan" className="panel-link">
             플랜
           </Link>
         </div>
-        <PlanTimeline phases={data.phases} today={today} />
+        <PlanTimeline phases={data.phases} today={today} limit={3} />
       </section>
     </div>
   )
