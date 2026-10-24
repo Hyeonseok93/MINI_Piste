@@ -32,38 +32,49 @@
 /* 말풍선용 전역 [data-tip] { position: relative } 보다 우선하도록 .timeline 을 앞에 붙인다 */
 .timeline .bar {
   position: absolute;
-  height: 22px;
-  border: 1px solid color-mix(in srgb, var(--c) 55%, transparent);
-  border-radius: 4px;
-  background: color-mix(in srgb, var(--c) 14%, transparent);
+  display: flex;
+  align-items: center;
+  height: 30px;
+  overflow: hidden;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--c) 20%, var(--surface-2));
 }
 
 /* 쉬어 가는 단계는 빗금 */
 .pause .bar {
-  background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--c) 30%, transparent) 0 4px, transparent 4px 9px);
+  background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--c) 28%, transparent) 0 4px, var(--surface-2) 4px 9px);
 }
 
-.bar.current {
-  background: color-mix(in srgb, var(--c) 32%, transparent);
-  border-color: var(--c);
+.timeline .bar.current {
+  background: color-mix(in srgb, var(--c) 38%, var(--surface-2));
+  box-shadow: inset 0 0 0 1.5px var(--c);
 }
 
-.label {
-  position: absolute;
-  height: 20px;
-  line-height: 20px;
+.inside {
+  padding: 0 8px;
   font-size: 12.5px;
   font-weight: 600;
-  color: color-mix(in srgb, var(--c) 80%, var(--ink));
+  color: color-mix(in srgb, var(--c) 30%, var(--ink));
   white-space: nowrap;
   pointer-events: none;
 }
 
-/* 층을 올린 이름과 막대를 잇는 선 */
+.callout {
+  position: absolute;
+  height: 20px;
+  line-height: 18px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: color-mix(in srgb, var(--c) 75%, var(--ink));
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* 막대 밖 이름과 막대를 잇는 짧은 선 */
 .leader {
   position: absolute;
   width: 1px;
-  background: color-mix(in srgb, var(--c) 45%, transparent);
+  background: color-mix(in srgb, var(--c) 50%, transparent);
   pointer-events: none;
 }
 

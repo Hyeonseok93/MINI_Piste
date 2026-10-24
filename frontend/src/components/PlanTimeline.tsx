@@ -12,11 +12,13 @@ const DAY = 86_400_000
 const days = (a: string, b: string) => Math.round((parseISODate(b).getTime() - parseISODate(a).getTime()) / DAY)
 
 // 세로 배치(px)
-const LEVEL_H = 20 // 이름 한 층
-const MAX_LEVELS = 3
-const BAR_H = 22
-const AXIS_H = 28
-const LABEL_GAP = 10 // 같은 층 이름 사이 최소 간격
+const BAR_H = 30
+const CALLOUT_H = 20 // 막대 밖 이름 한 층
+const MAX_LEVELS = 2
+const AXIS_H = 30
+const INSIDE_PAD = 8 // 막대 안 이름 좌우 여백
+const GAP = 10 // 같은 층 이름 사이 최소 간격
+const NARROW = 560 // 이보다 좁으면(휴대폰) 막대 밖 이름은 지금·다음 단계만
 
 /** 단계 이름 앞 이모지로 종류를 정해 색을 고른다 ("🔥 감량 1단계" → cut) */
 const KIND: Record<string, string> = { '🌱': 'start', '🔥': 'cut', '🔨': 'build', '💪': 'build', '🛌': 'pause', '👔': 'event', '🎯': 'review' }
@@ -33,30 +35,44 @@ function textWidth(text: string) {
   return ctx.measureText(text).width
 }
 
-interface Label {
-  text: string
-  left: number
-  width: number
-  level: number
-  cx: number
+const nameOnly = (name: string) => (iconOf(name) ? name.split(' ').slice(1).join(' ') : name)
+
+interface Placement {
+  /** 막대 안에 쓰는 이름 (들어갈 때) */
+  inside: string | null
+  /** 막대가 좁으면 위에 올리는 이름 */
+  callout: { text: string; left: number; level: number } | null
 }
 
-/** 이름을 막대 가운데 위에 두고, 앞 이름과 겹치면 한 층 위로. 세 층에도 안 들어가면 아이콘만, 그래도 안 되면 생략 */
-function placeLabels(items: { name: string; x0: number; x1: number }[], width: number): (Label | null)[] {
-  const right = Array<number>(MAX_LEVELS).fill(-Infinity)
-  return items.map(({ name, x0, x1 }) => {
-    const cx = (x0 + x1) / 2
-    for (const text of [name, iconOf(name)].filter(Boolean)) {
+/**
+ * 이름 배치: 막대 안에 들어가면 안에 쓴다(아이콘+이름 → 이름만 순으로 시도).
+ * 안 들어가는 것만 막대 시작점 위에 올리는데, 지금·앞으로 할 단계를 먼저 자리 잡고
+ * 두 층 안에서 겹치지 않으면 쓰고, 자리가 없으면 생략한다(막대를 누르면 말풍선으로 보인다).
+ * 휴대폰처럼 좁으면 지금·다음 단계 두 개만 올린다.
+ */
+function placeNames(items: { name: string; x0: number; x1: number; order: number }[], width: number): Placement[] {
+  const out: Placement[] = items.map(({ name, x0, x1 }) => {
+    const room = x1 - x0 - INSIDE_PAD * 2
+    const inside = [name, nameOnly(name)].find((t) => textWidth(t) <= room) ?? null
+    return { inside, callout: null }
+  })
+  const taken: [number, number][][] = Array.from({ length: MAX_LEVELS }, () => [])
+  const queue = items.map((it, i) => ({ ...it, i })).filter(({ i }) => !out[i].inside)
+  queue.sort((a, b) => a.order - b.order)
+  const limit = width < NARROW ? 2 : queue.length
+  for (const { name, x0, i } of queue.slice(0, limit)) {
+    for (const text of [name, nameOnly(name)]) {
       const w = textWidth(text)
-      const left = Math.min(Math.max(cx - w / 2, 0), Math.max(width - w, 0))
-      const level = right.findIndex((r) => left >= r + LABEL_GAP)
+      const left = Math.min(Math.max(x0, 0), Math.max(width - w, 0))
+      const level = taken.findIndex((spans) => spans.every(([l, r]) => left + w + GAP <= l || left >= r + GAP))
       if (level >= 0) {
-        right[level] = left + w
-        return { text, left, width: w, level, cx }
+        taken[level].push([left, left + w])
+        out[i].callout = { text, left, level }
+        break
       }
     }
-    return null
-  })
+  }
+  return out
 }
 
 /** 월 눈금: 1월은 연도로, 나머지는 'n월'. 눈금 사이가 좁으면 건너뛴다 */
@@ -85,7 +101,7 @@ function thinTicks<T extends { x: number }>(ticks: T[], todayX: number | null, w
   return out
 }
 
-/** 전체 일정 타임라인: 아래 월 축, 단계마다 막대, 이름은 막대 위 (겹치면 층을 나눈다) */
+/** 전체 일정 타임라인: 단계마다 막대(이름은 안에, 좁으면 위에), 아래 월 축, 오늘 표시 */
 export default function PlanTimeline({ phases, today }: Props) {
   const [ref, width] = useWidth()
   if (phases.length === 0) return null
@@ -96,17 +112,19 @@ export default function PlanTimeline({ phases, today }: Props) {
   const W = width || 1
   const x = (d: string) => (Math.min(Math.max(days(start, d), 0), total) / total) * W
 
-  const bars = phases.map((p) => ({ name: p.name, x0: x(p.start_date), x1: x(addDays(p.end_date ?? p.start_date, 1)) }))
-  const labels = width ? placeLabels(bars, W) : []
-  const levels = Math.max(1, ...labels.map((l) => (l ? l.level + 1 : 0)))
-  const barTop = levels * LEVEL_H + 6
-  const height = barTop + BAR_H + AXIS_H
+  const current = phases.find((p) => p.start_date <= today && (!p.end_date || today <= p.end_date))
+  // 막대 밖 이름은 지금 단계 → 앞으로 할 단계(가까운 순) → 지난 단계 순으로 자리를 잡는다
+  const order = (p: PhaseSpan, i: number) => (p === current ? -1 : p.start_date > today ? i : 1000 + i)
+  const bars = phases.map((p, i) => ({ name: p.name, x0: x(p.start_date), x1: x(addDays(p.end_date ?? p.start_date, 1)), order: order(p, i) }))
+  const placed = width ? placeNames(bars, W) : []
+  const levels = Math.max(0, ...placed.map((p) => (p.callout ? p.callout.level + 1 : 0)))
+  const barTop = levels * CALLOUT_H + 4
+  const axisTop = barTop + BAR_H + 8
+  const height = axisTop + AXIS_H
 
   const elapsed = Math.min(Math.max(days(start, today) + 1, 0), total)
   const showToday = today >= start && today <= end
   const todayX = x(today)
-  const current = phases.find((p) => p.start_date <= today && (!p.end_date || today <= p.end_date))
-
   const shownTicks = width ? thinTicks(monthTicks(start, end, x), showToday ? todayX : null, W) : []
 
   return (
@@ -121,43 +139,42 @@ export default function PlanTimeline({ phases, today }: Props) {
         <>
           {bars.map((b, i) => {
             const p = phases[i]
-            const l = labels[i]
-            const kind = kindOf(p.name)
+            const { inside, callout } = placed[i]
             return (
-              <div key={p.name} className={s[kind]}>
+              <div key={p.name} className={s[kindOf(p.name)]}>
                 <div
                   className={`${s.bar}${p === current ? ` ${s.current}` : ''}`}
-                  style={{ left: b.x0, width: Math.max(b.x1 - b.x0, 2), top: barTop }}
+                  style={{ left: b.x0 + 1, width: Math.max(b.x1 - b.x0 - 2, 2), top: barTop }}
                   data-tip={`${p.name}, ${formatYMDot(p.start_date)}–${p.end_date ? formatYMDot(p.end_date) : ''}`}
-                />
-                {l && (
+                >
+                  {inside && <span className={s.inside}>{inside}</span>}
+                </div>
+                {callout && (
                   <>
-                    <span className={s.label} style={{ left: l.left, top: barTop - (l.level + 1) * LEVEL_H - 2 }}>
-                      {l.text}
+                    <span className={s.callout} style={{ left: callout.left, top: barTop - (callout.level + 1) * CALLOUT_H }}>
+                      {callout.text}
                     </span>
-                    {l.level > 0 && (
-                      <span
-                        className={s.leader}
-                        style={{ left: Math.min(Math.max(l.cx, b.x0 + 2), b.x1 - 2), top: barTop - l.level * LEVEL_H, height: l.level * LEVEL_H }}
-                      />
-                    )}
+                    <span
+                      className={s.leader}
+                      style={{ left: Math.min(b.x0 + 6, (b.x0 + b.x1) / 2), top: barTop - callout.level * CALLOUT_H - 3, height: callout.level * CALLOUT_H + 3 }}
+                    />
                   </>
                 )}
               </div>
             )
           })}
 
-          <div className={s.axis} style={{ top: barTop + BAR_H + 6 }} />
+          <div className={s.axis} style={{ top: axisTop }} />
           {shownTicks.map((t) => (
-            <span key={t.x} className={`${s.tick}${t.year ? ` ${s.year}` : ''}`} style={{ left: t.x, top: barTop + BAR_H + 6 }}>
+            <span key={t.x} className={`${s.tick}${t.year ? ` ${s.year}` : ''}`} style={{ left: t.x, top: axisTop }}>
               <span className="num">{t.label}</span>
             </span>
           ))}
 
           {showToday && (
             <>
-              <span className={s.today} style={{ left: todayX, top: 0, height: barTop + BAR_H + 10 }} />
-              <span className={`${s.todayLabel} num`} style={{ left: Math.min(Math.max(todayX, 30), W - 30), top: barTop + BAR_H + 6 }}>
+              <span className={s.today} style={{ left: todayX, top: barTop - 4, height: axisTop - barTop + 10 }} />
+              <span className={`${s.todayLabel} num`} style={{ left: Math.min(Math.max(todayX, 30), W - 30), top: axisTop }}>
                 오늘 {formatMD(today)}
               </span>
             </>
