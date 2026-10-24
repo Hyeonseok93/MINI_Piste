@@ -1,3 +1,31 @@
+/* 왼쪽 프로필 카드와 오른쪽 두 카드(화면·데이터)의 위·아래 끝을 맞춘다 */
+.layout {
+  display: grid;
+  gap: 16px;
+  max-width: 980px;
+}
+
+@media (min-width: 768px) {
+  .layout {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.side {
+  display: grid;
+  gap: 16px;
+  grid-template-rows: auto 1fr;
+}
+
+/* 남는 높이는 데이터 카드가 채우고, 버튼은 카드 바닥에 */
+.data {
+  grid-template-rows: auto auto auto 1fr;
+}
+
+.data > :last-child {
+  align-self: end;
+}
+
 .me {
   display: flex;
   align-items: center;

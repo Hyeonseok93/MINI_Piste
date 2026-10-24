@@ -28,7 +28,7 @@ export default function SettingsPage({ profile }: { profile: Profile }) {
         </div>
       </header>
 
-      <div className="grid cols-2 narrow-lg">
+      <div className={s.layout}>
         <section className="panel">
           <div className={s.me}>
             <span className={s.avatar}>{initial(name || profile.name)}</span>
@@ -40,7 +40,7 @@ export default function SettingsPage({ profile }: { profile: Profile }) {
           <ProfileForm initial={profile} submitLabel="프로필 저장" onNameChange={setName} onSaved={() => toast('프로필을 저장했습니다')} />
         </section>
 
-        <div className="stack loose">
+        <div className={s.side}>
           <section className="panel stack">
             <h2 className="panel-title">화면</h2>
             <div className="seg" role="group" aria-label="화면 테마">
@@ -53,7 +53,7 @@ export default function SettingsPage({ profile }: { profile: Profile }) {
             <p className="row-sub">이 기기에만 저장됩니다. 휴대폰과 PC를 따로 정할 수 있어요.</p>
           </section>
 
-          <section className="panel stack">
+          <section className={`panel stack ${s.data}`}>
             <h2 className="panel-title">데이터</h2>
             <p className="row-sub">기록은 PC의 Docker 볼륨(PostgreSQL)에 저장됩니다. 컨테이너를 꺼도 지워지지 않고, 볼륨을 지울 때만 사라집니다.</p>
             <p className="row-sub">같은 와이파이에 연결된 휴대폰에서는 PC의 IP 주소와 8080 포트로 접속하세요.</p>
