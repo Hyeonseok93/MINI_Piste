@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-// 헬스장에서 실제로 하는 흐름: 처음 시작 → 운동 모드로 세트 기록·휴식 → 루틴 수정 → 홈 체중 → 단계 기간 → 몸 기록 → 못 한 날 표시.
+// 헬스장에서 실제로 하는 흐름: 처음 시작 → 운동 모드로 세트 기록·휴식 → 루틴 수정 → 홈 체중 → 단계 기간·추가·삭제 → 몸 기록 → 못 한 날 표시.
 // 날짜는 시드 플랜 기준으로 고정한다 (2026-10-25 일요일 = 전신 A, 10/16 무게 찾기 기록 있음).
 const API = 'http://127.0.0.1:8100/api'
 
@@ -94,6 +94,23 @@ test('플랜: 단계 종료일을 날짜 선택기로 하루 당긴다', async (
   await expect(end).not.toHaveAttribute('aria-label', before!)
   await page.getByRole('button', { name: '저장', exact: true }).click()
   await expect(page.getByRole('status').filter({ hasText: '단계를 저장했습니다' })).toBeVisible()
+})
+
+test('플랜: 새 단계를 만들고 삭제한다', async ({ page }, info) => {
+  const name = `테스트 단계 ${info.project.name}`
+  await page.goto('/plan')
+  await page.getByRole('button', { name: '새 단계' }).click()
+  const form = page.getByRole('region', { name: '새 단계' })
+  await form.getByLabel('단계 이름').fill(name)
+  // 시작일은 마지막 단계 다음 날, 요일 계획은 마지막 단계 복사가 기본
+  await form.getByRole('button', { name: '단계 만들기' }).click()
+  await expect(page.getByRole('status').filter({ hasText: `${name} 단계를 만들었습니다` })).toBeVisible()
+
+  await page.getByRole('button', { name: `${name} 이름과 기간 수정` }).click()
+  await page.getByRole('button', { name: '단계 삭제' }).click()
+  await page.getByRole('alertdialog').getByRole('button', { name: '삭제' }).click()
+  await expect(page.getByRole('status').filter({ hasText: '단계를 삭제했습니다' })).toBeVisible()
+  await expect(page.getByRole('heading', { name })).toBeHidden()
 })
 
 test('몸: 오늘 체중을 저장하면 그래프에 반영된다', async ({ page }, info) => {

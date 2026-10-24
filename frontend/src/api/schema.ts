@@ -103,7 +103,11 @@ export interface paths {
         /** List Phases */
         get: operations["list_phases_api_phases_get"];
         put?: never;
-        post?: never;
+        /**
+         * Create Phase
+         * @description 새 단계. 요일 계획은 copy_from 단계에서 복사하거나, 없으면 7일 모두 휴식.
+         */
+        post: operations["create_phase_api_phases_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -180,7 +184,11 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        delete?: never;
+        /**
+         * Delete Phase
+         * @description 단계 삭제. 그 기간의 운동 기록은 남고, 계획만 사라진다.
+         */
+        delete: operations["delete_phase_api_phases__phase_id__delete"];
         options?: never;
         head?: never;
         /** Update Phase */
@@ -996,6 +1004,20 @@ export interface components {
              */
             e1rm_date: string;
         };
+        /** PhaseCreate */
+        PhaseCreate: {
+            /** Name */
+            name: string;
+            /**
+             * Start Date
+             * Format: date
+             */
+            start_date: string;
+            /** End Date */
+            end_date?: string | null;
+            /** Copy From */
+            copy_from?: number | null;
+        };
         /** PhaseDayIn */
         PhaseDayIn: {
             kind: components["schemas"]["DayKind"];
@@ -1523,6 +1545,39 @@ export interface operations {
             };
         };
     };
+    create_phase_api_phases_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PhaseCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PhaseOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_routines_api_routines_get: {
         parameters: {
             query?: never;
@@ -1694,6 +1749,35 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["RoutineOut"];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_phase_api_phases__phase_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                phase_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {

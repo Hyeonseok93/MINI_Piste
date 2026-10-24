@@ -132,6 +132,32 @@ def test_phase_dates_validation(client):
     assert client.patch(f"/api/phases/{first['id']}", json={"name": "복귀 첫 주"}).json()["name"] == "복귀 첫 주"
 
 
+def test_create_phase_copies_days_and_delete(client):
+    phases = client.get("/api/phases").json()
+    last = phases[-1]
+    body = {"name": "🏁 2년차", "start_date": "2027-11-01", "end_date": "2028-01-31", "copy_from": last["id"]}
+    r = client.post("/api/phases", json=body)
+    assert r.status_code == 201
+    new = r.json()
+    assert [d["kind"] for d in new["days"]] == [d["kind"] for d in last["days"]]
+    # 새 단계 기간의 달력이 복사한 계획을 따른다
+    nov = client.get("/api/calendar", params={"month": "2027-11"}).json()
+    assert nov[0]["phase"] == "🏁 2년차"
+
+    # 겹치는 기간, 거꾸로 된 날짜는 거절
+    assert client.post("/api/phases", json={**body, "name": "겹침"}).status_code == 409
+    backwards = {"name": "x", "start_date": "2029-02-01", "end_date": "2029-01-01"}
+    assert client.post("/api/phases", json=backwards).status_code == 422
+
+    # 복사 없이 만들면 7일 모두 휴식
+    blank = client.post("/api/phases", json={"name": "빈 단계", "start_date": "2028-02-01"}).json()
+    assert len(blank["days"]) == 7 and {d["kind"] for d in blank["days"]} == {"rest"}
+
+    assert client.delete(f"/api/phases/{blank['id']}").status_code == 204
+    assert client.delete(f"/api/phases/{blank['id']}").status_code == 404
+    assert len(client.get("/api/phases").json()) == len(phases) + 1
+
+
 # --- 월말 측정 -------------------------------------------------------------------
 def test_measurement_with_weekly_weight_average(client):
     for d, w in [("2026-10-25", 109.0), ("2026-10-28", 108.0), ("2026-10-31", 107.0), ("2026-10-20", 120.0)]:

@@ -1,3 +1,5 @@
+from datetime import date
+
 from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy import or_, select, update
 from sqlalchemy.orm import Session, selectinload
@@ -6,6 +8,7 @@ from app.db import get_db
 from app.models import DayKind, Exercise, Phase, PhaseDay, Routine, RoutineItem, Workout
 from app.schemas import (
     DayPlanOut,
+    PhaseCreate,
     PhaseDayIn,
     PhaseOut,
     PhaseUpdate,
@@ -151,6 +154,47 @@ def _load_phase(db: Session, phase_id: int) -> Phase:
     return p
 
 
+def _check_overlap(db: Session, start: date, end: date | None, exclude_id: int | None = None) -> None:
+    """다른 단계와 기간이 겹치면 날짜별 계획이 모호해지므로 막는다."""
+    q = select(Phase) if exclude_id is None else select(Phase).where(Phase.id != exclude_id)
+    for other in db.scalars(q):
+        o_end = other.end_date or other.start_date
+        if start <= o_end and (end is None or other.start_date <= end):
+            raise HTTPException(409, f"'{other.name}' 단계와 기간이 겹칩니다")
+
+
+@router.post("/phases", response_model=PhaseOut, status_code=201)
+def create_phase(body: PhaseCreate, db: Session = Depends(get_db)):
+    """새 단계. 요일 계획은 copy_from 단계에서 복사하거나, 없으면 7일 모두 휴식."""
+    _check_overlap(db, body.start_date, body.end_date)
+    if body.copy_from is not None:
+        days = [
+            PhaseDay(
+                weekday=d.weekday,
+                kind=d.kind,
+                label=d.label,
+                routine_id=d.routine_id,
+                alt_routine_id=d.alt_routine_id,
+                cardio_minutes=d.cardio_minutes,
+            )
+            for d in _load_phase(db, body.copy_from).days
+        ]
+    else:
+        days = [PhaseDay(weekday=w, kind=DayKind.rest, label="휴식") for w in range(7)]
+    p = Phase(name=body.name.strip(), start_date=body.start_date, end_date=body.end_date, days=days)
+    db.add(p)
+    db.commit()
+    return _load_phase(db, p.id)
+
+
+@router.delete("/phases/{phase_id}", status_code=204)
+def delete_phase(phase_id: int, db: Session = Depends(get_db)):
+    """단계 삭제. 그 기간의 운동 기록은 남고, 계획만 사라진다."""
+    db.delete(_load_phase(db, phase_id))
+    db.commit()
+    return Response(status_code=204)
+
+
 @router.patch("/phases/{phase_id}", response_model=PhaseOut)
 def update_phase(phase_id: int, body: PhaseUpdate, db: Session = Depends(get_db)):
     p = _load_phase(db, phase_id)
@@ -159,11 +203,7 @@ def update_phase(phase_id: int, body: PhaseUpdate, db: Session = Depends(get_db)
     end = data.get("end_date", p.end_date)
     if end is not None and start > end:
         raise HTTPException(422, "시작일이 종료일보다 늦을 수 없습니다")
-    # 다른 단계와 기간이 겹치면 날짜별 계획이 모호해진다
-    for other in db.scalars(select(Phase).where(Phase.id != phase_id)):
-        o_end = other.end_date or other.start_date
-        if start <= o_end and (end is None or other.start_date <= end):
-            raise HTTPException(409, f"'{other.name}' 단계와 기간이 겹칩니다")
+    _check_overlap(db, start, end, exclude_id=phase_id)
     for k, v in data.items():
         setattr(p, k, v)
     db.commit()

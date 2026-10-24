@@ -29,6 +29,7 @@ export type RoutineUpdate = S['RoutineUpdate']
 export type RoutineItemInput = S['RoutineItemIn']
 export type PhaseDay = S['PhaseDayOut']
 export type Phase = S['PhaseOut']
+export type PhaseCreate = S['PhaseCreate']
 export type PhaseUpdate = S['PhaseUpdate']
 export type PhaseDayInput = S['PhaseDayIn']
 

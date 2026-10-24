@@ -62,8 +62,22 @@ function Phases({ phases, today }: { phases: Phase[] | undefined; today: string 
   return (
     <div className="grid">
       <section className="panel">
+        <div className="panel-head">
+          <h2 className="panel-title">1년 플랜</h2>
+          {editing !== 'new' && (
+            <button type="button" className="btn btn-primary btn-sm" onClick={() => setEditing('new')}>
+              <PlusIcon /> 새 단계
+            </button>
+          )}
+        </div>
         <PisteTimeline phases={phases} today={today} />
       </section>
+      {editing === 'new' && (
+        <section className="panel" aria-label="새 단계">
+          <h2 className="panel-title mb-lg">새 단계</h2>
+          <PhaseEditor phases={phases} onDone={() => setEditing(null)} />
+        </section>
+      )}
       <div className="grid cols-2">
         {phases.map((p) => (
           <section key={p.id} className={`panel${isCurrent(p, today) ? ` ${css.current}` : ''}`}>
@@ -77,7 +91,7 @@ function Phases({ phases, today }: { phases: Phase[] | undefined; today: string 
               )}
             </div>
             {editing === `${p.id}-period` ? (
-              <PhaseEditor phase={p} onDone={() => setEditing(null)} />
+              <PhaseEditor phase={p} phases={phases} onDone={() => setEditing(null)} />
             ) : (
               <>
                 <p className={`num ${css.dates}`}>
@@ -149,7 +163,7 @@ function Routines() {
             <span className={css.count}>{r.item_count}</span>
           </button>
         ))}
-        <button className="btn btn-ghost btn-sm" onClick={addRoutine} disabled={create.isPending}>
+        <button className="btn btn-primary btn-sm" onClick={addRoutine} disabled={create.isPending}>
           <PlusIcon /> 새 루틴
         </button>
       </div>

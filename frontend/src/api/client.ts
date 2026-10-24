@@ -19,6 +19,7 @@ import type {
   PersonalRecord,
   Phase,
   PhaseDayInput,
+  PhaseCreate,
   PhaseUpdate,
   Profile,
   ProfileInput,
@@ -94,6 +95,8 @@ export const api = {
 
   // 플랜
   phases: () => request<Phase[]>('/phases'),
+  createPhase: (body: PhaseCreate) => request<Phase>('/phases', json('POST', body)),
+  deletePhase: (id: number) => request<void>(`/phases/${id}`, del),
   updatePhase: (id: number, body: PhaseUpdate) => request<Phase>(`/phases/${id}`, json('PATCH', body)),
   setPhaseDay: (id: number, weekday: number, body: PhaseDayInput) => request<Phase>(`/phases/${id}/days/${weekday}`, json('PUT', body)),
   routines: () => request<RoutineSummary[]>('/routines'),

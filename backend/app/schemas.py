@@ -144,6 +144,20 @@ class RoutineUpdate(BaseModel):
     description: str | None = Field(default=None, max_length=200)
 
 
+class PhaseCreate(BaseModel):
+    name: str = Field(min_length=1, max_length=80)
+    start_date: date
+    end_date: date | None = None
+    # 요일 계획을 복사해 올 단계. 없으면 7일 모두 휴식으로 시작한다
+    copy_from: int | None = None
+
+    @model_validator(mode="after")
+    def _dates_in_order(self):
+        if self.end_date is not None and self.start_date > self.end_date:
+            raise ValueError("시작일이 종료일보다 늦을 수 없습니다")
+        return self
+
+
 class PhaseUpdate(BaseModel):
     name: str | None = Field(default=None, min_length=1, max_length=80)
     start_date: date | None = None

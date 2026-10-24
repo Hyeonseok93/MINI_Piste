@@ -241,6 +241,46 @@
             }
           }
         }
+      },
+      "post": {
+        "tags": [
+          "plan"
+        ],
+        "summary": "Create Phase",
+        "description": "새 단계. 요일 계획은 copy_from 단계에서 복사하거나, 없으면 7일 모두 휴식.",
+        "operationId": "create_phase_api_phases_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PhaseCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PhaseOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/routines": {
@@ -491,6 +531,40 @@
       }
     },
     "/api/phases/{phase_id}": {
+      "delete": {
+        "tags": [
+          "plan"
+        ],
+        "summary": "Delete Phase",
+        "description": "단계 삭제. 그 기간의 운동 기록은 남고, 계획만 사라진다.",
+        "operationId": "delete_phase_api_phases__phase_id__delete",
+        "parameters": [
+          {
+            "name": "phase_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Phase Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
       "patch": {
         "tags": [
           "plan"
@@ -3336,6 +3410,50 @@
           "e1rm_date"
         ],
         "title": "PersonalRecord"
+      },
+      "PhaseCreate": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "start_date": {
+            "type": "string",
+            "format": "date",
+            "title": "Start Date"
+          },
+          "end_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End Date"
+          },
+          "copy_from": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Copy From"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "start_date"
+        ],
+        "title": "PhaseCreate"
       },
       "PhaseDayIn": {
         "properties": {
