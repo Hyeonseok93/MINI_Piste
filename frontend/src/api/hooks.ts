@@ -7,6 +7,7 @@ import type {
   ExerciseUpdate,
   MeasurementInput,
   PhaseDayInput,
+  PhaseUpdate,
   ProfileInput,
   RoutineCreate,
   RoutineItemInput,
@@ -78,6 +79,7 @@ export const useCreateRoutine = () => usePlanMutation((body: RoutineCreate) => a
 export const useUpdateRoutine = () => usePlanMutation(({ id, body }: { id: number; body: RoutineUpdate }) => api.updateRoutine(id, body))
 export const useSetRoutineItems = () => usePlanMutation(({ id, items }: { id: number; items: RoutineItemInput[] }) => api.setRoutineItems(id, items))
 export const useDeleteRoutine = () => usePlanMutation((id: number) => api.deleteRoutine(id))
+export const useUpdatePhase = () => usePlanMutation(({ id, body }: { id: number; body: PhaseUpdate }) => api.updatePhase(id, body))
 export const useSetPhaseDay = () =>
   usePlanMutation(({ id, weekday, body }: { id: number; weekday: number; body: PhaseDayInput }) => api.setPhaseDay(id, weekday, body))
 export const useCreateExercise = () => usePlanMutation((body: ExerciseCreate) => api.createExercise(body))

@@ -1,0 +1,135 @@
+.picker {
+  position: relative;
+  min-width: 0;
+}
+
+.trigger {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  height: 46px;
+  padding: 0 14px;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-ctl);
+  background: var(--surface-2);
+  text-align: left;
+  transition: border-color 120ms ease;
+}
+
+.trigger:hover {
+  border-color: color-mix(in srgb, var(--ink) 22%, transparent);
+}
+
+.open .trigger,
+.trigger:focus-visible {
+  border-color: var(--primary);
+  box-shadow: var(--focus);
+}
+
+.icon {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  color: var(--muted);
+}
+
+.value {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.placeholder {
+  color: var(--muted);
+}
+
+.pop {
+  position: absolute;
+  left: 0;
+  top: calc(100% + 6px);
+  z-index: 30;
+  width: 300px;
+  max-width: calc(100vw - 32px);
+  padding: 10px;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-ctl);
+  background: var(--surface);
+  box-shadow: var(--shadow-pop);
+  animation: pop-in 140ms ease-out;
+}
+
+.up .pop {
+  top: auto;
+  bottom: calc(100% + 6px);
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.month {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.weekdays,
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 2px;
+}
+
+.weekdays span {
+  padding: 4px 0;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.day {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.day:hover:not(:disabled) {
+  background: var(--surface-2);
+}
+
+.day:focus-visible {
+  border-radius: 50%;
+}
+
+.today {
+  box-shadow: inset 0 0 0 1.5px var(--line-2);
+}
+
+.selected,
+.selected:hover:not(:disabled) {
+  background: var(--primary);
+  color: var(--primary-ink);
+}
+
+.day:disabled {
+  opacity: 0.3;
+}
+
+.foot {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+}

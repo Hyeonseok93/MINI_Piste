@@ -4,6 +4,8 @@ import type { Phase } from '../api/types'
 import PisteTimeline from '../components/PisteTimeline'
 import ExerciseEditor from '../components/plan/ExerciseEditor'
 import PhaseDayEditor from '../components/plan/PhaseDayEditor'
+import PhaseEditor from '../components/plan/PhaseEditor'
+import css from '../components/plan/Plan.module.css'
 import RoutineEditor from '../components/plan/RoutineEditor'
 import { PlusIcon } from '../components/icons'
 import { useToast } from '../components/Toast'
@@ -35,7 +37,7 @@ export default function PlanPage() {
           <h1 className="page-title">플랜</h1>
           <p className="page-sub">
             요일 계획과 루틴, 종목을 여기서 바꿉니다.
-            {current && ` 지금은 ${trainDays.join('·')} 운동, ${restDays.join('·')} 휴식.`}
+            {current && ` 지금은 ${trainDays.join('·')} 운동, ${restDays.join('·')} 휴식이에요.`}
           </p>
         </div>
         <div className="seg" role="tablist">
@@ -64,44 +66,55 @@ function Phases({ phases, today }: { phases: Phase[] | undefined; today: string 
       </section>
       <div className="grid cols-2">
         {phases.map((p) => (
-          <section key={p.id} className={`panel${isCurrent(p, today) ? ' panel-current' : ''}`}>
+          <section key={p.id} className={`panel${isCurrent(p, today) ? ` ${css.current}` : ''}`}>
             <div className="panel-head">
               <h2 className="panel-title">{p.name}</h2>
               {isCurrent(p, today) && <span className="pill strength">진행 중</span>}
+              {editing !== `${p.id}-period` && (
+                <button type="button" className="btn btn-ghost btn-sm" onClick={() => setEditing(`${p.id}-period`)} aria-label={`${p.name} 이름과 기간 수정`}>
+                  기간 수정
+                </button>
+              )}
             </div>
-            <p className="row-sub num num-md phase-dates">
-              {formatShort(p.start_date)} – {p.end_date ? formatShort(p.end_date) : ''}
-            </p>
-            <ul className="rows">
-              {[...p.days]
-                .sort((a, b) => a.weekday - b.weekday)
-                .map((d) => {
-                  const key = `${p.id}-${d.weekday}`
-                  return (
-                    <li key={d.weekday} className="compact block">
-                      {editing === key ? (
-                        <PhaseDayEditor phaseId={p.id} day={d} onDone={() => setEditing(null)} />
-                      ) : (
-                        <button type="button" className="row row-button day-row" onClick={() => setEditing(key)} aria-label={`${weekdayLabel(d.weekday)}요일 계획 수정`}>
-                          <span className="muted wd-label">{weekdayLabel(d.weekday)}</span>
-                          <span className={`dot ${d.kind}`} />
-                          <span className={`grow${d.kind === 'rest' ? ' muted' : ''}`}>
-                            {d.routine ? (
-                              <>
-                                <b>{shortTitle(d)}</b>
-                                {d.alt_routine && <span className="muted">, 격주 {d.alt_routine.name}</span>}
-                              </>
-                            ) : (
-                              d.label
-                            )}
-                          </span>
-                          <span className="muted edit-hint">수정</span>
-                        </button>
-                      )}
-                    </li>
-                  )
-                })}
-            </ul>
+            {editing === `${p.id}-period` ? (
+              <PhaseEditor phase={p} onDone={() => setEditing(null)} />
+            ) : (
+              <>
+                <p className={`num ${css.dates}`}>
+                  {formatShort(p.start_date)} – {p.end_date ? formatShort(p.end_date) : '끝 없음'}
+                </p>
+                <ul className={css.days}>
+                  {[...p.days]
+                    .sort((a, b) => a.weekday - b.weekday)
+                    .map((d) => {
+                      const key = `${p.id}-${d.weekday}`
+                      return (
+                        <li key={d.weekday} className="block">
+                          {editing === key ? (
+                            <PhaseDayEditor phaseId={p.id} day={d} onDone={() => setEditing(null)} />
+                          ) : (
+                            <button type="button" className={css.dayRow} onClick={() => setEditing(key)} aria-label={`${weekdayLabel(d.weekday)}요일 계획 수정`}>
+                              <span className={css.wd}>{weekdayLabel(d.weekday)}</span>
+                              <span className={`dot ${d.kind}`} />
+                              <span className={`grow${d.kind === 'rest' ? ' muted' : ''}`}>
+                                {d.routine ? (
+                                  <>
+                                    <b>{shortTitle(d)}</b>
+                                    {d.alt_routine && <span className="muted">, 격주 {d.alt_routine.name}</span>}
+                                  </>
+                                ) : (
+                                  d.label
+                                )}
+                              </span>
+                              <span className={css.editHint}>수정</span>
+                            </button>
+                          )}
+                        </li>
+                      )
+                    })}
+                </ul>
+              </>
+            )}
           </section>
         ))}
       </div>
@@ -133,7 +146,7 @@ function Routines() {
         {data?.map((r) => (
           <button key={r.id} className={`btn btn-sm ${r.id === selected ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setId(r.id)}>
             {r.name}
-            <span className="muted-inline">{r.item_count}</span>
+            <span className={css.count}>{r.item_count}</span>
           </button>
         ))}
         <button className="btn btn-ghost btn-sm" onClick={addRoutine} disabled={create.isPending}>
@@ -156,7 +169,7 @@ function Exercises() {
   return (
     <div className="grid">
       <div className="row wrap">
-        <input className="input search-input" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="종목 검색" aria-label="종목 검색" />
+        <input className={`input ${css.search}`} value={query} onChange={(e) => setQuery(e.target.value)} placeholder="종목 검색" aria-label="종목 검색" />
         <label className="check">
           <input type="checkbox" checked={showArchived} onChange={(e) => setShowArchived(e.target.checked)} />
           보관한 종목도 보기
@@ -174,7 +187,7 @@ function Exercises() {
       )}
       <div className="grid cols-2">
         {list.map((e) => (
-          <section key={e.id} className={`panel stack tight${e.archived ? ' is-archived' : ''}`}>
+          <section key={e.id} className={`panel stack tight${e.archived ? ` ${css.archived}` : ''}`}>
             <div className="row">
               <div className="grow">
                 <h3 className="row-title">
